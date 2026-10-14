@@ -74,6 +74,16 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     client, month, clients_root, outputs_root = args.client, args.month, args.clients_root, args.outputs_root
     sys.stdout.reconfigure(encoding="utf-8")
+    # Validate before any path is built: a client like '../x' would otherwise write outside the outputs folder.
+    if not run_client.CLIENT_ID.match(client):
+        print(f"ERROR: invalid client id {client!r}; use lowercase letters, digits, '-' or '_' (e.g. abc).")
+        return 2
+    if not monthly_review.MONTH.match(month):
+        print(f"ERROR: month must look like 2026-06, got {month!r}.")
+        return 2
+    if not (Path(clients_root) / client / "config.yaml").is_file():
+        print(f"ERROR: unknown client {client!r}: no {Path(clients_root) / client / 'config.yaml'}. Add a config (see 02_skill/README.md).")
+        return 2
     out_dir = outputs_root / client
     approval = out_dir / f"approval_{month}.json"
     if approval.is_file() and json.loads(approval.read_text(encoding="utf-8")).get("status") == "approved":

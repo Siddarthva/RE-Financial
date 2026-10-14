@@ -37,7 +37,14 @@ def load_config(client: str, clients_root: Path = CLIENTS_ROOT) -> dict:
     if not CLIENT_ID.match(client):
         raise ValueError(f"Invalid client id {client!r}; use lowercase letters, digits, '-' or '_'.")
     path = Path(clients_root) / client / "config.yaml"
-    cfg = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not path.is_file():
+        raise ValueError(f"Unknown client {client!r}: {path} not found. Add a client config (see 02_skill/README.md).")
+    try:
+        cfg = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except yaml.YAMLError as exc:
+        raise ValueError(f"{path} is not valid YAML ({exc.__class__.__name__}, {getattr(exc, 'problem_mark', '')}).".replace(" ,", ""))
+    if not isinstance(cfg, dict):
+        raise ValueError(f"{path} must be a YAML mapping of settings.")
     missing = [k for k in REQUIRED if k not in cfg]
     wrong = [k for k, t in REQUIRED.items() if k in cfg and not isinstance(cfg[k], t)]
     if missing or wrong:

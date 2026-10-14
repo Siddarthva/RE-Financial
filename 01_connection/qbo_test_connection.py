@@ -168,6 +168,7 @@ def main() -> int:
         return 2
     client = sys.argv[1]
     if not re.match(r"^[a-z0-9][a-z0-9_-]{0,63}$", client):
+        print(f"ERROR: invalid client id {client!r}; use lowercase letters, digits, '-' or '_' (e.g. abc).")
         return 2
     d = OUT / client
     d.mkdir(parents=True, exist_ok=True)

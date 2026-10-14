@@ -11,8 +11,10 @@ from paths import PROJECT  # noqa: E402
 def _run(args: list[str], timeout: int = 180) -> tuple[bool, str]:
     try:
         r = subprocess.run([sys.executable, *args], cwd=PROJECT, capture_output=True, text=True, timeout=timeout, encoding="utf-8")
+    except subprocess.TimeoutExpired:
+        return False, f"{args[0]} did not finish within {timeout} seconds and was stopped. Run it from a terminal to see its progress."
     except (OSError, subprocess.SubprocessError) as exc:
-        return False, f"Could not start script: {type(exc).__name__}"
+        return False, f"Could not start {args[0]}: {type(exc).__name__}"
     text = (r.stdout + r.stderr).strip()
     return r.returncode == 0, text[-1500:]
 

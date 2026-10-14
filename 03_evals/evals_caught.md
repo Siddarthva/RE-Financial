@@ -116,3 +116,13 @@ Thin coverage worth knowing (caught, but by a single eval): adapter gross-margin
 | No warning for an outlier ×1000, zero revenue, or a look-alike label | F16, F17, F23 | `run_client.cell_warnings`: outlier over 100× the median month (ABC's largest normal ratio is ~54×), zero revenue, non-ASCII labels | `test_outlier_and_lookalike_warnings_and_none_on_clean_data` |
 | Found by the suite in this phase's own new code: the gap warning crashed on `Period` formatting | F02 | `strftime` | `test_gap_warning_names_the_month` |
 | Found while writing the suite: the outlier screen took 9 s per call | — | Vectorised (0.06 s) | — |
+
+## Workflow failure modes (2026-10-14, Phase 3: `04_architecture/workflows/`)
+
+19 failure modes across workflows a–g were run by hand. Before the fixes, 10 failed badly: 8 tracebacks, 1 silent exit, and 1 overwrite of a saved file. 2 more surfaced raw library errors (`DateParseError`, `FileNotFoundError`). All now give one clear line; guarded by `tests/test_workflow_failures.py` (12 tests).
+- **Path traversal:** `run_pipeline.py ../x 2026-06` built `outputs/../x/` before validating the id, and `client_sandbox` created `outputs/<client>/.tmp` for any id. Both now refuse invalid ids before building a path.
+- **Tracebacks on the skill path:** `monthly_review.py prepare/build` crashed on refused intake, bad month, unknown client, or a missing or invalid packet, commentary or verdict. Now one `ERROR:` line naming the file and the next step.
+- **Loader:** a bad `--from` and a missing or invalid `--compare` file crashed. An empty range exited 0 and **overwrote `outputs/abc/qbo_load_plan.json` with an empty plan** (found when the probe did exactly that; restored from git). Now a usage error, or a message with nothing written.
+- **`approve.py`:** a damaged decision or verdict file crashed. Now it refuses, exits 5 and records nothing.
+- **`qbo_test_connection.py`:** an invalid client id exited 2 with no output; `package_submission.py` crashed without git. The UI reported a timeout as "Could not start script".
+- Not built: re-run as v2 after approval (a controls decision; see `04_architecture/workflows/c_approve_reject_lock.md`).

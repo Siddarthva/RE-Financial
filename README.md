@@ -12,6 +12,7 @@ This repo is a submission for RE Financial Services' "Build Exercise — AI Solu
 | 4. One-page architecture | [`04_architecture/`](04_architecture/) | [`architecture.md`](04_architecture/architecture.md) |
 | Requirement-by-requirement status | [`04_architecture/`](04_architecture/) | [`brief_traceability.md`](04_architecture/brief_traceability.md) |
 | Close workflow (6 stages) | [`04_architecture/`](04_architecture/) | [`workflow.md`](04_architecture/workflow.md) |
+| Workflow failure modes (a–g) | [`04_architecture/workflows/`](04_architecture/workflows/) | [`README.md`](04_architecture/workflows/README.md): inputs, outputs, gates, messages, idempotency, tests |
 | Optional review UI | [`05_review_workspace/`](05_review_workspace/) | [`app/Home.py`](05_review_workspace/app/Home.py) |
 
 ## Latest results (2026-10-14, clean-state re-run: [`verification_matrix.md`](04_architecture/verification_matrix.md))

@@ -42,9 +42,14 @@ def main() -> int:
     path = d / f"approval_{a.period}.json"
     if not packet.is_file():
         return fail(f"no review packet for {a.client} {a.period}; run the pipeline first")
-    if path.is_file() and json.loads(path.read_text(encoding="utf-8")).get("status") == "approved":
+    try:
+        existing = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+        verdict = json.loads(review.read_text(encoding="utf-8")).get("verdict") if review.is_file() else None
+    except ValueError as exc:  # never guess a decision from a damaged file
+        return fail(f"cannot read an existing decision or verdict file as JSON ({exc.__class__.__name__}); "
+                    f"check {path.name} and {review.name} in outputs/{a.client}/. Nothing was recorded.", 5)
+    if existing.get("status") == "approved":
         return fail(f"{a.client} {a.period} is approved and locked", 3)
-    verdict = json.loads(review.read_text(encoding="utf-8")).get("verdict") if review.is_file() else None
     status = "rejected" if a.reject else "approved"
     if status == "approved" and verdict != "approve":
         return fail(f"cannot approve: finance-reviewer verdict is {verdict!r}, not 'approve'", 4)

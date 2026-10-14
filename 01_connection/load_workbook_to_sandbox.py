@@ -23,6 +23,7 @@ import base64
 import hashlib
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.parse
@@ -275,13 +276,25 @@ def main(argv=None):
     ap.add_argument("--from", dest="start", metavar="YYYY-MM"), ap.add_argument("--to", dest="end", metavar="YYYY-MM")
     args = ap.parse_args(argv)
     sys.stdout.reconfigure(encoding="utf-8")
+    for flag, v in (("--from", args.start), ("--to", args.end)):
+        if v is not None and not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", v):
+            ap.error(f"{flag} must look like 2026-06, got {v!r}")
+    if args.start and args.end and args.start > args.end:
+        ap.error(f"--from {args.start} is after --to {args.end}")
     if args.apply and not args.env_file.exists():  # fail before any file or network side effect
         raise SystemExit(f"--apply needs the write-scoped env file: {args.env_file} (not found; nothing was changed)")
     monthly = load_monthly_totals()
     out_dir = run_client.OUTPUTS_ROOT / CLIENT
 
     if args.compare:
-        diffs, names = compare(json.loads(args.compare.read_text(encoding="utf-8")), monthly)
+        try:
+            pnl = json.loads(args.compare.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            raise SystemExit(f"--compare file not found: {args.compare}. Save a QBO monthly P&L first "
+                             "(01_connection/evidence/quickbooks/capture_dated.py).")
+        except ValueError:
+            raise SystemExit(f"--compare file is not valid JSON: {args.compare}. Use the redacted P&L response saved by capture_dated.py.")
+        diffs, names = compare(pnl, monthly)
         lines = ["# QBO vs workbook", "", f"QBO P&L: `{args.compare.name}`. Workbook: ABC monthly totals.", ""]
         lines += ["No differences in the three loaded accounts." if not diffs else "| Metric | Month | Workbook | QBO | QBO - workbook | Note |\n|---|---|---|---|---|---|"]
         lines += [f"| {d['metric']} | {d['month']} | {d['workbook']} | {d['qbo']} | {d['diff']} | {d['note']} |" for d in diffs]
@@ -291,6 +304,9 @@ def main(argv=None):
         return 1 if diffs else 0
 
     plan = build_plan(monthly, args.start, args.end)
+    if not plan:  # never replace a saved plan with an empty one
+        raise SystemExit(f"No workbook months between {args.start or 'the start'} and {args.end or 'the end'} "
+                         f"(workbook: {pd.Timestamp(monthly['month'].min()):%Y-%m} to {pd.Timestamp(monthly['month'].max()):%Y-%m}); nothing was written.")
     print(f"{'APPLY' if args.apply else 'DRY RUN'}: {len(plan)} journal entries, Jan 2025-Jun 2026 workbook totals (sandbox only)\n")
     print(f"{'Doc':<12}{'Date':<12}{'Income':>14}{'COGS':>14}{'Opex':>16}{'Clearing':>16}  Net income (workbook)")
     for e in plan:

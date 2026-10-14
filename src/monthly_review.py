@@ -165,12 +165,29 @@ def _sheet(wb, title, header, rows):
     return excel_layout.polish_sheet(ws, wrap=NOTE_COLUMNS, formats=ID_FORMATS)
 
 
+def _read(path, what, fix, as_json=False):
+    """Read an input file, or raise ValueError saying which file and what to do next."""
+    path = Path(path)
+    if not path.is_file():
+        raise ValueError(f"{what} not found: {path}. {fix}")
+    text = path.read_text(encoding="utf-8")
+    if not as_json:
+        return text
+    try:
+        return json.loads(text)
+    except ValueError as exc:
+        raise ValueError(f"{what} is not valid JSON: {path} (line {getattr(exc, 'lineno', '?')}). {fix}") from None
+
+
 def build(client, month_text, commentary_path, review_path, clients_root=run_client.CLIENTS_ROOT, outputs_root=run_client.OUTPUTS_ROOT):
+    if not run_client.CLIENT_ID.match(client) or not MONTH.match(month_text):
+        raise ValueError(f"Client must be an id like 'abc' and month like 2026-06; got {client!r} {month_text!r}.")
     with client_sandbox(client, clients_root, outputs_root):
         out_dir = Path(outputs_root) / client
-        packet = json.loads((out_dir / f"review_packet_{month_text}.json").read_text(encoding="utf-8"))
-        text = Path(commentary_path).read_text(encoding="utf-8")
-        review = json.loads(Path(review_path).read_text(encoding="utf-8"))
+        packet = _read(out_dir / f"review_packet_{month_text}.json", "Review packet",
+                       f"Run 'python src/monthly_review.py prepare {client} {month_text}' first.", as_json=True)
+        text = _read(commentary_path, "Commentary file", "Save the drafted commentary first (step 3 of /monthly-analysis).")
+        review = _read(review_path, "Reviewer verdict", "Save the finance-reviewer's JSON verdict first (step 4 of /monthly-analysis).", as_json=True)
         statements = parse_statements(text)
         overall = grade(text, packet)
         notes = {n["statement"]: n for n in review.get("statement_notes", [])}
@@ -225,7 +242,7 @@ def build(client, month_text, commentary_path, review_path, clients_root=run_cli
     return target, approved
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("prepare")
@@ -233,14 +250,20 @@ def main():
     b = sub.add_parser("build")
     b.add_argument("client"), b.add_argument("month")
     b.add_argument("--commentary", required=True), b.add_argument("--review", required=True)
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
     sys.stdout.reconfigure(encoding="utf-8")
-    if args.cmd == "prepare":
-        print(f"packet: {prepare(args.client, args.month)}")
-    else:
-        path, approved = build(args.client, args.month, args.commentary, args.review)
-        print(f"workbook: {path}\nverdict: {'APPROVED' if approved else 'CHANGES REQUIRED'}")
+    try:
+        if args.cmd == "prepare":
+            print(f"packet: {prepare(args.client, args.month)}")
+        else:
+            path, approved = build(args.client, args.month, args.commentary, args.review)
+            print(f"workbook: {path}\nverdict: {'APPROVED' if approved else 'CHANGES REQUIRED'}")
+    except (ValueError, FileNotFoundError, PermissionError) as exc:
+        # Expected failures (refused intake, bad input, missing file, isolation) get one clear line, not a traceback.
+        print(f"ERROR: {exc}")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

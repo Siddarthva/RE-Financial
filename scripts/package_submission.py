@@ -20,7 +20,11 @@ import scan_secrets  # noqa: E402
 
 
 def tracked_files() -> list[str]:
-    run = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True, check=True)
+    try:
+        run = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True, check=True)
+    except (OSError, subprocess.CalledProcessError):
+        raise SystemExit("Cannot list tracked files: git is not installed or this folder is not a git repository. "
+                         "The zip is built from git-tracked files only, so nothing was written.")
     names = [n for n in run.stdout.decode("utf-8").split("\0") if n]
     return [n for n in names if (ROOT / n).is_file()]  # skip entries deleted in the working tree
 

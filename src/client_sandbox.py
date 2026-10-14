@@ -12,6 +12,7 @@ a shared source workbook declared in the client's config) stay readable.
 """
 from __future__ import annotations
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -19,6 +20,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 _active: "ClientSandbox | None" = None
+_CLIENT_ID = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")  # same rule as run_client.CLIENT_ID
 _WRITE_FLAGS = os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_APPEND | os.O_TRUNC
 _MUTATING_EVENTS = {"os.mkdir", "os.rename", "os.replace", "os.remove", "os.rmdir", "shutil.rmtree", "shutil.copyfile"}
 
@@ -84,6 +86,8 @@ sys.addaudithook(_audit)
 def client_sandbox(client: str, clients_root, outputs_root):
     """Activate isolation for one client; yields the ClientSandbox (its .accessed log is useful in tests)."""
     global _active
+    if not _CLIENT_ID.match(str(client)):  # before any path is built: '../x' would escape outputs/
+        raise ValueError(f"Invalid client id {client!r}; use lowercase letters, digits, '-' or '_' (e.g. abc).")
     if _active is not None:
         raise RuntimeError(f"A sandbox for client '{_active.client}' is already active.")
     box = ClientSandbox(client, clients_root, outputs_root)
