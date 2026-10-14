@@ -17,6 +17,26 @@ python src/run_client.py xyz
 python scripts/scan_secrets.py . outputs
 ```
 
+## Result: v1.3.1 clean run and clean-room check, 2026-10-14
+
+**QuickBooks retest fixed.** The failure of 2026-10-13 ("QuickBooks returned an error") was a script bug, not an expired token, wrong environment or query problem. The server's tools take their arguments as `{"params": {...}}`; `01_connection/qbo_test_connection.py` sent `{}`, and the server rejected it at input validation ("Required at params") before calling QuickBooks. Diagnosed without opening any credential file: the error body was read with digit runs and token-like strings masked. Also fixed: the server reports real QuickBooks failures as text starting `Error:` without `isError`, which the script would have reported as success; stderr was discarded. Failures are now classified (bad request, bad app keys, expired token, wrong environment, network, not configured, outage, server missing) with a next step, and the stored server text is masked. New `tests/test_qbo_diagnose.py` (3 tests). After the fix `--test` returned the sandbox CompanyInfo read-only.
+
+| Check | Result | Counts |
+|---|---|---|
+| Unit tests (incl. UI) | **PASS** | 101 run, 101 OK (98 + 3 new) |
+| Golden cases | **PASS** | 17/17 |
+| Mutation test | **PASS** | 13/13 caught, 0 survived |
+| Commentary (engine / reviewed / skill output) | **PASS** | numbers 28/28, 27/27, 36/36; top movements 3/3 each |
+| Clients | **PASS** | `abc` 18 months, 0 warnings; `xyz` 14 months, 1 expected warning |
+| Pipeline | **PASS** | `abc 2026-06` and `xyz 2026-05`: Intake, Calculate done |
+| Workbook SHA-256 | **Unchanged** | `75da8d679a89551f…` before and after |
+| Live QuickBooks `--test` | **PASS** | CompanyInfo read, read-only flags enforced |
+| Secret scan (staged copy of tracked files) | **PASS** | 0 findings, 145 text files, 4 declared fake-fixture files skipped |
+
+**Clean-room check.** `python scripts/package_submission.py` built `dist/submission.zip` (156 tracked files, 478,215 bytes). Unzipped to an empty temp folder and ran the README quickstart there: unit tests 101/101 OK in 66 s, golden 17/17, `run_pipeline.py abc 2026-06` success, commentary grader PASS, mutation test 13/13 caught in 6 min 18 s, Streamlit started and answered HTTP 200 on its health endpoint. The workbook hash in the zip matched. In the zip, `--test` now says the MCP server is not part of the repo and how to add it.
+
+Found by the clean-room run: the README quoted ~30 s for the unit tests and 1-2 min for the mutation test; real times are ~1 min and ~6 min. README corrected.
+
 ## Result: v1.3-structure run (repo restructure), 2026-10-14
 
 Files moved with `git mv` into `01_connection/` ... `05_review_workspace/` and `data/`; repo root is the project root. Entries below this section use the pre-restructure paths (`evals/`, `docs/`, `ai_solutions_builder_free/`, `submission/`); `03_evals/` is the old `evals/`. Commands are now run from the repo root, e.g. `python 03_evals/run_golden_evals.py`, `python scripts/scan_secrets.py <tracked files>`.

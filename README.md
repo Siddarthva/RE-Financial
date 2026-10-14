@@ -18,12 +18,13 @@ This repo is a submission for RE Financial Services' "Build Exercise — AI Solu
 
 | Check | Result |
 |---|---|
-| Unit tests (includes 15 UI tests) | 98 run, 98 OK |
+| Unit tests (includes 15 UI tests) | 101 run, 101 OK |
 | Golden cases | 17 / 17 |
 | Mutation test | 13 / 13 mutants caught, 0 survived |
 | Commentary grader (engine text, reviewed text, saved skill output) | all three PASS |
 | Source workbook SHA-256 | unchanged (`75da8d679a89551f…`) |
-| Secret scan (153 tracked files) | 0 findings |
+| Secret scan (156 tracked files) | 0 findings |
+| Live QuickBooks read-only test (`qbo_test_connection.py --test`) | passed 2026-10-14 (CompanyInfo) |
 
 These results prove the checks pass on the supplied workbook. They do not prove a live QuickBooks connection or that commentary is insightful.
 
@@ -33,12 +34,12 @@ Python 3.11+; built on 3.13 and Windows 11. From the repo root:
 
 ```powershell
 pip install -r requirements.txt
-python -m unittest discover -s tests          # ~30 s, expect: OK
+python -m unittest discover -s tests          # ~1 min, expect: OK (101 tests)
 python 03_evals/run_golden_evals.py            # expect: Score: 17/17
 python scripts/run_pipeline.py abc 2026-06     # intake gate + calculate + flux -> outputs/abc/
 python 03_evals/grade_commentary.py            # grades the engine's own commentary: PASS
-python 03_evals/mutation_test.py               # ~1-2 min, expect: 13/13 mutants caught
 streamlit run 05_review_workspace/app/Home.py  # optional UI, reads outputs/ only
+python 03_evals/mutation_test.py               # optional, ~6 min: expect 13/13 mutants caught
 ```
 
 Then open [`02_skill/sample_outputs/`](02_skill/sample_outputs/) (Excel sign-off pack, commentary, flux) to see what a reviewer receives. In Claude Code, `/monthly-analysis abc 2026-06` runs the full draft-and-review flow.
@@ -46,7 +47,7 @@ Then open [`02_skill/sample_outputs/`](02_skill/sample_outputs/) (Excel sign-off
 ## What's not done
 
 - **Stretch goal not done.** The workbook was never loaded into the sandbox and the skill was never run through the live connection. The loader and an 18-entry dry-run plan exist and are tested against a fake; no live write has been made.
-- **Connection retest failing.** Eight live read-only calls were saved on 2026-10-12 (secrets redacted). The latest `--test` on 2026-10-13 returned a QuickBooks error that has not been diagnosed, so a fresh live demo is not guaranteed.
+- **Live connection needs your own setup.** Eight live read-only calls are saved (2026-10-12, secrets redacted) and a fresh test passed on 2026-10-14. A reviewer cannot repeat it without their own Intuit sandbox, the MCP server (below) and `npm run auth`. Without them, `--test` says what is missing.
 - **Team hosting and ten-client isolation are designs, not builds.** Two clients exist. Isolation is an in-process audit hook plus per-client folders, not an OS or credential boundary.
 - **The MCP server is not in this repo.** It is Intuit's repository, cloned beside it and untracked. Clone, build and authorize it to reproduce the connection. `01_connection/dependency_risk.md` covers its 49 npm audit findings (none fixed).
 - **Different layouts need code.** `clients/xyz` shows a new client needs only a config, but the parser expects a wide sheet with one column per month.

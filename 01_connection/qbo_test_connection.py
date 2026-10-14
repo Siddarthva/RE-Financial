@@ -112,7 +112,12 @@ def _rpc(proc, q, msg, want_id=None, timeout=45):
 def test_connection() -> dict:
     base = {"tested_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
     if not SERVER.is_file():
-        return {**base, "ok": False, "message": "QuickBooks MCP server is not built. Run 'npm run build' in quickbooks-online-mcp-server."}
+        if not SERVER.parents[1].is_dir():
+            msg = ("The QuickBooks MCP server is not part of this repo. Clone Intuit's quickbooks-online-mcp-server into "
+                   f"'{SERVER_DIR}' beside this repo, then run 'npm install', 'npm run build' and 'npm run auth' there.")
+        else:
+            msg = f"The QuickBooks MCP server is not built. Run 'npm install' and 'npm run build' in {SERVER_DIR}."
+        return {**base, "ok": False, "cause": "server_missing", "message": msg}
     env = {**os.environ, **{f: "true" for f in FLAGS}}
     try:
         proc = subprocess.Popen(["node", str(SERVER)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
