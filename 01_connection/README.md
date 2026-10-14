@@ -47,7 +47,7 @@ The server registers a tool only if its category is not disabled (`src/helpers/r
 |---|---|
 | 71 tools registered with the three flags `true`; none is create/update/delete | [`2026-10-14/01_tools_list.response.json`](evidence/quickbooks/2026-10-14/01_tools_list.response.json), check (c) in the [dated README](evidence/quickbooks/2026-10-14/README.md) |
 | Only `get_*` and `search_*` tools were called | [`connection_decision.md`](connection_decision.md) |
-| The loader's write path is separate and sandbox-only; it uses a different credential file and refuses production | [`load_workbook_to_sandbox.py`](load_workbook_to_sandbox.py), [`config/qbo_write.env.example`](../config/qbo_write.env.example) |
+| The loader's write path is separate and sandbox-only; it uses a different credential file and refuses production | [`load_workbook_to_sandbox.py`](load_workbook_to_sandbox.py), [`qbo_write.env.example`](qbo_write.env.example) |
 | `CLAUDE.md` forbids flipping the flags | [`CLAUDE.md`](../CLAUDE.md) |
 
 Not shown: a refused write attempt. No write was tried, by rule.
@@ -92,7 +92,7 @@ Without the server, `--test` exits 1 and names the missing folder (`QBO_MCP_SERV
 | [`evidence/quickbooks/checks.json`](evidence/quickbooks/checks.json), [`redaction_log.json`](evidence/quickbooks/redaction_log.json) | Pass/fail checks and what was redacted |
 | [`evidence/quickbooks/redact_and_verify.py`](evidence/quickbooks/redact_and_verify.py) | Redaction and residual-secret check |
 | [`dependency_risk.md`](dependency_risk.md) | 49 npm audit findings: 2 critical, 37 high, 10 moderate; 3 in runtime dependencies; none fixed |
-| [`NETWORK_DIAGNOSTICS.md`](NETWORK_DIAGNOSTICS.md) | Connectivity checks for the Windows machine |
+| [`qbo_write.env.example`](qbo_write.env.example) | Template for the sandbox-only write credential used by the loader. Keep the real file in `.secrets/` (git-ignored, the loader's default); the read-only MCP server never uses it |
 
 Limit: the sandbox holds Intuit's sample data, not ABC's. The monthly analysis reads the supplied workbook; **QuickBooks data is not an input to it.**
 
@@ -106,7 +106,7 @@ Limit: the sandbox holds Intuit's sample data, not ABC's. The monthly analysis r
 | `bad_client` | `invalid_client`, client ID/secret | Check the Development keys at developer.intuit.com, then `npm run auth` |
 | `expired_token` | `invalid_grant`, 401, refresh failed | Refresh token expired or revoked: `npm run auth` in the server folder |
 | `wrong_environment` | production, realm, 403 | Set `QUICKBOOKS_ENVIRONMENT=sandbox`, use Development keys, re-run `npm run auth` |
-| `network` | `ECONNRESET`, `ETIMEDOUT`, `ENOTFOUND` | Check internet, VPN or proxy; see [`NETWORK_DIAGNOSTICS.md`](NETWORK_DIAGNOSTICS.md) |
+| `network` | `ECONNRESET`, `ETIMEDOUT`, `ENOTFOUND` | Check internet, VPN or proxy |
 | `not_configured` | `must be set`, `ENOENT` | Create the server's env file with the app keys, then `npm run auth` |
 | `rate_or_outage` | 429, 5xx | Wait a few minutes and retest |
 | `bad_request` | input validation | A bug in the test script, not in QuickBooks; report it, do not re-authorize |

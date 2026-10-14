@@ -27,7 +27,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "00_START_HERE"
-SRC = OUT / "src"
+SRC = ROOT / "scripts" / "pdf_src"
 CACHE = ROOT / "scripts" / ".pdf_cache"
 MERMAID_JS = CACHE / "node_modules" / "mermaid" / "dist" / "mermaid.min.js"
 FINAL_RUN = ROOT / "03_evals" / "FINAL_RUN.md"

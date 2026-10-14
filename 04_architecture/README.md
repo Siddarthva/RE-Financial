@@ -11,7 +11,6 @@
 | [`workflows/`](workflows/README.md) | One page per workflow (a–g): inputs, outputs, gates, failure messages, idempotency, tests | [`tests/test_workflow_failures.py`](../tests/test_workflow_failures.py) (12 tests) |
 | [`verification_matrix.md`](verification_matrix.md) | Every line of the brief mapped to a command or file and its result from a clean-state run on 2026-10-14 | Commands listed in the matrix |
 | [`brief_traceability.md`](brief_traceability.md) | Each requirement, where it is answered, Done / Partial / Not done, and why | The files it names |
-| [`CLAUDE_CODE_DAY2_RUNBOOK.md`](CLAUDE_CODE_DAY2_RUNBOOK.md) | An earlier working runbook, kept for history only | None; do not rely on it |
 
 ### Workflow pages
 
