@@ -95,6 +95,14 @@ def run_abc_case(typ, data, expected):
                     errors.append(f"{account} {year} peak={year_row.idxmax():%Y-%m}")
             errors += [f"{account} {m}={row[pd.Timestamp(m)]}" for m, v in by_month.items() if not close(row[pd.Timestamp(m)], v)]
         return not errors, "; ".join(errors) or "February peak in 2025 and 2026"
+    if typ == "abc_margin_flags":
+        got = {f["month"]: f for f in abc.margin_drop_flags(monthly, data["threshold_pp"])}
+        want = {f["month"]: f for f in expected["flags"]}
+        if set(got) != set(want):
+            return False, f"flagged {sorted(got)} expected {sorted(want)}"
+        bad = [m for m in want if not close(got[m]["gross_margin_pct"], want[m]["gross_margin"], 1e-6)
+               or not close(got[m]["change_pp"], want[m]["change_pp"], 1e-4)]
+        return not bad, "; ".join(bad) or f"{len(want)} months flagged: {', '.join(sorted(want))}"
     if typ == "abc_one_off":
         found = abc.find_one_off_items(am, data["min_abs"])
         got = {(r.account, r.month.strftime("%Y-%m-%d")): r.amount for r in found.itertuples()}

@@ -28,6 +28,10 @@ totals:
 # Block headers / subtotals inside OPEX; excluded so their child rows are not double-counted.
 subtotal_rows: [S & M Payroll, Total S & M Payroll, Marketing, Total Marketing]   # B47, B59, B60, B71
 
+# Flag any month whose gross margin falls by more than this many percentage points vs the prior month.
+thresholds:
+  gross_margin_drop_pp: 5
+
 fiscal_year:
   start_month: 1   # Evidence: Balance Sheet D63 Current Year Earnings (-1,987,916.44) = SUM Net Income Jan-Jun 2026; E63 = Jan-May 2026.
 

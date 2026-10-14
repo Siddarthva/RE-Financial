@@ -39,6 +39,11 @@ class MonthlyReviewTests(unittest.TestCase):
         (d / "r.json").write_text(json.dumps(review), encoding="utf-8")
         return mr.build("abc", month, d / "c.md", d / "r.json", outputs_root=self.out)
 
+    def test_gross_margin_drop_flags(self):
+        self.assertEqual(self.packet["gross_margin_drop_threshold_pp"], 5)
+        self.assertEqual([f["month"] for f in self.packet["gross_margin_flags"]], ["2025-03", "2025-08", "2026-04"])
+        self.assertTrue(all(f["change_pp"] < -5 for f in self.packet["gross_margin_flags"]))
+
     def test_packet_has_source_cell_values(self):
         jun = self.packet["months"]["2026-06"]
         self.assertAlmostEqual(jun["revenue"]["value"], 195898.16, places=2)       # C14

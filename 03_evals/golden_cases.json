@@ -615,5 +615,46 @@
       "notes": "Burn = average monthly decline in the Balance Sheet cash balance, not net income. The primary figure is the 3-month runway, 3.4 months. The 1- and 6-month figures are the same method over other windows. They are listed so a commentary that states its window is graded correctly. Cash has fallen every month after Nov 2025 (J15 2,994,391.54, the last rise, up from K15 2,941,638.51)."
     },
     "grading": "Cash and burn within 0.005; runway within 0.000001."
+  },
+  {
+    "id": "G18",
+    "name": "ABC gross-margin drops over 5 pp",
+    "type": "abc_margin_flags",
+    "input": {
+      "threshold_pp": 5
+    },
+    "expected": {
+      "flags": [
+        {
+          "month": "2025-03",
+          "gross_margin": 0.7068358285353941,
+          "change_pp": -8.101564305673048
+        },
+        {
+          "month": "2025-08",
+          "gross_margin": 0.6301868749559828,
+          "change_pp": -7.3046013852194225
+        },
+        {
+          "month": "2026-04",
+          "gross_margin": 0.7068868482412951,
+          "change_pp": -5.361127941113642
+        }
+      ],
+      "flag_count": 3
+    },
+    "source": {
+      "workbook": "ABC Inc - Financial Statements.xlsx",
+      "sheet": "Income Statement",
+      "columns": "C=Jun 2026 ... T=Jan 2025 (newest first)",
+      "derivation": "Hand-computed from cached cell values; not produced by the adapter.",
+      "cells": {
+        "2025-03": "R26/R14 vs S26/S14",
+        "2025-08": "M26/M14 vs N26/N14",
+        "2026-04": "E26/E14 vs F26/F14",
+        "other_months": "every other month-on-month change in row 26/row 14 is a fall of 5 pp or less, or a rise"
+      }
+    },
+    "grading": "Exactly these three months are flagged; margins within 0.000001; change in pp within 0.0001."
   }
 ]

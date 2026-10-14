@@ -37,7 +37,7 @@ def _num(x):
     return None if pd.isna(x) else round(float(x), 6)
 
 
-def build_computed(account_month, monthly, month, cash=None):
+def build_computed(account_month, monthly, month, cash=None, gross_margin_drop_pp=None):
     """The JSON that commentary is graded against: every month's totals/MoM/TTM/margins and the chosen month's line items.
 
     `monthly` is the adapter summary indexed by month; `month` is a Timestamp that must have a prior month.
@@ -73,6 +73,9 @@ def build_computed(account_month, monthly, month, cash=None):
             out["line_items"][account]["share_of_opex"] = _num(v / monthly.at[month, "operating_expenses"])
     ranked = sorted(out["line_items"].items(), key=lambda kv: abs(kv[1]["mom_change"] or 0), reverse=True)
     out["top_movements"] = [{"account": a, "mom_change": d["mom_change"]} for a, d in ranked[:3]]
+    if gross_margin_drop_pp is not None:
+        out["gross_margin_drop_threshold_pp"] = gross_margin_drop_pp
+        out["gross_margin_flags"] = engine.margin_drop_flags(monthly, gross_margin_drop_pp)
     if cash is not None:
         change = cash["cash"] - cash["prior_cash"]
         out["cash"] = {"month": f"{cash['month']:%Y-%m}", "value": _num(cash["cash"]), "prior_value": _num(cash["prior_cash"]),
@@ -99,7 +102,8 @@ def prepare(client, month_text, clients_root=run_client.CLIENTS_ROOT, outputs_ro
         if cfg["sheets"].get("balance_sheet"):
             bs = engine.parse_wide_income_statement(cfg["workbook_path"], {**engine.ABC_BS_LAYOUT, "sheet": cfg["sheets"]["balance_sheet"]})
             cash = engine.cash_position(bs.loc[:, bs.columns <= month])
-        packet = build_computed(am, monthly.set_index("month"), month, cash)
+        packet = build_computed(am, monthly.set_index("month"), month, cash,
+                                gross_margin_drop_pp=cfg.get("thresholds", {}).get("gross_margin_drop_pp"))
         packet["client"], packet["display_name"] = client, cfg["display_name"]
         packet["one_offs"] = [{"account": r.account, "section": r.section, "month": f"{r.month:%Y-%m}", "amount": r.amount}
                               for r in engine.find_one_off_items(am).itertuples()]

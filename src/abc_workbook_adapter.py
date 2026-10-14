@@ -171,6 +171,14 @@ def add_fiscal_year(monthly, start_month=1):
             out[f"{col}_fytd"] = out.groupby("fiscal_year")[col].cumsum()
     return out
 
+def margin_drop_flags(monthly, threshold_pp):
+    """Months whose gross margin fell by more than `threshold_pp` percentage points versus the prior month."""
+    m = (monthly if "month" in monthly.columns else monthly.reset_index()).sort_values("month").reset_index(drop=True)
+    change_pp = (m["gross_margin_pct"].diff() * 100)
+    return [{"month": f"{r.month:%Y-%m}", "gross_margin_pct": float(r.gross_margin_pct), "change_pp": float(c)}
+            for r, c in zip(m.itertuples(), change_pp) if pd.notna(c) and c < -threshold_pp]
+
+
 def find_one_off_items(account_month, min_abs=5000.0):
     """Detail accounts that are non-zero in exactly one month with |amount| >= min_abs."""
     sections = account_month.attrs.get("sections", {})
