@@ -18,8 +18,8 @@ sequenceDiagram
         S->>Q: get_company_info (read-only)
         Q-->>S: CompanyInfo or error
         S-->>T: result text
-        T->>T: diagnose() maps errors to cause and next step; mask() hides IDs/tokens
-        T-->>U: one JSON line, exit 0 ok / 1 failed; qbo_status.json + audit line
+        T->>T: diagnose() maps errors to cause and next step, and mask() hides IDs/tokens
+        T-->>U: one JSON line, exit 0 ok or 1 failed, plus qbo_status.json and an audit line
     end
 ```
 

@@ -6,7 +6,7 @@
 - `clients/<id>/config.yaml` holds each client's workbook path, sheet and label names, account mapping and fiscal year. A new client needs a config file, not code (`xyz` is the proof).
 - `src/abc_workbook_adapter.py` parses wide monthly sheets and computes totals, MoM, TTM, margins, categories, one-offs and cash runway. `src/run_client.py` runs one client and writes `outputs/<client>/`.
 - `src/monthly_review.py` builds the review packet and the Excel sign-off pack. `.claude/` holds skills, the `finance-reviewer` agent, `/monthly-analysis`, and hooks.
-- `03_evals/` has 17 golden cases, a commentary grader and a mutation test; `tests/` has the unit tests. Failures found are logged in `03_evals/evals_caught.md`.
+- `03_evals/` has 22 golden cases, a commentary grader, a mutation test and a 32-fault robustness suite; `tests/` has the unit tests. Failures found are logged in `03_evals/evals_caught.md`.
 
 ## Context: what the model sees
 Only the packet JSON for one client and month, plus skill instructions. It never gets the workbook, `.env` files or another client's folder. Commentary is checked two ways: a deterministic grader (every number, the 3 top movements, cash risk) and an LLM reviewer (causes, unsupported claims). The grader cannot judge wording; the reviewer can be wrong, so a human signs off. Sign-off cells are left blank.

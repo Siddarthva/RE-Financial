@@ -4,6 +4,7 @@
 - `approve.py` — approve or reject a period; writes the audit log.
 - `export_eval_results.py` — eval summary JSON for the review workspace.
 - `scan_secrets.py` — secret scan; never prints values.
+- `check_links.py` — checks every relative Markdown link and heading anchor in git-tracked `.md` files.
 - `package_submission.py` — zip of git-tracked files, built only after a clean secret scan.
 
 Connection scripts live in `01_connection/`.

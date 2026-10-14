@@ -1,26 +1,26 @@
 {
-  "run_id": "20261014T011608Z-xyz-2026-05",
+  "run_id": "20261014T074959Z-xyz-2026-05",
   "client": "xyz",
   "period": "2026-05",
-  "started_at": "2026-10-14T01:16:08+00:00",
-  "finished_at": "2026-10-14T01:16:09+00:00",
+  "started_at": "2026-10-14T07:49:59+00:00",
+  "finished_at": "2026-10-14T07:49:59+00:00",
   "source": {
     "workbook": "xyz_financials.xlsx",
     "sha256": "9005063328d08edf10604e60d5b0a98494d642ffacce72918ac37736cad45efc"
   },
-  "skill_version": "monthly-financial-analysis@5cc0a53fcbcb",
-  "git_sha": "baadb09",
+  "skill_version": "monthly-financial-analysis@59884e52e344",
+  "git_sha": "9711420",
   "status": "success",
   "stages": [
     {
       "name": "Intake",
       "status": "done",
-      "duration_s": 0.21
+      "duration_s": 0.124
     },
     {
       "name": "Calculate",
       "status": "done",
-      "duration_s": 0.537
+      "duration_s": 0.484
     },
     {
       "name": "Grade commentary",
@@ -28,5 +28,8 @@
       "duration_s": 0.0
     }
   ],
-  "diff_vs_previous": null
+  "diff_vs_previous": {
+    "previous_run_id": "20261014T073742Z-xyz-2026-05",
+    "changed": []
+  }
 }

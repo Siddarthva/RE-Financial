@@ -21,3 +21,4 @@ capture-*.txt
 # local server clone and credentials
 quickbooks-online-mcp-server/
 .secrets/
+scripts/.pdf_cache/

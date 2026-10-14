@@ -17,6 +17,18 @@ python src/run_client.py xyz
 python scripts/scan_secrets.py . outputs
 ```
 
+## Result: v1.5 phases 1-3 counts re-run for the PDF pack, 2026-10-14
+
+The v1.4 block below pre-dates Phases 1-3 (G19-G22, the 32-fault robustness suite, workflow-failure tests). This block re-ran the suites at commit `9711420` plus uncommitted doc edits; the PDFs in `00_START_HERE/` read their counts from this table. Robustness was not re-run in this block: 32/32 is from `03_evals/robustness/ROBUSTNESS_REPORT.md` (Phase 2). Workbook SHA-256 `75da8d679a89551f…` unchanged after the runs.
+
+| Check | Result | Counts |
+|---|---|---|
+| Unit tests (incl. UI, robustness and workflow-failure tests) | **PASS** | 129 run, 129 OK |
+| Golden cases | **PASS** | 22/22 (workbook 4, workbook+perturbation 9, ABC cell-sourced 9) |
+| Mutation test | **PASS** | 13/13 caught, 0 survived |
+| Robustness (fault injection, Phase 2 report) | **PASS** | 32/32 pass, 0 silent-wrong |
+| Secret scan (git-tracked files) | **PASS** | 0 findings, 178 text files |
+
 ## Result: v1.4-submission consistency pass, 2026-10-14
 
 Changes since v1.3.1: golden counts made consistent across docs and UI, live test passes, rehearsed modification (G18). Mutation test (13/13) was not re-run after the G18 change.
