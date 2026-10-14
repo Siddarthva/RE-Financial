@@ -11,6 +11,7 @@ Anything else raises PermissionError. Paths outside clients/ and outputs/ (Pytho
 a shared source workbook declared in the client's config) stay readable.
 """
 from __future__ import annotations
+import contextlib
 import os
 import re
 import shutil
@@ -103,3 +104,5 @@ def client_sandbox(client: str, clients_root, outputs_root):
         tempfile.tempdir = saved_tempdir
         shutil.rmtree(private_tmp, ignore_errors=True)
         _active = None
+        with contextlib.suppress(OSError):  # an unknown client must not leave an empty outputs/<client>/ behind
+            private_tmp.parent.rmdir()

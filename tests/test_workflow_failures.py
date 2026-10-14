@@ -63,15 +63,20 @@ class Pipeline(Base):  # workflow (a)
 
 class SkillSteps(Base):  # workflow (b)
     def test_prepare_errors_are_one_line(self):
-        self.assertClean(*cli("src/monthly_review.py", "prepare", "abc", "2026-13"), 1, "ERROR: Month must look like 2026-06")
-        self.assertClean(*cli("src/monthly_review.py", "prepare", "nope", "2026-06"), 1, "ERROR: Unknown client 'nope'")
-        self.assertClean(*cli("src/monthly_review.py", "prepare", "abc", "2024-01"), 1, "ERROR: Intake refused the workbook")
+        o = ["--outputs-root", str(self.tmp / "out")]
+        real = {p.name for p in (ROOT / "outputs").iterdir()}
+        self.assertClean(*cli("src/monthly_review.py", "prepare", "abc", "2026-13", *o), 1, "ERROR: Month must look like 2026-06")
+        self.assertClean(*cli("src/monthly_review.py", "prepare", "nope", "2026-06", *o), 1, "ERROR: Unknown client 'nope'")
+        self.assertClean(*cli("src/monthly_review.py", "prepare", "abc", "2024-01", *o), 1, "ERROR: Intake refused the workbook")
+        self.assertEqual({p.name for p in (ROOT / "outputs").iterdir()}, real, "a failing prepare leaked into the real outputs/")
+        self.assertEqual(list((self.tmp / "out").glob("*")), [], "a failing prepare left a folder in the output root")
 
     def test_build_names_the_missing_or_broken_input(self):
         out = self.tmp / "out"
         (out / "abc").mkdir(parents=True)
         with self.assertRaisesRegex(ValueError, "Review packet not found.*prepare abc 2026-06"):
             mr.build("abc", "2026-06", self.tmp / "c.md", self.tmp / "r.json", outputs_root=out)
+        (out / "abc").mkdir(parents=True, exist_ok=True)  # the empty client folder is removed when the sandbox exits
         (out / "abc" / "review_packet_2026-06.json").write_text("{}", encoding="utf-8")
         (self.tmp / "c.md").write_text("1. A statement.\n", encoding="utf-8")
         (self.tmp / "r.json").write_text("{not json", encoding="utf-8")

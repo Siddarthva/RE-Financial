@@ -126,3 +126,10 @@ Thin coverage worth knowing (caught, but by a single eval): adapter gross-margin
 - **`approve.py`:** a damaged decision or verdict file crashed. Now it refuses, exits 5 and records nothing.
 - **`qbo_test_connection.py`:** an invalid client id exited 2 with no output; `package_submission.py` crashed without git. The UI reported a timeout as "Could not start script".
 - Not built: re-run as v2 after approval (a controls decision; see `04_architecture/workflows/c_approve_reject_lock.md`).
+
+## Test leaked into real `outputs/` (2026-10-14)
+
+- **Symptom:** an empty, untracked `outputs/nope/` appeared in the real outputs folder.
+- **Cause:** `test_prepare_errors_are_one_line` ran `monthly_review.py prepare nope 2026-06` (and two `abc` failures) with no output root, so they used the real `outputs/`. `client_sandbox` creates `outputs/<client>/.tmp` before the unknown-client check and removed only `.tmp`, leaving `outputs/<client>/`. A mistyped client name by a real user would have left the same folder.
+- **Fix:** `monthly_review.py prepare/build` take `--outputs-root` (default unchanged); the test passes a temp root and asserts both that the real `outputs/` listing is unchanged and that the temp root is empty after the failures. `client_sandbox` removes the empty client folder on exit. `test_build_names_the_missing_or_broken_input` now recreates its own `out/abc` folder rather than relying on the leftover one.
+- **Check:** full unit suite run twice after deleting `outputs/nope/`: 129 OK both times, folder did not reappear. Golden 22/22.

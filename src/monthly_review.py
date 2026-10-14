@@ -247,16 +247,18 @@ def main(argv=None):
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("prepare")
     p.add_argument("client"), p.add_argument("month")
+    p.add_argument("--outputs-root", default=str(run_client.OUTPUTS_ROOT), help="where to write (tests use a temp folder)")
     b = sub.add_parser("build")
     b.add_argument("client"), b.add_argument("month")
     b.add_argument("--commentary", required=True), b.add_argument("--review", required=True)
+    b.add_argument("--outputs-root", default=str(run_client.OUTPUTS_ROOT), help="where to write (tests use a temp folder)")
     args = ap.parse_args(argv)
     sys.stdout.reconfigure(encoding="utf-8")
     try:
         if args.cmd == "prepare":
-            print(f"packet: {prepare(args.client, args.month)}")
+            print(f"packet: {prepare(args.client, args.month, outputs_root=args.outputs_root)}")
         else:
-            path, approved = build(args.client, args.month, args.commentary, args.review)
+            path, approved = build(args.client, args.month, args.commentary, args.review, outputs_root=args.outputs_root)
             print(f"workbook: {path}\nverdict: {'APPROVED' if approved else 'CHANGES REQUIRED'}")
     except (ValueError, FileNotFoundError, PermissionError) as exc:
         # Expected failures (refused intake, bad input, missing file, isolation) get one clear line, not a traceback.
