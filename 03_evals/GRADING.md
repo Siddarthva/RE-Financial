@@ -142,7 +142,7 @@ Any of the following is a regression and blocks the change:
 - Skill run 1 (before the skill named top movements across all lines): 53/53 numbers, 2/3 movements → FAIL (Usage Fees missing). Saved in `outputs/skill_commentary_run1.md`.
 - Skill run 2 (after the skill guidance fix): 43/43 numbers, 3/3 movements → **PASS.** Saved in `outputs/skill_commentary.md`.
 
-## Current baseline (2026-10-13)
+## Baseline as of 2026-10-13 (dated; superseded by the counts at the end of this section)
 
 - Golden cases: **17/17 PASS** (G15–G17 added; G11 now checks every earlier month is null).
 - Unit tests: **75/75 PASS** (clean re-run 2026-10-13).
@@ -150,4 +150,4 @@ Any of the following is a regression and blocks the change:
 - Reference commentary `outputs/reference_commentary_jun2026.md` (positive control): 13/13 numbers, 3/3 movements, cash risk covered → **PASS**.
 - Engine `generate_commentary()`, reviewed text and saved skill output (`outputs/skill_commentary.md`): all **PASS** as of the 2026-10-13 clean re-run (28/28, 27/27 and 36/36 numbers; 3/3 movements; cash risk covered). The earlier FAILs for the engine text and the saved skill output are kept in `03_evals/FINAL_RUN.md`. The skill output was graded as saved, not regenerated live.
 
-The latest full run, with commands, counts and the failures along the way, is in `03_evals/FINAL_RUN.md` (unit tests 75/75, golden 17/17, mutation 13/13).
+The latest full run, with commands, counts and the failures along the way, is in `03_evals/FINAL_RUN.md` (unit tests 129/129, golden 22/22, mutation 13/13, robustness 32/32 as of 2026-10-14).

@@ -1,10 +1,64 @@
-# Verification matrix (Phase 1, 2026-10-14)
+# Verification matrix
 
-> **Counts are as of Phase 1 (2026-10-14).** Later phases added G19–G22, the 32-fault robustness suite and 12 workflow-failure tests. Current totals: 129 unit tests, 22 golden cases, 176 text files in the tracked-file secret scan. See the root [`README.md`](../README.md).
+Two parts: the **current** results (final pre-submission run, 2026-10-14) and, below them, the dated **history** of the Phase 1 clean-state run, kept as a record. Counts in the history are Phase 1 counts and are superseded by this section.
 
-Every line of the brief, mapped to the command or file that proves it and the result of a run **today**, from a clean `outputs/`. The old `outputs/` was moved aside first and everything was regenerated. Authored inputs that no script produces were then restored: reviewed and skill commentary, reviewer verdicts, the reference commentary, the 3-month reconciliation and earlier run manifests. Audit logs were restored with their history first and today's entries after. Status wording is the same as [`brief_traceability.md`](brief_traceability.md).
+## Current results (final pre-submission run, 2026-10-14)
 
-## Runs today
+Run on the committed tree, in this order, one suite at a time.
+
+| Command | Exit | Result |
+|---|---|---|
+| `python -m unittest discover -s tests` | 0 | **129 run, OK** |
+| `python 03_evals/run_golden_evals.py` | 0 | **22/22** |
+| `python 03_evals/mutation_test.py` | 0 | **13/13 mutants caught**, 0 survived |
+| `python 03_evals/robustness/fault_injection.py` | 0 | **32/32 faults behaved as required**; source workbook hash unchanged |
+| `git ls-files -z \| xargs -0 python scripts/scan_secrets.py` | 0 | 175 text files scanned, 0 findings |
+| `python scripts/check_links.py` | 0 | 0 broken links (count in the final run record) |
+
+Not re-run in this pass: the grader on the three commentary texts, the pipeline for abc/xyz, the loader dry run and the live QuickBooks checks. Their last results are in the history below and in `03_evals/FINAL_RUN.md`.
+
+## Brief → proof → status (current)
+
+| # | Brief line | Proof (command / file) | Today | Status |
+|---|---|---|---|---|
+| 1.1 | Connect securely and reliably | `01_connection/connection_decision.md`; `capture_dated.py` check (c) | 71 read-only tools; write tools not registered (`register-tool.ts`) | Done |
+| 1.2 | Demonstrate it working against the sandbox | `qbo_test_connection.py abc --test`; `evidence/quickbooks/2026-10-14/` | CompanyInfo, P&L and BS all PASS, 04:34–04:36 UTC | Done |
+| 1.3 | Document chosen / rejected / why | `connection_decision.md` | Doc review only | Done |
+| 1.4 | Team hosting | `connection_decision.md` "Team hosting" | Design, labelled Proposed | Partial |
+| 1.5 | Credential handling | `.claude/hooks/guard_secrets.py`, `scan_secrets.py`, `tests/test_evidence_redaction.py` | Scans clean; redaction residual check PASS | Done |
+| 2.1 | Revenue, margins, opex by category | `src/abc_workbook_adapter.py`; G01–G03, G09–G13 (22 cases in total) | 22/22 | Done |
+| 2.2 | MoM and TTM | `src/financial_analysis.py`; golden TTM cases | 22/22 | Done |
+| 2.3 | Commentary flagging movements | `grade_commentary.py` on engine, reviewed and skill text | 3 PASS; flawed control FAIL | Done |
+| 2.4 | For a human reviewer to finish | `src/monthly_review.py build …` → `monthly_review_2026-06.xlsx` | Rebuilt, APPROVED; same cell values as `02_skill/sample_outputs/` | Done |
+| 2.5 | Maintainable, extensible | `02_skill/README.md`, `tests/` | 129 tests OK | Done |
+| 2.6 | Another company without a rewrite | `run_client.py xyz`, `run_pipeline.py xyz 2026-05`, `tests/test_client_isolation.py` | Both exit 0 | Partial (wide-sheet layout only) |
+| 2.S | Stretch: load workbook into sandbox, run end to end | `load_workbook_to_sandbox.py --dry-run`; `--compare` vs today's live P&L | Dry run OK. Live P&L has **no** `Workbook Load` accounts (income 0.00 Jan–Apr 2026); `--compare` exits 1 | Not done |
+| 3.1 | ≥5 golden cases | `run_golden_evals.py` | 22/22 | Done |
+| 3.2 | Grading approach | `03_evals/GRADING.md`, `grade_commentary.py` | Grader separates good and flawed text | Done |
+| 3.3 | Regression detection | `mutation_test.py` | 13/13 caught | Done |
+| 3.4 | Commentary quality beyond numbers | `GRADING.md` | Tone and causes not code-graded | Partial |
+| 4.1 | Structure, files, skills, memory | `04_architecture/architecture.md` | Doc review only | Done |
+| 4.2 | Hosting | `architecture.md` "Hosting" | Doc review only | Done |
+| 4.3 | Ten clients, data separation | `tests/test_client_isolation.py` | In unit run, OK | Partial (two clients; OS/credential separation Proposed) |
+| D1 | Working connection | `01_connection/` | Checks a–d PASS; MCP server is an untracked clone | Partial |
+| D2 | Skill files | `.claude/skills/`, `.claude/commands/monthly-analysis.md` | Saved skill output graded PASS; the skill was **not** re-run live today | Done |
+| D3 | Eval cases and grading | `03_evals/` | As above | Done |
+| D4 | One-page architecture note | `architecture.md` | Doc review only | Done |
+| R1 | Demo connection and analysis | `qbo_test_connection.py --test`, `run_pipeline.py` | Both pass today | Done |
+| R2 | One small modification | `evals_caught.md` "Rehearsed modification", commit `315a473` | Mutation run now covers G18 | Done |
+| R3 | Why structured this way | `architecture.md`, `workflow.md` | Doc review only | Done |
+| R4 | What the evals caught | `03_evals/evals_caught.md` | Today's fixes listed above | Done |
+| R5 | What breaks first at ten clients | `architecture.md` "What breaks first" | Doc review only | Done |
+| G1 | Sandbox and supplied workbook only | `CLAUDE.md`, `clients/xyz/` (synthetic) | Workbook hash unchanged | Done |
+| G2 | Explain every choice as your own | Docs | Depends on the presenter | Partial |
+
+## History: Phase 1 clean-state run (2026-10-14)
+
+> **These are Phase 1 counts** (103 unit tests, 18/18 golden). Later phases added G19–G22, the 32-fault robustness suite and workflow-failure tests; see the current results above.
+
+Every line of the brief, mapped to the command or file that proves it and the result of the Phase 1 run on 2026-10-14, from a clean `outputs/`. The old `outputs/` was moved aside first and everything was regenerated. Authored inputs that no script produces were then restored: reviewed and skill commentary, reviewer verdicts, the reference commentary, the 3-month reconciliation and earlier run manifests. Audit logs were restored with their history first and today's entries after. Status wording is the same as [`brief_traceability.md`](brief_traceability.md).
+
+### Runs (Phase 1)
 
 | Command | Exit | Key result |
 |---|---|---|
@@ -24,7 +78,7 @@ Every line of the brief, mapped to the command or file that proves it and the re
 
 Live sandbox checks (read-only): see [`01_connection/evidence/quickbooks/2026-10-14/README.md`](../01_connection/evidence/quickbooks/2026-10-14/README.md). (a) CompanyInfo PASS. (b) P&L Jan–Jun 2026 monthly and Balance Sheet at 30 Jun 2026 PASS; the BS balances at 5,488.75. (c) 71 tools registered, none of them create/update/delete, PASS. (d) A missing server folder gives an actionable message with exit 1, PASS.
 
-## Fixes made in this phase
+### Fixes made in Phase 1
 
 | Found by | Defect | Fix | Test |
 |---|---|---|---|
@@ -34,42 +88,7 @@ Live sandbox checks (read-only): see [`01_connection/evidence/quickbooks/2026-10
 | Step 3d | `qbo_test_connection.py --test` exited 0 when the test failed, and the review UI (`actions._run`) gates on the exit code | Exits 1 on a failed test | Live run: exit 1 for a missing server, exit 0 when connected |
 | Step 3d | No way to point the test at another server folder; the missing-server message named a fixed folder | `QBO_MCP_SERVER_DIR` override; the message names the folder it looked in | Live run above |
 
-## Brief → proof → status
-
-| # | Brief line | Proof (command / file) | Today | Status |
-|---|---|---|---|---|
-| 1.1 | Connect securely and reliably | `01_connection/connection_decision.md`; `capture_dated.py` check (c) | 71 read-only tools; write tools not registered (`register-tool.ts`) | Done |
-| 1.2 | Demonstrate it working against the sandbox | `qbo_test_connection.py abc --test`; `evidence/quickbooks/2026-10-14/` | CompanyInfo, P&L and BS all PASS, 04:34–04:36 UTC | Done |
-| 1.3 | Document chosen / rejected / why | `connection_decision.md` | Doc review only | Done |
-| 1.4 | Team hosting | `connection_decision.md` "Team hosting" | Design, labelled Proposed | Partial |
-| 1.5 | Credential handling | `.claude/hooks/guard_secrets.py`, `scan_secrets.py`, `tests/test_evidence_redaction.py` | Scans clean; redaction residual check PASS | Done |
-| 2.1 | Revenue, margins, opex by category | `src/abc_workbook_adapter.py`; G01–G03, G09–G13 | 18/18 | Done |
-| 2.2 | MoM and TTM | `src/financial_analysis.py`; golden TTM cases | 18/18 | Done |
-| 2.3 | Commentary flagging movements | `grade_commentary.py` on engine, reviewed and skill text | 3 PASS; flawed control FAIL | Done |
-| 2.4 | For a human reviewer to finish | `src/monthly_review.py build …` → `monthly_review_2026-06.xlsx` | Rebuilt, APPROVED; same cell values as `02_skill/sample_outputs/` | Done |
-| 2.5 | Maintainable, extensible | `02_skill/README.md`, `tests/` | 103 tests OK | Done |
-| 2.6 | Another company without a rewrite | `run_client.py xyz`, `run_pipeline.py xyz 2026-05`, `tests/test_client_isolation.py` | Both exit 0 | Partial (wide-sheet layout only) |
-| 2.S | Stretch: load workbook into sandbox, run end to end | `load_workbook_to_sandbox.py --dry-run`; `--compare` vs today's live P&L | Dry run OK. Live P&L has **no** `Workbook Load` accounts (income 0.00 Jan–Apr 2026); `--compare` exits 1 | Not done |
-| 3.1 | ≥5 golden cases | `run_golden_evals.py` | 18/18 | Done |
-| 3.2 | Grading approach | `03_evals/GRADING.md`, `grade_commentary.py` | Grader separates good and flawed text | Done |
-| 3.3 | Regression detection | `mutation_test.py` | 13/13 caught | Done |
-| 3.4 | Commentary quality beyond numbers | `GRADING.md` | Tone and causes not code-graded | Partial |
-| 4.1 | Structure, files, skills, memory | `04_architecture/architecture.md` | Doc review only | Done |
-| 4.2 | Hosting | `architecture.md` "Hosting" | Doc review only | Done |
-| 4.3 | Ten clients, data separation | `tests/test_client_isolation.py` | In unit run, OK | Partial (two clients; OS/credential separation Proposed) |
-| D1 | Working connection | `01_connection/` | Checks a–d PASS; MCP server is an untracked clone | Partial |
-| D2 | Skill files | `.claude/skills/`, `.claude/commands/monthly-analysis.md` | Saved skill output graded PASS; the skill was **not** re-run live today | Done |
-| D3 | Eval cases and grading | `03_evals/` | As above | Done |
-| D4 | One-page architecture note | `architecture.md` | Doc review only | Done |
-| R1 | Demo connection and analysis | `qbo_test_connection.py --test`, `run_pipeline.py` | Both pass today | Done |
-| R2 | One small modification | `evals_caught.md` "Rehearsed modification", commit `315a473` | Mutation run now covers G18 | Done |
-| R3 | Why structured this way | `architecture.md`, `workflow.md` | Doc review only | Done |
-| R4 | What the evals caught | `03_evals/evals_caught.md` | Today's fixes listed above | Done |
-| R5 | What breaks first at ten clients | `architecture.md` "What breaks first" | Doc review only | Done |
-| G1 | Sandbox and supplied workbook only | `CLAUDE.md`, `clients/xyz/` (synthetic) | Workbook hash unchanged | Done |
-| G2 | Explain every choice as your own | Docs | Depends on the presenter | Partial |
-
-## Independent falsification check
+### Independent falsification check
 
 A subagent that had not seen this work got only the brief and the repo, and tried to falsify 5 claims in `README.md` and `brief_traceability.md`. All 5 held:
 - unit 103 OK, golden 18/18;
