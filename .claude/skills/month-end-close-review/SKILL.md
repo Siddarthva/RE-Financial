@@ -36,3 +36,9 @@ Produce a structured close-status pack for a human accountant. This is a workflo
 - Never create, post, update, or delete accounting records unless a separately approved workflow explicitly allows it. Default to read-only.
 - Do not invent reconciliations or mark an item complete without supporting evidence.
 - Do not call a difference an error until timing, mapping, and source completeness have been considered.
+
+## Version
+1.0 — 2026-10-14
+
+## Changelog
+- 1.0 (2026-10-14): Baseline. Added Version and Changelog sections; no behaviour change.

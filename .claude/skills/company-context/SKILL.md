@@ -31,3 +31,9 @@ Use this description as the project context. Do not invent products, regulated l
 - Financial statement consistency checks → `financial-statement-tie-out`
 - SEC-related disclosure preparation → `sec-reporting-support`
 - Monthly trend analysis (audit, revenue, margins, OPEX, MoM, TTM, cash-flow availability, anomalies, commentary) → `monthly-financial-analysis`
+
+## Version
+1.0 — 2026-10-14
+
+## Changelog
+- 1.0 (2026-10-14): Baseline. Added Version and Changelog sections; no behaviour change.

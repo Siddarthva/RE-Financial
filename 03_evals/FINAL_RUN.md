@@ -189,3 +189,13 @@ Both fixes are logged in `03_evals/evals_caught.md` (#12, #14) with a regression
 | 4 | Skill, command, agent: no "runway cannot be calculated" text; `submission/` copies identical to source; no stale paths | Verified |
 | 5 | Golden source cell ref: 8 of 17 have `source` (G09-G13, G15-G17); G01-G08, G14 do not (synthetic inputs, no workbook cell) | Gap, listed |
 | - | Unit tests 75/75, golden 17/17 re-run; `submission/` in sync | Pass |
+
+## LEVEL_UP Phase A, 2026-10-14
+
+| Item | Result |
+|---|---|
+| `02_skill/authoring_kit/` (SKILL_TEMPLATE.md, GOLDEN_CASE_TEMPLATE.json, CHECKLIST.md) | Created |
+| `skill-catalog.md` rewritten as table (skill, stage, status, version, evals, trigger cases) | Done; all 7 skills Draft (no `03_evals/skill_triggers/` yet) |
+| Version + Changelog added to 7 SKILL.md | Done (1.0) |
+| Unit 129/129, golden 22/22, commentary PASS, secret scan 0 secret-named files | Pass |
+| Trigger evals | Not run: none exist yet |

@@ -35,3 +35,9 @@ Actuals by period and account/category. Budget, forecast, prior-year, or prior-m
 
 ## Guardrails
 Do not fabricate a budget or forecast. Do not describe a variance as “on plan” without a supplied target. Avoid causal claims based only on correlation or a single period.
+
+## Version
+1.0 — 2026-10-14
+
+## Changelog
+- 1.0 (2026-10-14): Baseline. Added Version and Changelog sections; no behaviour change.

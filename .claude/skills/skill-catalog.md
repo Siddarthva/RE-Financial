@@ -4,15 +4,19 @@ All project skills live under `.claude/skills/<skill-name>/SKILL.md`. Claude Cod
 
 ## Skills
 
-| Skill | Path | Use when | Primary outputs |
-|---|---|---|---|
-| `monthly-financial-analysis` | `.claude/skills/monthly-financial-analysis/SKILL.md` | Analyzing, auditing, or reporting on a monthly financial-statement workbook | Workbook audit, revenue/margin/OPEX trends, MoM, TTM, cash-flow availability disclosure, anomaly flags, executive commentary |
-| `financial-statement-tie-out` | `.claude/skills/financial-statement-tie-out/SKILL.md` | Tying out or reconciling statements and trial balances | Check table (formula, expected, observed, difference, status) and exception list |
-| `fpa-budget-variance` | `.claude/skills/fpa-budget-variance/SKILL.md` | Comparing actuals with a supplied budget, forecast, or prior period | Variance table, favourable/unfavourable conventions, top drivers |
-| `fractional-cfo-insights` | `.claude/skills/fractional-cfo-insights/SKILL.md` | An owner wants a CFO-style decision brief | KPI snapshot, key movements, risks, decisions and questions |
-| `month-end-close-review` | `.claude/skills/month-end-close-review/SKILL.md` | Running or reviewing a month-end close | Close checklist, reconciliation summary, exceptions, sign-off pack |
-| `sec-reporting-support` | `.claude/skills/sec-reporting-support/SKILL.md` | Preparing support for SEC-related reporting | Traceability matrix, tie-outs, draft narrative marked `FOR REVIEW — NOT FILE-READY` |
-| `company-context` | `.claude/skills/company-context/SKILL.md` | Scoping firm services or routing a new client task | Verified firm context and skill routing |
+Status rule (see `02_skill/authoring_kit/`): **Validated** needs a SKILL.md from the template, 3+ golden cases on real ABC data, and 3+ positive and 1+ negative trigger cases in `03_evals/skill_triggers/`, all passing. Otherwise **Draft**. `03_evals/skill_triggers/` does not exist yet, so no skill is Validated.
+
+| Skill | Workflow stage | Status | Version | Evals | Trigger cases |
+|---|---|---|---|---|---|
+| `monthly-financial-analysis` | Calculate / draft | Draft | 1.0 | Golden 22 (G01-G22), commentary grader, mutation 13/13, fault injection 32/32 | 0 |
+| `financial-statement-tie-out` | Intake | Draft | 1.0 | None skill-specific (engine checks covered by unit tests) | 0 |
+| `month-end-close-review` | Reviewer / package | Draft | 1.0 | None | 0 |
+| `fpa-budget-variance` | Calculate / flux | Draft | 1.0 | None | 0 |
+| `fractional-cfo-insights` | Package (owner brief) | Draft | 1.0 | None | 0 |
+| `sec-reporting-support` | Out of close workflow (SEC support) | Draft | 1.0 | None | 0 |
+| `company-context` | Routing (before intake) | Draft | 1.0 | None | 0 |
+
+Paths: `.claude/skills/<skill>/SKILL.md`. Command `/monthly-analysis` (`.claude/commands/monthly-analysis.md`) is not a skill file and has no version section; it is covered by `03_evals/live_consistency_2026-10-15.md`.
 
 ## Sections inside `monthly-financial-analysis`
 Earlier separate analytics skills are now numbered sections of `monthly-financial-analysis`:

@@ -40,3 +40,9 @@ State the period and methodology used. If cash burn is zero/negative, irregular,
 
 ## Guardrails
 Do not claim that a company is healthy, distressed, solvent, or insolvent from a few ratios alone. Do not invent forecast inputs, debt terms, funding availability, or customer economics.
+
+## Version
+1.0 — 2026-10-14
+
+## Changelog
+- 1.0 (2026-10-14): Baseline. Added Version and Changelog sections; no behaviour change.

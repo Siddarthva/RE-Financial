@@ -28,3 +28,9 @@ Assist with data collection, tie-outs, variance explanations, and draft disclosu
 - Do not claim SEC compliance or filing readiness.
 - Do not give legal advice or replace review by the issuer's qualified finance, accounting, and legal professionals.
 - Do not upload or transmit client data to an external service unless the approved environment permits it.
+
+## Version
+1.0 — 2026-10-14
+
+## Changelog
+- 1.0 (2026-10-14): Baseline. Added Version and Changelog sections; no behaviour change.

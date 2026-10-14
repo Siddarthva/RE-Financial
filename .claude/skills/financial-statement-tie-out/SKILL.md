@@ -28,3 +28,9 @@ A table with check, formula, expected value, observed value, difference, status,
 
 ## Guardrails
 A balance-sheet equation balancing does not prove the statements are correct. Do not treat a Balance Sheet as a period activity report; it is normally a point-in-time statement. Compare it to a specific as-of date or explicitly explain a report's date-column semantics.
+
+## Version
+1.0 — 2026-10-14
+
+## Changelog
+- 1.0 (2026-10-14): Baseline. Added Version and Changelog sections; no behaviour change.

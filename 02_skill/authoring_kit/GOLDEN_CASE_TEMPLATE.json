@@ -1,0 +1,21 @@
+{
+  "id": "G<NN>",
+  "name": "<what this case pins, in plain words>",
+  "type": "<engine check type, e.g. revenue_mom>",
+  "source": "workbook | workbook+perturbation",
+  "workbook": "ABC Inc - Financial Statements.xlsx",
+  "sheet": "<sheet name>",
+  "layout": "<column order, e.g. columns run newest first: C=Jun 2026 ... T=Jan 2025>",
+  "input": {
+    "cells": ["<sheet>!<cell>", "<sheet>!<cell>"]
+  },
+  "expected": {
+    "<field>": "<value computed by hand from the cached source cells, not by the engine>"
+  },
+  "perturbation": {
+    "cells_changed": [],
+    "purpose": "<why no change is needed, or the cell, original value and new value>"
+  },
+  "derivation": "Hand-computed in plain Python from cached source-cell values, not from the engine.",
+  "grading": "<tolerance, e.g. half a cent; and what the commentary must not assert>"
+}

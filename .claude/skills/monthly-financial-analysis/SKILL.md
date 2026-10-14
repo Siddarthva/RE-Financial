@@ -100,3 +100,9 @@ Produce a consistent, review-ready monthly trend analysis for a human finance re
 - `financial-statement-tie-out` — balance-sheet equation and cross-statement checks.
 - `fpa-budget-variance` — actuals vs supplied budget/forecast.
 - `month-end-close-review`, `fractional-cfo-insights`, `sec-reporting-support`, `company-context` — firm workflows; see `.claude/skills/skill-catalog.md`.
+
+## Version
+1.0 — 2026-10-14
+
+## Changelog
+- 1.0 (2026-10-14): Baseline. Added Version and Changelog sections; no behaviour change.
