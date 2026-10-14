@@ -24,7 +24,7 @@ Run at commit `c9336d2` (clean tree). Unit and golden suites were re-run for thi
 | Check | Result | Counts |
 |---|---|---|
 | Unit tests | **PASS** | 129 run, 129 OK |
-| Golden cases | **PASS** | 22/22 |
+| Golden cases | **PASS** | 22/22 (workbook 4, workbook+perturbation 9, ABC cell-sourced 9) |
 | Mutation test | **PASS** | 13/13 caught, 0 survived |
 | Robustness (fault injection) | **PASS** | 32/32 pass, source workbook hash unchanged |
 | Secret scan (git-tracked files) | **PASS** | 0 findings, 175 text files |
