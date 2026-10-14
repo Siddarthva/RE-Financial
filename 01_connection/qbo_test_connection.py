@@ -100,6 +100,8 @@ def _rpc(proc, q, msg, want_id=None, timeout=45):
         try:
             line = q.get(timeout=1)
         except queue.Empty:
+            if proc.poll() is not None and q.empty():
+                raise OSError("server exited")  # crashed: fail now with its stderr, not after the full timeout
             continue
         try:
             data = json.loads(line)
@@ -137,9 +139,10 @@ def test_connection() -> dict:
         resp = _rpc(proc, q, {"jsonrpc": "2.0", "id": 2, "method": "tools/call",
                               "params": {"name": "get_company_info", "arguments": {"params": {}}}}, 2)  # the server wraps every tool's arguments in "params"
     except TimeoutError:
-        return {**base, "ok": False, "message": "No response within 45 seconds. Check your network and that the server can start."}
+        return {**base, "ok": False, "cause": "timeout", "message": "No response within 45 seconds. Check your network and that the server can start."}
     except (OSError, ValueError):
         stderr = ""
+        time.sleep(0.3)  # let the stderr reader thread drain
         while not errq.empty():
             stderr += errq.get()
         return {**base, "ok": False, **(diagnose(stderr) if stderr.strip() else {"cause": "server_exited",
