@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import re
 from typing import Any
 
 import pandas as pd
@@ -107,3 +108,17 @@ def locked_banner(approval) -> None:
             f'<div class="crw-empty"><strong>Locked - approved</strong> by {approval.get("reviewer")} '
             f'on {approval.get("decided_at")}. No further changes are accepted for this period.</div>',
             unsafe_allow_html=True)
+
+
+_SECRET = re.compile(
+    r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{5,}"
+    r"|(?:AB11|RT1-|AB1|XX11)[A-Za-z0-9_-]{30,}"
+    r"|(?i:bearer)\s+[A-Za-z0-9._~+/=-]{20,}"
+    r"|(?i:realm[_ ]?id)[\"']?\s*[:=]\s*[\"']?\d{6,}|/company/\d{6,}"
+    r"|(?i:client[_-]?secret|refresh[_-]?token|access[_-]?token|api[_-]?key|password|authorization[_-]?code)[\"']?\s*[:=]\s*[\"']?[A-Za-z0-9_\-./+=]{8,}"
+    r"|[?&]code=[A-Za-z0-9_\-]{16,}|-----BEGIN [A-Z ]*PRIVATE KEY-----")
+
+
+def scrub(text: str) -> str:
+    """Defence in depth: anything that looks like a credential, realm ID or auth code is withheld before display."""
+    return _SECRET.sub("[withheld]", text or "")

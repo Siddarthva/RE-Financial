@@ -62,7 +62,7 @@ def render():
                 ok, out = actions.run_analysis(client, period)
             (st.success if ok else st.error)("Pipeline finished." if ok else "Pipeline failed.")
             if out:
-                st.code(out, language=None)
+                st.code(ui.scrub(out), language=None)
         if locked:
             st.caption("This period is approved and locked; the pipeline will not re-run it.")
 

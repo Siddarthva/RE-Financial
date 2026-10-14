@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-OUTPUTS = Path(__file__).resolve().parent.parent / "outputs"
+from paths import DOCS, OUTPUTS  # noqa: E402
 _PERIOD_RE = re.compile(r"review_packet_(\d{4}-\d{2})\.json$")
 
 
@@ -203,9 +203,6 @@ def load_eval_summary() -> Loaded:
 
 def load_commentary_grade() -> Loaded:
     return _read_json(OUTPUTS / "commentary_grade.json")
-
-
-DOCS = OUTPUTS.parent / "ai_solutions_builder_free" / "docs"
 
 
 def load_doc(name: str) -> Loaded:

@@ -1,4 +1,4 @@
-"""Close Review Workspace - entry point. Run: streamlit run app/streamlit_app.py"""
+"""Close Review Workspace - entry point. Run: streamlit run app/Home.py"""
 import sys
 from pathlib import Path
 

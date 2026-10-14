@@ -68,7 +68,7 @@ def render():
             st.rerun()
         st.error("Golden evals did not complete.")
         if out:
-            st.code(out, language=None)
+            st.code(ui.scrub(out), language=None)
 
     r = data.load_eval_summary()
     cg = data.load_commentary_grade()

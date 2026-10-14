@@ -44,7 +44,7 @@ def _quickbooks(client):
             st.caption(f"Flags: {d['flags_source']}")
         t = d.get("last_test")
         if t:
-            (st.success if t.get("ok") else st.error)(f"Last test {t.get('tested_at')}: {t.get('message')}")
+            (st.success if t.get("ok") else st.error)(f"Last test {t.get('tested_at')}: {ui.scrub(t.get('message'))}")
         ui.source_note(s.path)
     if st.button("Test connection"):
         with st.spinner("Running read-only CompanyInfo query..."):

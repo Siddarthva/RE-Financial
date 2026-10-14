@@ -91,7 +91,7 @@ def _approval(client, period, verdict):
                 st.error("Reviewer name and reason are both required.")
             else:
                 ok, msg = actions.decide(client, period, name.strip(), reason.strip(), reject=reject)
-                (st.success if ok else st.error)(msg or ("Recorded." if ok else "The decision was not recorded."))
+                (st.success if ok else st.error)(ui.scrub(msg) or ("Recorded." if ok else "The decision was not recorded."))
                 if ok:
                     st.rerun()
     st.markdown("**Audit log entries for this period**")

@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-PROJECT = Path(__file__).resolve().parent.parent / "ai_solutions_builder_free"
+from paths import PROJECT  # noqa: E402
 
 
 def _run(args: list[str], timeout: int = 180) -> tuple[bool, str]:
