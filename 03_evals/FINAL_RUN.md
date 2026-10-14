@@ -33,7 +33,7 @@ python scripts/scan_secrets.py . outputs
 | Live QuickBooks `--test` | **PASS** | CompanyInfo read, read-only flags enforced |
 | Secret scan (staged copy of tracked files) | **PASS** | 0 findings, 145 text files, 4 declared fake-fixture files skipped |
 
-**Clean-room check.** `python scripts/package_submission.py` built `dist/submission.zip` (156 tracked files, 478,215 bytes). Unzipped to an empty temp folder and ran the README quickstart there: unit tests 101/101 OK in 66 s, golden 17/17, `run_pipeline.py abc 2026-06` success, commentary grader PASS, mutation test 13/13 caught in 6 min 18 s, Streamlit started and answered HTTP 200 on its health endpoint. The workbook hash in the zip matched. In the zip, `--test` now says the MCP server is not part of the repo and how to add it.
+**Clean-room check.** `python scripts/package_submission.py` built `dist/submission.zip` (156 tracked files, about 0.48 MB). Unzipped to an empty temp folder and ran the README quickstart there: unit tests 101/101 OK in 66 s, golden 17/17, `run_pipeline.py abc 2026-06` success, commentary grader PASS, mutation test 13/13 caught in 6 min 18 s, Streamlit started and answered HTTP 200 on its health endpoint. The workbook hash in the zip matched. In the zip, `--test` now says the MCP server is not part of the repo and how to add it.
 
 Found by the clean-room run: the README quoted ~30 s for the unit tests and 1-2 min for the mutation test; real times are ~1 min and ~6 min. README corrected.
 
