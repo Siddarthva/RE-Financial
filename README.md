@@ -6,14 +6,14 @@ This repo answers RE Financial Services' "Build Exercise: AI Solutions Builder".
 
 | Brief part | Folder | Key file | Detail README | PDF |
 |---|---|---|---|---|
-| 1. QuickBooks ↔ Claude connection | [`01_connection/`](01_connection/) | [`connection_decision.md`](01_connection/connection_decision.md) | [README](01_connection/README.md) | none generated |
-| 2. Monthly trend-analysis skill | [`02_skill/`](02_skill/) | [`SKILL.md`](.claude/skills/monthly-financial-analysis/SKILL.md) | [README](02_skill/README.md) | none generated |
-| 3. Evals (≥5 golden cases + grading) | [`03_evals/`](03_evals/) | [`golden_cases.json`](03_evals/golden_cases.json), [`GRADING.md`](03_evals/GRADING.md) | [README](03_evals/README.md) | none generated |
-| 4. One-page architecture | [`04_architecture/`](04_architecture/) | [`architecture.md`](04_architecture/architecture.md) | [README](04_architecture/README.md) | none generated |
-| Requirement-by-requirement status | [`04_architecture/`](04_architecture/) | [`brief_traceability.md`](04_architecture/brief_traceability.md) | [README](04_architecture/README.md) | none generated |
-| Optional review UI | [`05_review_workspace/`](05_review_workspace/) | [`app/Home.py`](05_review_workspace/app/Home.py) | [README](05_review_workspace/README.md) | none generated |
+| 1. QuickBooks ↔ Claude connection | [`01_connection/`](01_connection/) | [`connection_decision.md`](01_connection/connection_decision.md) | [README](01_connection/README.md) | [PDF](00_START_HERE/01_Connection_Architecture.pdf) |
+| 2. Monthly trend-analysis skill | [`02_skill/`](02_skill/) | [`SKILL.md`](.claude/skills/monthly-financial-analysis/SKILL.md) | [README](02_skill/README.md) | [PDF](00_START_HERE/02_Skill_and_Analysis_Workflow.pdf) |
+| 3. Evals (≥5 golden cases + grading) | [`03_evals/`](03_evals/) | [`golden_cases.json`](03_evals/golden_cases.json), [`GRADING.md`](03_evals/GRADING.md) | [README](03_evals/README.md) | [PDF](00_START_HERE/03_Evals_and_Regression.pdf) |
+| 4. One-page architecture | [`04_architecture/`](04_architecture/) | [`architecture.md`](04_architecture/architecture.md) | [README](04_architecture/README.md) | [PDF](00_START_HERE/04_Architecture_OnePage.pdf) |
+| Requirement-by-requirement status | [`04_architecture/`](04_architecture/) | [`brief_traceability.md`](04_architecture/brief_traceability.md) | [README](04_architecture/README.md) | [PDF](00_START_HERE/06_Verification_and_Robustness_Report.pdf) |
+| Optional review UI | [`05_review_workspace/`](05_review_workspace/) | [`app/Home.py`](05_review_workspace/app/Home.py) | [README](05_review_workspace/README.md) | none |
 
-No PDF exists in this repo. The column is kept so the gap is visible; the Markdown files are the deliverables.
+The PDFs are in [`00_START_HERE/`](00_START_HERE/README.md), generated from these Markdown files by `scripts/build_pdfs.py`. The Markdown files remain the source of truth.
 
 ## Latest results (2026-10-14, clean-state re-run: [`verification_matrix.md`](04_architecture/verification_matrix.md))
 
@@ -56,7 +56,7 @@ Then open [`02_skill/sample_outputs/`](02_skill/sample_outputs/) (Excel sign-off
 - **The MCP server is not in this repo.** It is Intuit's repository, cloned beside it and untracked. [`dependency_risk.md`](01_connection/dependency_risk.md) covers its 49 npm audit findings (none fixed).
 - **Different layouts need code.** `clients/xyz` shows a new client needs only a config, but the parser expects a wide sheet with one column per month.
 - **Commentary quality is only partly graded.** Numbers and coverage are checked by code; usefulness and causes rest on an LLM reviewer and a human.
-- **No PDFs and no UI screenshots** are in the repo.
+- **No UI screenshots** are in the repo. The PDFs in `00_START_HERE/` are built from the Markdown, not hand-edited.
 
 Full detail, with a reason for every item: [`brief_traceability.md`](04_architecture/brief_traceability.md).
 

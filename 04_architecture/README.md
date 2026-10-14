@@ -27,7 +27,7 @@
 
 ## PDFs
 
-No PDF is generated or committed. The brief itself was supplied as a PDF outside this repo. If a PDF of the one-page note is needed, export [`architecture.md`](architecture.md) from a Markdown viewer. Whether the note fits one printed page was never checked ([`verification_matrix.md`](verification_matrix.md)).
+The one-page note is rendered to a PDF at [`00_START_HERE/04_Architecture_OnePage.pdf`](../00_START_HERE/04_Architecture_OnePage.pdf) by `scripts/build_pdfs.py`, which checks that it is exactly one page.
 
 ## What this folder proves, and what it doesn't
 

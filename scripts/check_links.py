@@ -63,8 +63,13 @@ def main(argv):
     if argv:
         files = [Path(a).resolve() for a in argv]
     else:
-        names = subprocess.run(["git", "ls-files", "*.md"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split("\n")
-        files = [ROOT / n for n in names if n]
+        try:
+            names = subprocess.run(["git", "ls-files", "*.md"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split("\n")
+            files = [ROOT / n for n in names if n]
+        except (OSError, subprocess.CalledProcessError):
+            # An unzipped submission is not a git repository: check every Markdown file outside caches and dependencies.
+            skip = {"node_modules", "dist", "__pycache__", ".pdf_cache", "quickbooks-online-mcp-server", ".git"}
+            files = [p for p in ROOT.rglob("*.md") if not skip & set(p.relative_to(ROOT).parts)]
     missing = [f for f in files if not f.exists()]
     if missing:
         print("ERROR: file not found: " + ", ".join(str(m) for m in missing))

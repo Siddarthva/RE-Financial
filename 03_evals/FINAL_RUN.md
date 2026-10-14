@@ -34,6 +34,8 @@ Commands, in order: `python -m unittest discover -s tests` (13:06, 69 s; 8 UI te
 | Link check | **PASS** | 60 files, 128 links, 0 broken |
 | Secret scan (git-tracked files) | **PASS** | 0 findings, 176 text files |
 
+**Clean-room check.** `dist/submission.zip` (194 files, 1.38 MB) unzipped into an empty temp folder and the README quickstart followed there. First pass found two defects, both fixed before the tag: `scripts/check_links.py` crashed with a traceback outside a git repository (now falls back to scanning every `.md`), and the root README still said no PDFs exist (now links the PDFs). Second pass results are in the final report of the task.
+
 Not re-run live: the monthly P&L and Balance Sheet reads (cited from `01_connection/evidence/quickbooks/2026-10-14/`) and the `--compare` step behind `qbo_vs_workbook.md`.
 
 ## Result: v1.5 phases 1-3 counts re-run for the PDF pack, 2026-10-14
