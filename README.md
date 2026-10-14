@@ -25,7 +25,7 @@ No PDF exists in this repo. The column is kept so the gap is visible; the Markdo
 | Robustness (fault injection) | 32 / 32 corrupted-workbook faults STOP, WARN or HANDLE as declared, on both entry points; 0 silent wrong numbers ([report](03_evals/robustness/ROBUSTNESS_REPORT.md)) |
 | Commentary grader (engine text, reviewed text, saved skill output) | all three PASS; the flawed control FAILs as intended |
 | Source workbook SHA-256 | unchanged (`75da8d679a89551f…`) |
-| Secret scan (git-tracked files: 178 text files scanned) | 0 findings |
+| Secret scan (git-tracked files: 176 text files scanned) | 0 findings |
 | Live QuickBooks read-only checks | passed 2026-10-14 04:34–04:36 UTC: CompanyInfo, monthly P&L Jan–Jun 2026, Balance Sheet at 30 Jun 2026; no write tool registered ([evidence](01_connection/evidence/quickbooks/2026-10-14/README.md)) |
 
 These results show the checks pass on the supplied workbook and that the read-only QuickBooks test passed on the date shown. They do not show that the commentary is insightful.
@@ -41,7 +41,7 @@ python 03_evals/run_golden_evals.py            # expect: Score: 22/22
 python scripts/run_pipeline.py abc 2026-06     # intake gate + calculate + flux -> outputs/abc/
 python 03_evals/grade_commentary.py            # grades the engine's own commentary: PASS
 streamlit run 05_review_workspace/app/Home.py  # optional UI, reads outputs/ only
-python 03_evals/mutation_test.py               # optional, ~6 min: expect 13/13 mutants caught
+python 03_evals/mutation_test.py               # optional, ~6-15 min: expect 13/13 mutants caught
 python 03_evals/robustness/fault_injection.py  # optional, ~3 min: expect 32/32 faults as required
 python scripts/check_links.py                  # every relative link in every README resolves
 ```

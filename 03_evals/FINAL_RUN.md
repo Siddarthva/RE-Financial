@@ -17,6 +17,25 @@ python src/run_client.py xyz
 python scripts/scan_secrets.py . outputs
 ```
 
+## Result: v1.5-final clean run, 2026-10-14
+
+Machine: Windows 11 Home (10.0.26300), Python 3.13.5. Local times UTC+05:30. Run at commit `9711420` plus the uncommitted v1.5 doc and PDF-pack changes (committed afterwards as `dc43a60`). `outputs/` was moved aside to a scratch folder and recreated empty; nothing was copied back from that folder. Two kinds of file were then taken from git HEAD instead, because no script produces them: model-authored commentary and reviews (`commentary_2026-06*`, `skill_commentary*`, `reference_commentary_jun2026.md`, `review_2026-06*`, `monthly_review_2026-06*.xlsx`, `reconciliation_3_months.md`, `ABC_Inc_Financial_Analysis.xlsx`, `qbo_vs_workbook.md`, `outputs/README.md`). Earlier run manifests and the earlier audit-log lines were not restored; the new audit logs hold only this run (the old ones remain in git history). Workbook SHA-256 `75da8d679a89551f…` unchanged.
+
+Commands, in order: `python -m unittest discover -s tests` (13:06, 69 s; 8 UI tests skipped because outputs were still empty, re-run after regeneration: 75 s, 0 skipped), `python src/run_client.py abc|xyz`, `python scripts/run_pipeline.py abc 2026-06` and `xyz 2026-05` (13:07), `python 03_evals/run_golden_evals.py` (13:07), `python 03_evals/grade_commentary.py` (engine, reviewed, skill output), `python 03_evals/mutation_test.py` (13:07:52, 14 min 15 s), `python 03_evals/robustness/fault_injection.py` (13:22:07, 2 min 33 s), `python scripts/export_eval_results.py`, `python 01_connection/qbo_test_connection.py abc --test` (13:25 IST), `python 01_connection/load_workbook_to_sandbox.py --dry-run`, `python scripts/check_links.py`, `python scripts/package_submission.py`.
+
+| Check | Result | Counts |
+|---|---|---|
+| Unit tests (incl. UI, robustness and workflow-failure tests) | **PASS** | 129 run, 129 OK |
+| Golden cases | **PASS** | 22/22 (workbook 4, workbook+perturbation 9, ABC cell-sourced 9) |
+| Mutation test | **PASS** | 13/13 caught, 0 survived |
+| Robustness (fault injection) | **PASS** | 32/32 pass, 0 silent-wrong |
+| Commentary grader (engine / reviewed / skill output) | **PASS** | all three PASS |
+| Live QuickBooks `--test` | **PASS** | `ok: true`, CompanyInfo (Sandbox Company US a3a1), 2026-10-14 07:55 UTC, read-only |
+| Link check | **PASS** | 60 files, 128 links, 0 broken |
+| Secret scan (git-tracked files) | **PASS** | 0 findings, 176 text files |
+
+Not re-run live: the monthly P&L and Balance Sheet reads (cited from `01_connection/evidence/quickbooks/2026-10-14/`) and the `--compare` step behind `qbo_vs_workbook.md`.
+
 ## Result: v1.5 phases 1-3 counts re-run for the PDF pack, 2026-10-14
 
 The v1.4 block below pre-dates Phases 1-3 (G19-G22, the 32-fault robustness suite, workflow-failure tests). This block re-ran the suites at commit `9711420` plus uncommitted doc edits; the PDFs in `00_START_HERE/` read their counts from this table. Robustness was not re-run in this block: 32/32 is from `03_evals/robustness/ROBUSTNESS_REPORT.md` (Phase 2). Workbook SHA-256 `75da8d679a89551f…` unchanged after the runs.

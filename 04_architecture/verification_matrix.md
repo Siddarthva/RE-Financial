@@ -1,6 +1,6 @@
 # Verification matrix (Phase 1, 2026-10-14)
 
-> **Counts are as of Phase 1 (2026-10-14).** Later phases added G19–G22, the 32-fault robustness suite and 12 workflow-failure tests. Current totals: 129 unit tests, 22 golden cases, 178 text files in the tracked-file secret scan. See the root [`README.md`](../README.md).
+> **Counts are as of Phase 1 (2026-10-14).** Later phases added G19–G22, the 32-fault robustness suite and 12 workflow-failure tests. Current totals: 129 unit tests, 22 golden cases, 176 text files in the tracked-file secret scan. See the root [`README.md`](../README.md).
 
 Every line of the brief, mapped to the command or file that proves it and the result of a run **today**, from a clean `outputs/`. The old `outputs/` was moved aside first and everything was regenerated. Authored inputs that no script produces were then restored: reviewed and skill commentary, reviewer verdicts, the reference commentary, the 3-month reconciliation and earlier run manifests. Audit logs were restored with their history first and today's entries after. Status wording is the same as [`brief_traceability.md`](brief_traceability.md).
 
