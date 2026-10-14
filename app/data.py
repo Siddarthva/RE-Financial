@@ -196,6 +196,29 @@ def downstream_status(client: str, period: str | None) -> dict[str, dict]:
     return out
 
 
+def load_eval_summary() -> Loaded:
+    """outputs/eval_results.json, written by scripts/export_eval_results.py from the existing eval scripts."""
+    return _read_json(OUTPUTS / "eval_results.json")
+
+
+def load_commentary_grade() -> Loaded:
+    return _read_json(OUTPUTS / "commentary_grade.json")
+
+
+DOCS = OUTPUTS.parent / "ai_solutions_builder_free" / "docs"
+
+
+def load_doc(name: str) -> Loaded:
+    """Markdown doc under ai_solutions_builder_free/docs/ (names are fixed by callers, never user input)."""
+    p = DOCS / name
+    if not p.is_file():
+        return Loaded(path=_rel(p), error="File not found")
+    try:
+        return Loaded(data=p.read_text(encoding="utf-8"), path=_rel(p))
+    except OSError as exc:
+        return Loaded(path=_rel(p), error=f"Could not read file: {exc}")
+
+
 def reviewer_excel(client: str, period: str | None) -> tuple[str, bytes] | None:
     if not period:
         return None

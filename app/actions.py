@@ -26,5 +26,9 @@ def decide(client: str, period: str, reviewer: str, reason: str, reject: bool) -
     return _run(args + (["--reject"] if reject else []))
 
 
+def run_golden_evals() -> tuple[bool, str]:
+    return _run(["scripts/export_eval_results.py"], timeout=300)
+
+
 def test_qbo(client: str) -> tuple[bool, str]:
     return _run(["scripts/qbo_test_connection.py", client, "--test"], timeout=90)
