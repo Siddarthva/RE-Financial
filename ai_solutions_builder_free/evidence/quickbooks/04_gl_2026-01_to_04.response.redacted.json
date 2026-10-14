@@ -1,0 +1,93 @@
+{
+  "Header": {
+    "Time": "2026-10-12T06:59:20-07:00",
+    "ReportName": "GeneralLedger",
+    "ReportBasis": "Accrual",
+    "StartPeriod": "2026-01-01",
+    "EndPeriod": "2026-04-30",
+    "Currency": "USD",
+    "Option": [
+      {
+        "Name": "NoReportData",
+        "Value": "true"
+      }
+    ]
+  },
+  "Columns": {
+    "Column": [
+      {
+        "ColTitle": "Date",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "tx_date"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Transaction Type",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "txn_type"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Num",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "doc_num"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Name",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "name"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Memo/Description",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "memo"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Split",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "split_acc"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Amount",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "subt_nat_amount"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Balance",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "rbal_nat_amount"
+          }
+        ]
+      }
+    ]
+  },
+  "Rows": {}
+}

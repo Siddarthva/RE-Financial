@@ -1,0 +1,84 @@
+{
+  "CompanyName": "Sandbox Company US a3a1",
+  "LegalName": "Sandbox Company US a3a1",
+  "CompanyAddr": {
+    "Id": "1",
+    "Line1": "123 Sierra Way",
+    "City": "San Pablo",
+    "CountrySubDivisionCode": "CA",
+    "PostalCode": "87999"
+  },
+  "CustomerCommunicationAddr": {
+    "Id": "1",
+    "Line1": "123 Sierra Way",
+    "City": "San Pablo",
+    "CountrySubDivisionCode": "CA",
+    "PostalCode": "87999"
+  },
+  "LegalAddr": {
+    "Id": "1",
+    "Line1": "123 Sierra Way",
+    "City": "San Pablo",
+    "CountrySubDivisionCode": "CA",
+    "PostalCode": "87999"
+  },
+  "CustomerCommunicationEmailAddr": {
+    "Address": "[REDACTED:email]"
+  },
+  "PrimaryPhone": {},
+  "CompanyStartDate": "2026-10-10",
+  "FiscalYearStartMonth": "January",
+  "Country": "US",
+  "Email": {
+    "Address": "[REDACTED:email]"
+  },
+  "WebAddr": {},
+  "SupportedLanguages": "en",
+  "DefaultTimeZone": "America/Los_Angeles",
+  "NameValue": [
+    {
+      "Name": "NonTracking",
+      "Value": "false"
+    },
+    {
+      "Name": "IsQbdtMigrated",
+      "Value": "false"
+    },
+    {
+      "Name": "CompanyType",
+      "Value": "Other"
+    },
+    {
+      "Name": "SubscriptionStatus",
+      "Value": "SUBSCRIBED"
+    },
+    {
+      "Name": "OfferingSku",
+      "Value": "QuickBooks Online Plus"
+    },
+    {
+      "Name": "PayrollFeature",
+      "Value": "false"
+    },
+    {
+      "Name": "AccountantFeature",
+      "Value": "false"
+    },
+    {
+      "Name": "ItemCategoriesFeature",
+      "Value": "true"
+    },
+    {
+      "Name": "AssignedTime",
+      "Value": "2026-10-10T21:00:19-07:00"
+    }
+  ],
+  "domain": "QBO",
+  "sparse": false,
+  "Id": "1",
+  "SyncToken": "9",
+  "MetaData": {
+    "CreateTime": "2026-10-10T21:00:19-07:00",
+    "LastUpdatedTime": "2026-10-10T21:01:17-07:00"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "01_pnl_2026-01_to_06_monthly_accrual.response.redacted.json": "nothing to redact",
+  "02_pnl_2026-01_to_06_monthly_cash.response.redacted.json": "nothing to redact",
+  "03_pnl_default_no_params.response.redacted.json": "nothing to redact",
+  "04_gl_2026-01_to_04.response.redacted.json": "nothing to redact",
+  "05_gl_2000-01_to_2026-04.response.redacted.json": "nothing to redact",
+  "06_invoices_before_2026-05-01.response.redacted.txt": "nothing to redact",
+  "07_balance_sheet_2026-06-30.response.redacted.json": "nothing to redact",
+  "08_company_info.response.redacted.json": {
+    "email": 2
+  }
+}

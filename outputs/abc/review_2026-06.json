@@ -1,0 +1,24 @@
+{
+  "verdict": "approve",
+  "changes": [],
+  "statement_notes": [
+    {"statement": 1, "status": "ok", "note": ""},
+    {"statement": 2, "status": "ok", "note": ""},
+    {"statement": 3, "status": "ok", "note": ""},
+    {"statement": 4, "status": "ok", "note": "Net margin -168.84% and the 6.09pp fall are correct. The loss shrank while revenue fell, so the margin worsened."},
+    {"statement": 5, "status": "ok", "note": ""},
+    {"statement": 6, "status": "ok", "note": "Bad Debts moved from 12,935.29 to -1,806.24, which is a negative or reversing line. It is named correctly."},
+    {"statement": 7, "status": "ok", "note": ""},
+    {"statement": 8, "status": "ok", "note": ""},
+    {"statement": 9, "status": "ok", "note": ""},
+    {"statement": 10, "status": "ok", "note": "runway_months.3m = 3.403094 and burn.3m = 209,656.62, with primary_window = 3m."},
+    {"statement": 11, "status": "ok", "note": "warnings is empty."},
+    {"statement": 12, "status": "ok", "note": "No entry in one_offs has month 2026-06. The only 2026 item is SKU Profiling in 2026-04."}
+  ],
+  "open_questions": [
+    {"question": "What explains the Bad Debts credit of -1,806.24 in June, against 12,935.29 in May? Is it a recovery or reversal of a prior provision?", "why": "It is the second-largest movement and cuts operating expenses by 14.7k. If it is non-recurring, underlying operating expenses are higher than reported."},
+    {"question": "What is the nature of the Events & Conferences increase, from 11,323.91 to 29,294.58? Is it one-off or recurring?", "why": "It is the largest movement and, at 6.3% of operating expenses, the main offset to the other cost reductions."},
+    {"question": "Why did Partnership Income and Professional Services fall to zero, and why did Usage Fees fall 6.3%?", "why": "These three lines account for the whole 12.5k revenue decline (-476.73, -833.33 and -11,142.74). Whether they continue matters for runway."},
+    {"question": "Is the drop in Partnerships Commission (10,800 to 1,800) and Sales Commission (13,126.41 to 5,926.88) a timing difference?", "why": "These lines drive much of the cost reduction and may reverse next month."}
+  ]
+}

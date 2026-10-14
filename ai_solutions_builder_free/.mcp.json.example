@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "quickbooks": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["<path-to>/quickbooks-online-mcp-server/dist/index.js"],
+      "env": {
+        "QUICKBOOKS_DISABLE_WRITE": "true",
+        "QUICKBOOKS_DISABLE_UPDATE": "true",
+        "QUICKBOOKS_DISABLE_DELETE": "true",
+        "QUICKBOOKS_CLIENT_ID": "${QUICKBOOKS_CLIENT_ID}",
+        "QUICKBOOKS_CLIENT_SECRET": "${QUICKBOOKS_CLIENT_SECRET}",
+        "QUICKBOOKS_ENVIRONMENT": "${QUICKBOOKS_ENVIRONMENT}",
+        "QUICKBOOKS_REALM_ID": "${QUICKBOOKS_REALM_ID}",
+        "QUICKBOOKS_REFRESH_TOKEN": "${QUICKBOOKS_REFRESH_TOKEN}"
+      }
+    }
+  }
+}

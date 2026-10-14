@@ -1,0 +1,46 @@
+# XYZ Labs Pvt Ltd — synthetic test client (fictional). Regenerate data: python clients/xyz/generate_dataset.py
+client: xyz
+display_name: XYZ Labs Pvt Ltd (synthetic)
+workbook: xyz_financials.xlsx   # relative to this folder
+
+sheets:
+  income_statement: P&L
+
+layout:
+  header_label: Line Item       # A4; account labels are also in column A
+  month_format: "%b-%y"         # "Apr-25" ... "May-26", oldest first
+
+sections:
+  income:             {header: Revenue,       total: Total Revenue}
+  cost of goods sold: {header: Cost of Sales, total: Total Cost of Sales}
+  operating expenses: {header: Expenses,      total: Total Expenses}
+
+totals:
+  revenue: Total Revenue
+  cost_of_goods_sold: Total Cost of Sales
+  gross_profit: Gross Margin
+  operating_expenses: Total Expenses
+  operating_income: Operating Profit
+  net_income: Net Profit          # = Operating Profit - Finance Costs
+
+subtotal_rows: []
+
+fiscal_year:
+  start_month: 4                  # Indian fiscal year, April-March
+
+categories:
+  - Payroll & Benefits
+  - Sales & Marketing             # declared but no source accounts: must be reported as missing, not zero
+  - Professional Services
+  - Technology
+  - General & Administrative
+
+account_to_category:
+  Salaries & Wages: Payroll & Benefits
+  Employer PF & ESI: Payroll & Benefits
+  Audit Fees: Professional Services
+  Legal Counsel: Professional Services
+  SaaS Subscriptions: Technology
+  Office Lease: General & Administrative
+  Utilities: General & Administrative
+  Depreciation & Amortisation: General & Administrative

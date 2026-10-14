@@ -1,0 +1,41 @@
+{
+  "client": "xyz",
+  "display_name": "XYZ Labs Pvt Ltd (synthetic)",
+  "source": "xyz_financials.xlsx",
+  "months": 14,
+  "period": "Apr 2025 - May 2026",
+  "fiscal_year_start_month": 4,
+  "latest_fiscal_year": "FY2026-27",
+  "latest": {
+    "revenue": 1129127.13,
+    "cost_of_goods_sold": 352369.77,
+    "gross_profit": 776757.36,
+    "operating_expenses": 778751.94,
+    "operating_income": -1994.58,
+    "net_income": -14279.87,
+    "revenue_mom_change": -178007.41,
+    "revenue_mom_pct": -0.136181,
+    "gross_margin_pct": 0.687927,
+    "operating_margin_pct": -0.001766,
+    "net_margin_pct": -0.012647,
+    "revenue_ttm": 12466180.06,
+    "cost_of_goods_sold_ttm": 3802210.48,
+    "gross_profit_ttm": 8663969.58,
+    "operating_expenses_ttm": 9046129.12,
+    "operating_income_ttm": -382159.54,
+    "net_income_ttm": -538055.4,
+    "revenue_fytd": 2436261.67,
+    "gross_profit_fytd": 1750610.26,
+    "operating_expenses_fytd": 1541260.12,
+    "net_income_fytd": 184655.46
+  },
+  "categories_latest": {
+    "General & Administrative": 153642.39,
+    "Payroll & Benefits": 519653.4,
+    "Professional Services": 32323.4,
+    "Technology": 73132.75
+  },
+  "warnings": [
+    "Missing category: no 'Sales & Marketing' accounts in the source; reported as not available, not zero."
+  ]
+}

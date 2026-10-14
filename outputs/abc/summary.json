@@ -1,0 +1,41 @@
+{
+  "client": "abc",
+  "display_name": "ABC Inc",
+  "source": "../../ABC Inc - Financial Statements.xlsx",
+  "months": 18,
+  "period": "Jan 2025 - Jun 2026",
+  "fiscal_year_start_month": 1,
+  "latest_fiscal_year": "FY2026",
+  "latest": {
+    "revenue": 195898.16,
+    "cost_of_goods_sold": 58472.44,
+    "gross_profit": 137425.72,
+    "operating_expenses": 468181.8,
+    "operating_income": -330756.08,
+    "net_income": -330756.08,
+    "revenue_mom_change": -12452.8,
+    "revenue_mom_pct": -0.059768,
+    "gross_margin_pct": 0.701516,
+    "operating_margin_pct": -1.688408,
+    "net_margin_pct": -1.688408,
+    "revenue_ttm": 2303975.51,
+    "cost_of_goods_sold_ttm": 703547.6,
+    "gross_profit_ttm": 1600427.91,
+    "operating_expenses_ttm": 4690207.5,
+    "operating_income_ttm": -3089779.59,
+    "net_income_ttm": -3089779.59,
+    "revenue_fytd": 1187543.99,
+    "gross_profit_fytd": 834609.96,
+    "operating_expenses_fytd": 2822526.4,
+    "net_income_fytd": -1987916.44
+  },
+  "categories_latest": {
+    "Finance & Tax": -135.89,
+    "General & Administrative": 14303.5,
+    "Payroll & Benefits": 331397.16,
+    "Professional Services": 14000.0,
+    "Sales & Marketing": 74527.55,
+    "Technology": 34089.48
+  },
+  "warnings": []
+}

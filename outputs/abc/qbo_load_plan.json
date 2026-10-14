@@ -1,0 +1,596 @@
+[
+  {
+    "doc_number": "ABC-2025-01",
+    "txn_date": "2025-01-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "167587.50",
+        "description": "revenue 2025-01 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "36950.54",
+        "description": "cost_of_goods_sold 2025-01 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "513541.99",
+        "description": "operating_expenses 2025-01 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "382905.03",
+        "description": "balancing line 2025-01 (equals workbook net loss)"
+      }
+    ],
+    "signature": "250986c36ac089d7",
+    "private_note": "workbook-load:v1 sha256:250986c36ac089d7 source: ABC Inc workbook, 2025-01",
+    "net_income_workbook": "-382905.03"
+  },
+  {
+    "doc_number": "ABC-2025-02",
+    "txn_date": "2025-02-28",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "176651.19",
+        "description": "revenue 2025-02 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "37476.29",
+        "description": "cost_of_goods_sold 2025-02 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "555578.55",
+        "description": "operating_expenses 2025-02 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "416403.65",
+        "description": "balancing line 2025-02 (equals workbook net loss)"
+      }
+    ],
+    "signature": "5a15ff2e8f085e0a",
+    "private_note": "workbook-load:v1 sha256:5a15ff2e8f085e0a source: ABC Inc workbook, 2025-02",
+    "net_income_workbook": "-416403.65"
+  },
+  {
+    "doc_number": "ABC-2025-03",
+    "txn_date": "2025-03-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "170550.65",
+        "description": "revenue 2025-03 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "49999.34",
+        "description": "cost_of_goods_sold 2025-03 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "533111.68",
+        "description": "operating_expenses 2025-03 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "412560.37",
+        "description": "balancing line 2025-03 (equals workbook net loss)"
+      }
+    ],
+    "signature": "4d014960df755267",
+    "private_note": "workbook-load:v1 sha256:4d014960df755267 source: ABC Inc workbook, 2025-03",
+    "net_income_workbook": "-412560.37"
+  },
+  {
+    "doc_number": "ABC-2025-04",
+    "txn_date": "2025-04-30",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "154136.03",
+        "description": "revenue 2025-04 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "49550.71",
+        "description": "cost_of_goods_sold 2025-04 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "495053.56",
+        "description": "operating_expenses 2025-04 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "390468.24",
+        "description": "balancing line 2025-04 (equals workbook net loss)"
+      }
+    ],
+    "signature": "66c8f7730a066ef2",
+    "private_note": "workbook-load:v1 sha256:66c8f7730a066ef2 source: ABC Inc workbook, 2025-04",
+    "net_income_workbook": "-390468.24"
+  },
+  {
+    "doc_number": "ABC-2025-05",
+    "txn_date": "2025-05-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "169403.74",
+        "description": "revenue 2025-05 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "50211.89",
+        "description": "cost_of_goods_sold 2025-05 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "473844.16",
+        "description": "operating_expenses 2025-05 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "354652.31",
+        "description": "balancing line 2025-05 (equals workbook net loss)"
+      }
+    ],
+    "signature": "74d0ee24928821e0",
+    "private_note": "workbook-load:v1 sha256:74d0ee24928821e0 source: ABC Inc workbook, 2025-05",
+    "net_income_workbook": "-354652.31"
+  },
+  {
+    "doc_number": "ABC-2025-06",
+    "txn_date": "2025-06-30",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "190555.65",
+        "description": "revenue 2025-06 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "48929.91",
+        "description": "cost_of_goods_sold 2025-06 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "497871.96",
+        "description": "operating_expenses 2025-06 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "356246.22",
+        "description": "balancing line 2025-06 (equals workbook net loss)"
+      }
+    ],
+    "signature": "ac96c79fcaad17a2",
+    "private_note": "workbook-load:v1 sha256:ac96c79fcaad17a2 source: ABC Inc workbook, 2025-06",
+    "net_income_workbook": "-356246.22"
+  },
+  {
+    "doc_number": "ABC-2025-07",
+    "txn_date": "2025-07-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "183919.10",
+        "description": "revenue 2025-07 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "54581.14",
+        "description": "cost_of_goods_sold 2025-07 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "455324.92",
+        "description": "operating_expenses 2025-07 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "325986.96",
+        "description": "balancing line 2025-07 (equals workbook net loss)"
+      }
+    ],
+    "signature": "3108ac815cd9d0da",
+    "private_note": "workbook-load:v1 sha256:3108ac815cd9d0da source: ABC Inc workbook, 2025-07",
+    "net_income_workbook": "-325986.96"
+  },
+  {
+    "doc_number": "ABC-2025-08",
+    "txn_date": "2025-08-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "181747.20",
+        "description": "revenue 2025-08 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "67212.50",
+        "description": "cost_of_goods_sold 2025-08 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "431306.59",
+        "description": "operating_expenses 2025-08 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "316771.89",
+        "description": "balancing line 2025-08 (equals workbook net loss)"
+      }
+    ],
+    "signature": "757844bac6a41c75",
+    "private_note": "workbook-load:v1 sha256:757844bac6a41c75 source: ABC Inc workbook, 2025-08",
+    "net_income_workbook": "-316771.89"
+  },
+  {
+    "doc_number": "ABC-2025-09",
+    "txn_date": "2025-09-30",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "181508.47",
+        "description": "revenue 2025-09 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "58015.06",
+        "description": "cost_of_goods_sold 2025-09 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "483844.86",
+        "description": "operating_expenses 2025-09 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "360351.45",
+        "description": "balancing line 2025-09 (equals workbook net loss)"
+      }
+    ],
+    "signature": "4981a6cd590724f5",
+    "private_note": "workbook-load:v1 sha256:4981a6cd590724f5 source: ABC Inc workbook, 2025-09",
+    "net_income_workbook": "-360351.45"
+  },
+  {
+    "doc_number": "ABC-2025-10",
+    "txn_date": "2025-10-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "191426.63",
+        "description": "revenue 2025-10 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "58737.07",
+        "description": "cost_of_goods_sold 2025-10 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "479083.78",
+        "description": "operating_expenses 2025-10 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "346394.22",
+        "description": "balancing line 2025-10 (equals workbook net loss)"
+      }
+    ],
+    "signature": "a46d3b27dbe64757",
+    "private_note": "workbook-load:v1 sha256:a46d3b27dbe64757 source: ABC Inc workbook, 2025-10",
+    "net_income_workbook": "-346394.22"
+  },
+  {
+    "doc_number": "ABC-2025-11",
+    "txn_date": "2025-11-30",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "187800.63",
+        "description": "revenue 2025-11 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "54447.63",
+        "description": "cost_of_goods_sold 2025-11 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "420263.04",
+        "description": "operating_expenses 2025-11 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "286910.04",
+        "description": "balancing line 2025-11 (equals workbook net loss)"
+      }
+    ],
+    "signature": "f5b340849063e6a0",
+    "private_note": "workbook-load:v1 sha256:f5b340849063e6a0 source: ABC Inc workbook, 2025-11",
+    "net_income_workbook": "-286910.04"
+  },
+  {
+    "doc_number": "ABC-2025-12",
+    "txn_date": "2025-12-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "190029.49",
+        "description": "revenue 2025-12 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "57620.17",
+        "description": "cost_of_goods_sold 2025-12 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Credit",
+        "amount": "402142.09",
+        "description": "operating_expenses 2025-12 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Debit",
+        "amount": "534551.41",
+        "description": "balancing line 2025-12 (equals workbook net income)"
+      }
+    ],
+    "signature": "85bbc50ada9ca51d",
+    "private_note": "workbook-load:v1 sha256:85bbc50ada9ca51d source: ABC Inc workbook, 2025-12",
+    "net_income_workbook": "534551.41"
+  },
+  {
+    "doc_number": "ABC-2026-01",
+    "txn_date": "2026-01-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "204153.96",
+        "description": "revenue 2026-01 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "60755.11",
+        "description": "cost_of_goods_sold 2026-01 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "487711.23",
+        "description": "operating_expenses 2026-01 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "344312.38",
+        "description": "balancing line 2026-01 (equals workbook net loss)"
+      }
+    ],
+    "signature": "5fcb219bd034a694",
+    "private_note": "workbook-load:v1 sha256:5fcb219bd034a694 source: ABC Inc workbook, 2026-01",
+    "net_income_workbook": "-344312.38"
+  },
+  {
+    "doc_number": "ABC-2026-02",
+    "txn_date": "2026-02-28",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "183160.30",
+        "description": "revenue 2026-02 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "59234.68",
+        "description": "cost_of_goods_sold 2026-02 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "500504.05",
+        "description": "operating_expenses 2026-02 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "376578.43",
+        "description": "balancing line 2026-02 (equals workbook net loss)"
+      }
+    ],
+    "signature": "08a45f6f483c3ddb",
+    "private_note": "workbook-load:v1 sha256:08a45f6f483c3ddb source: ABC Inc workbook, 2026-02",
+    "net_income_workbook": "-376578.43"
+  },
+  {
+    "doc_number": "ABC-2026-03",
+    "txn_date": "2026-03-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "191468.19",
+        "description": "revenue 2026-03 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "45856.99",
+        "description": "cost_of_goods_sold 2026-03 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "421605.30",
+        "description": "operating_expenses 2026-03 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "275994.10",
+        "description": "balancing line 2026-03 (equals workbook net loss)"
+      }
+    ],
+    "signature": "fbb70ee6c2e896d7",
+    "private_note": "workbook-load:v1 sha256:fbb70ee6c2e896d7 source: ABC Inc workbook, 2026-03",
+    "net_income_workbook": "-275994.10"
+  },
+  {
+    "doc_number": "ABC-2026-04",
+    "txn_date": "2026-04-30",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "204512.42",
+        "description": "revenue 2026-04 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "59945.28",
+        "description": "cost_of_goods_sold 2026-04 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "465742.99",
+        "description": "operating_expenses 2026-04 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "321175.85",
+        "description": "balancing line 2026-04 (equals workbook net loss)"
+      }
+    ],
+    "signature": "4c268f80462e3e24",
+    "private_note": "workbook-load:v1 sha256:4c268f80462e3e24 source: ABC Inc workbook, 2026-04",
+    "net_income_workbook": "-321175.85"
+  },
+  {
+    "doc_number": "ABC-2026-05",
+    "txn_date": "2026-05-31",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "208350.96",
+        "description": "revenue 2026-05 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "68669.53",
+        "description": "cost_of_goods_sold 2026-05 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "478781.03",
+        "description": "operating_expenses 2026-05 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "339099.60",
+        "description": "balancing line 2026-05 (equals workbook net loss)"
+      }
+    ],
+    "signature": "4bb4f8e6f8850147",
+    "private_note": "workbook-load:v1 sha256:4bb4f8e6f8850147 source: ABC Inc workbook, 2026-05",
+    "net_income_workbook": "-339099.60"
+  },
+  {
+    "doc_number": "ABC-2026-06",
+    "txn_date": "2026-06-30",
+    "lines": [
+      {
+        "account": "Workbook Load - Total Income",
+        "posting": "Credit",
+        "amount": "195898.16",
+        "description": "revenue 2026-06 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total COGS",
+        "posting": "Debit",
+        "amount": "58472.44",
+        "description": "cost_of_goods_sold 2026-06 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Total Operating Expenses",
+        "posting": "Debit",
+        "amount": "468181.80",
+        "description": "operating_expenses 2026-06 (workbook total)"
+      },
+      {
+        "account": "Workbook Load - Clearing",
+        "posting": "Credit",
+        "amount": "330756.08",
+        "description": "balancing line 2026-06 (equals workbook net loss)"
+      }
+    ],
+    "signature": "803f16b0a41b3d92",
+    "private_note": "workbook-load:v1 sha256:803f16b0a41b3d92 source: ABC Inc workbook, 2026-06",
+    "net_income_workbook": "-330756.08"
+  }
+]

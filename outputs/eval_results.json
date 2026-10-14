@@ -1,0 +1,627 @@
+{
+  "generated_at": "2026-10-14T01:24:47+00:00",
+  "golden": {
+    "cases": [
+      {
+        "id": "G01",
+        "name": "Month-over-month revenue change",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "columns": [
+            "T",
+            "S"
+          ],
+          "revenue_row": 14
+        },
+        "expected": {
+          "absolute_change": 9063.690000000002,
+          "percentage_change": 0.05408332960393825
+        },
+        "actual": "change=9063.690000000002, pct=0.054083329603938246",
+        "tolerance": "Absolute change within half a cent; percentage within 0.000001; commentary must not assert a cause.",
+        "perturbation": "Real Jan->Feb 2025 Total Income (T14, S14) already has a non-zero MoM change, so no cell needs changing."
+      },
+      {
+        "id": "G02",
+        "name": "Gross margin",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "columns": [
+            "T"
+          ],
+          "revenue_row": 14,
+          "gross_profit_row": 26
+        },
+        "expected": {
+          "gross_margin": 0.7795149399567389
+        },
+        "actual": "gross_margin=0.7795149399567389",
+        "tolerance": "Gross margin ratio within 0.000001.",
+        "perturbation": "Real Jan 2025 Total Income (T14) and Gross Profit (T26) already give a margin, so no cell needs changing."
+      },
+      {
+        "id": "G03",
+        "name": "TTM requires twelve consecutive months",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "columns": [
+            "T",
+            "S",
+            "R",
+            "Q",
+            "P",
+            "O",
+            "N",
+            "M",
+            "L",
+            "K",
+            "J",
+            "I"
+          ],
+          "revenue_row": 14
+        },
+        "expected": {
+          "ttm_after_11": null,
+          "ttm_after_12": 2145316.28
+        },
+        "actual": "ttm_after_11=nan, ttm_after_12=2145316.28",
+        "tolerance": "No TTM at the 11th month; TTM = SUM(I14:T14) at the 12th.",
+        "perturbation": "Real Jan-Dec 2025 Total Income (T14..I14) is 12 consecutive months; the 11th month must have no TTM and the 12th must, so no cell needs changing."
+      },
+      {
+        "id": "G04",
+        "name": "Duplicate month rejected",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "columns": [
+            "T",
+            "S"
+          ],
+          "revenue_row": 14
+        },
+        "expected": {
+          "raises": "Expected one row per month"
+        },
+        "actual": "Expected one row per month. Aggregate duplicate months before analysis.",
+        "tolerance": "Must raise validation error; no silent double counting.",
+        "perturbation": "Relabel the Feb 2025 column as 15 Jan 2025 so Jan 2025 appears twice."
+      },
+      {
+        "id": "G05",
+        "name": "Missing revenue column rejected",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "columns": [
+            "T",
+            "S"
+          ],
+          "revenue_row": 14
+        },
+        "expected": {
+          "raises": "Missing required columns"
+        },
+        "actual": "Missing required columns: revenue",
+        "tolerance": "Must name the missing required column(s).",
+        "perturbation": "Rename the revenue row label so the Total Income row cannot be found and no revenue column exists."
+      },
+      {
+        "id": "G06",
+        "name": "Expense category trend",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "columns": [
+            "T",
+            "S"
+          ],
+          "category_row": 29
+        },
+        "expected": {
+          "category": "Accounting & Tax",
+          "absolute_change": 39.02000000000044,
+          "percentage_change": 0.003121600000000035
+        },
+        "actual": "change=39.02000000000044, pct=0.0031216000000000577",
+        "tolerance": "Category change and percentage change within half a cent / 0.000001.",
+        "perturbation": "Real Accounting & Tax (T29, S29) is non-zero in both months, so no cell needs changing."
+      },
+      {
+        "id": "G07",
+        "name": "Zero prior-month revenue",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "columns": [
+            "T",
+            "S"
+          ],
+          "revenue_row": 14
+        },
+        "expected": {
+          "absolute_change": 176651.19,
+          "percentage_change": null
+        },
+        "actual": "change=176651.19, pct=nan",
+        "tolerance": "Absolute change = S14; percentage change is null/undefined, not infinity.",
+        "perturbation": "Set Jan 2025 Total Income to 0 so Feb 2025 has a zero prior month."
+      },
+      {
+        "id": "G08",
+        "name": "Insufficient TTM history is disclosed",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "columns": "all",
+          "revenue_row": 14
+        },
+        "expected": {
+          "months_remaining": 6,
+          "commentary_contains": "fewer than 12"
+        },
+        "actual": "6 months; Revenue increased by 12.5% versus the previous available month. TTM totals are not yet available because fewer than 12 monthly observations were supplied. These are descriptive observations; the data alone does not establish the cause of a change.",
+        "tolerance": "Commentary explicitly says TTM is unavailable with fewer than 12 monthly observations.",
+        "perturbation": "Blank the 12 newest month headers so only Jan-Jun 2025 (6 months) remain."
+      },
+      {
+        "id": "G09",
+        "name": "ABC seasonal peak: February marketing spend",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "account": "Total Marketing",
+          "detail_account": "Events & Conferences"
+        },
+        "expected": {
+          "peak_month_by_year": {
+            "2025": "2025-02-01",
+            "2026": "2026-02-01"
+          },
+          "values": {
+            "Total Marketing": {
+              "2025-02-01": 144520.92,
+              "2026-02-01": 82245.64
+            },
+            "Events & Conferences": {
+              "2025-02-01": 89275.41,
+              "2026-02-01": 56851.23
+            }
+          }
+        },
+        "actual": "February marketing spend: February peak in 2025 and 2026",
+        "tolerance": "Peak month per calendar year must be February for both rows; values within 0.005.",
+        "perturbation": null
+      },
+      {
+        "id": "G10",
+        "name": "ABC one-off items and event month",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "min_abs": 5000
+        },
+        "expected": {
+          "one_off_items": [
+            {
+              "account": "Recruiting Expense",
+              "month": "2025-01-01",
+              "amount": 15750.0
+            },
+            {
+              "account": "Severance",
+              "month": "2025-07-01",
+              "amount": 9533.76
+            },
+            {
+              "account": "Income Tax Benefit",
+              "month": "2025-12-01",
+              "amount": -1244429.84
+            },
+            {
+              "account": "Stock-Based Compensation Expense",
+              "month": "2025-12-01",
+              "amount": 334660.53
+            },
+            {
+              "account": "SKU Profiling",
+              "month": "2026-04-01",
+              "amount": 10000.0
+            }
+          ],
+          "event_month": "2025-12-01",
+          "event_month_totals": {
+            "operating_expenses": -402142.09,
+            "net_income": 534551.41
+          },
+          "net_income_excluding_one_offs": -375217.9
+        },
+        "actual": "one-offs=[('Income Tax Benefit', '2025-12-01'), ('Recruiting Expense', '2025-01-01'), ('SKU Profiling', '2026-04-01'), ('Severance', '2025-07-01'), ('Stock-Based Compensation Expense', '2025-12-01')]; positive NI months=['2025-12']; NI ex one-offs=-375,217.90",
+        "tolerance": "Exact set of one-off accounts and months; amounts within 0.005; event month is the only month with positive net income.",
+        "perturbation": null
+      },
+      {
+        "id": "G11",
+        "name": "ABC first valid TTM month",
+        "source": "workbook",
+        "passed": true,
+        "input": {},
+        "expected": {
+          "first_valid_month": "2025-12-01",
+          "prior_month_ttm_is_null": "2025-11-01",
+          "ttm": {
+            "revenue": 2145316.28,
+            "cost_of_goods_sold": 623732.25,
+            "gross_profit": 1521584.03,
+            "operating_expenses": 4936683.0,
+            "net_income": -3415098.97
+          }
+        },
+        "actual": "first valid TTM=2025-12 revenue_ttm=2,145,316.28; 11 earlier months all null=True",
+        "tolerance": "Nov 2025 TTM must be null; Dec 2025 TTM values within 0.005.",
+        "perturbation": null
+      },
+      {
+        "id": "G12",
+        "name": "ABC largest OPEX category spike",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "exclude_one_offs_min_abs": 5000
+        },
+        "expected": {
+          "largest_overall": {
+            "account": "Stock-Based Compensation Expense",
+            "month": "2025-12-01",
+            "amount": 334660.53,
+            "mom_change": 334660.53,
+            "mom_pct": null
+          },
+          "largest_recurring": {
+            "account": "Events & Conferences",
+            "month": "2025-02-01",
+            "amount": 89275.41,
+            "mom_change": 89275.41,
+            "mom_pct": null
+          }
+        },
+        "actual": "largest_overall=Stock-Based Compensation Expense 2025-12 +334,660.53 pct=nan; largest_recurring=Events & Conferences 2025-02 +89,275.41 pct=nan",
+        "tolerance": "Account and month exact; change within 0.005; mom_pct must be null.",
+        "perturbation": null
+      },
+      {
+        "id": "G13",
+        "name": "ABC latest month full summary (Jun 2026)",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "month": "2026-06-01"
+        },
+        "expected": {
+          "revenue": {
+            "value": 195898.16,
+            "mom_change": -12452.8,
+            "mom_pct": -0.059768,
+            "ttm": 2303975.51
+          },
+          "cost_of_goods_sold": {
+            "value": 58472.44,
+            "ttm": 703547.6
+          },
+          "gross_profit": {
+            "value": 137425.72,
+            "margin": 0.701516,
+            "ttm": 1600427.91
+          },
+          "operating_expenses": {
+            "value": 468181.8,
+            "ttm": 4690207.5
+          },
+          "operating_income": {
+            "value": -330756.08,
+            "margin": -1.688408
+          },
+          "net_income": {
+            "value": -330756.08,
+            "margin": -1.688408,
+            "ttm": -3089779.59
+          }
+        },
+        "actual": "all summary fields match",
+        "tolerance": "Values and TTM within 0.005; percentages and margins within 0.000001.",
+        "perturbation": null
+      },
+      {
+        "id": "G14",
+        "name": "Month labels preserved through normalization",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "columns": [
+            "R",
+            "S",
+            "T"
+          ],
+          "revenue_row": 14
+        },
+        "expected": {
+          "months": [
+            "2025-01-01",
+            "2025-02-01",
+            "2025-03-01"
+          ],
+          "revenue": [
+            167587.5,
+            176651.19,
+            170550.65
+          ]
+        },
+        "actual": "months=['2025-01-01', '2025-02-01', '2025-03-01'], revenue=[167587.5, 176651.19, 170550.65]",
+        "tolerance": "Each value stays attached to its own calendar month (normalized to the 1st); any shift or reordering fails. Added after mutation testing showed a one-month shift in normalize_monthly survived every other eval.",
+        "perturbation": "Give Jan and Feb 2025 mid/late-month dates so normalization to the 1st must keep each value on its own month; columns are fed newest first as in the sheet."
+      },
+      {
+        "id": "G15",
+        "name": "ABC Platform Revenue step-down (Jan 2026)",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "account": "Platform Revenue",
+          "month": "2026-01-01"
+        },
+        "expected": {
+          "prior_value": 45000.0,
+          "value": 26666.66,
+          "mom_change": -18333.34,
+          "mom_pct": -0.407408,
+          "held_through": "2026-06-01"
+        },
+        "actual": "45,000.00 -> 26,666.66 (-18,333.34); held 6 months",
+        "tolerance": "Values within 0.005; mom_pct within 0.000001; value unchanged in every month from Jan 2026 to Jun 2026.",
+        "perturbation": null
+      },
+      {
+        "id": "G16",
+        "name": "ABC Bad Debts charge (May 2026)",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "account": "Bad Debts"
+        },
+        "expected": {
+          "values": {
+            "2026-04-01": 0.0,
+            "2026-05-01": 12935.29,
+            "2026-06-01": -1806.24
+          },
+          "mom_pct_may_2026": null
+        },
+        "actual": "values match; May 2026 mom_pct=nan",
+        "tolerance": "Values within 0.005; May 2026 mom_pct must be null.",
+        "perturbation": null
+      },
+      {
+        "id": "G17",
+        "name": "ABC Jun 2026 cash and runway",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "cash_row": "Total Cash and Cash Equivalents",
+          "primary_window_months": 3
+        },
+        "expected": {
+          "month": "2026-06-01",
+          "cash": 713481.26,
+          "prior_cash": 929024.59,
+          "burn": {
+            "1": 215543.33,
+            "3": 209656.62,
+            "6": 311972.67
+          },
+          "runway_months": {
+            "1": 3.310152,
+            "3": 3.403094,
+            "6": 2.286999
+          }
+        },
+        "actual": "cash=713,481.26; 3m burn=209,656.62; runway=3.40 months",
+        "tolerance": "Cash and burn within 0.005; runway within 0.000001.",
+        "perturbation": null
+      }
+    ],
+    "total": 17,
+    "passed": 17
+  },
+  "mutation": {
+    "rows": [
+      {
+        "mutation": "Reverse month order",
+        "module": "financial_analysis.py",
+        "caught": true,
+        "caught_by": [
+          "G01",
+          "G03",
+          "G07",
+          "G14",
+          "test_mom_revenue_change",
+          "test_ttm_only_after_12_months"
+        ]
+      },
+      {
+        "mutation": "Reverse month order",
+        "module": "abc_workbook_adapter.py",
+        "caught": true,
+        "caught_by": [
+          "G09",
+          "G10",
+          "G11",
+          "G12",
+          "G13",
+          "G15",
+          "G16",
+          "G17",
+          "test_abc_config_reproduces_existing_engine_numbers",
+          "test_abc_fiscal_ytd_matches_balance_sheet_current_year_earnings",
+          "test_approved_pack_has_blank_signoff_and_open_questions",
+          "test_balance_sheet_cash_and_runway",
+          "test_bug5_category_mom_pct_sign_uses_absolute_prior",
+          "test_current_year_earnings_ties_to_ytd_net_income",
+          "test_dec_2025_negative_opex_posts_as_a_credit",
+          "test_jun_2026_amounts_come_from_source_cells",
+          "test_packet_has_source_cell_values",
+          "test_spot_cells",
+          "test_xyz_one_off_audit_fee_detected"
+        ]
+      },
+      {
+        "mutation": "Flip revenue sign",
+        "module": "financial_analysis.py",
+        "caught": true,
+        "caught_by": [
+          "G01",
+          "G02",
+          "G03",
+          "G07",
+          "G14",
+          "test_margin_calculation",
+          "test_mom_revenue_change",
+          "test_ttm_only_after_12_months"
+        ]
+      },
+      {
+        "mutation": "Flip revenue sign",
+        "module": "abc_workbook_adapter.py",
+        "caught": true,
+        "caught_by": [
+          "G11",
+          "G13",
+          "test_abc_config_reproduces_existing_engine_numbers",
+          "test_every_entry_balances_and_its_p_and_l_effect_is_workbook_net_income",
+          "test_jun_2026_amounts_come_from_source_cells",
+          "test_packet_has_source_cell_values",
+          "test_spot_cells",
+          "test_ttm_available_for_twelve_consecutive_months"
+        ]
+      },
+      {
+        "mutation": "Sum subtotals twice",
+        "module": "abc_workbook_adapter.py",
+        "caught": true,
+        "caught_by": [
+          "test_abc_config_reproduces_existing_engine_numbers",
+          "test_category_rollups_sum_to_total_opex_every_month",
+          "test_opex_categories_sum_to_total_operating_expenses_every_month",
+          "test_subtotal_rows_excluded_from_categories"
+        ]
+      },
+      {
+        "mutation": "Shift months by one",
+        "module": "financial_analysis.py",
+        "caught": true,
+        "caught_by": [
+          "G14"
+        ]
+      },
+      {
+        "mutation": "Shift months by one",
+        "module": "abc_workbook_adapter.py",
+        "caught": true,
+        "caught_by": [
+          "G09",
+          "G10",
+          "G11",
+          "G12",
+          "G13",
+          "G15",
+          "G16",
+          "G17",
+          "test_a_single_wrong_month_is_reported",
+          "test_abc_config_reproduces_existing_engine_numbers",
+          "test_abc_fiscal_ytd_matches_balance_sheet_current_year_earnings",
+          "test_approved_pack_has_blank_signoff_and_open_questions",
+          "test_balance_sheet_cash_and_runway",
+          "test_bug3_rows_after_total_operating_expenses_are_not_opex",
+          "test_bug5_category_mom_pct_sign_uses_absolute_prior",
+          "test_current_year_earnings_ties_to_ytd_net_income",
+          "test_dec_2025_negative_opex_posts_as_a_credit",
+          "test_jun_2026_amounts_come_from_source_cells",
+          "test_months_parsed_ascending_without_gaps",
+          "test_packet_has_source_cell_values",
+          "test_spot_cells",
+          "test_xyz_layout_fiscal_year_and_ttm",
+          "test_xyz_one_off_audit_fee_detected"
+        ]
+      },
+      {
+        "mutation": "Drop one opex category",
+        "module": "financial_analysis.py",
+        "caught": true,
+        "caught_by": [
+          "G06",
+          "test_category_mom"
+        ]
+      },
+      {
+        "mutation": "Drop one opex category",
+        "module": "abc_workbook_adapter.py",
+        "caught": true,
+        "caught_by": [
+          "test_abc_config_reproduces_existing_engine_numbers",
+          "test_bug2_expense_trends_do_not_depend_on_module_global",
+          "test_bug3_rows_after_total_operating_expenses_are_not_opex",
+          "test_category_rollups_sum_to_total_opex_every_month",
+          "test_opex_categories_sum_to_total_operating_expenses_every_month"
+        ]
+      },
+      {
+        "mutation": "TTM over 11 months",
+        "module": "financial_analysis.py",
+        "caught": true,
+        "caught_by": [
+          "G03",
+          "test_ttm_only_after_12_months"
+        ]
+      },
+      {
+        "mutation": "TTM over 11 months",
+        "module": "abc_workbook_adapter.py",
+        "caught": true,
+        "caught_by": [
+          "G11",
+          "G13",
+          "test_abc_config_reproduces_existing_engine_numbers",
+          "test_ttm_available_for_twelve_consecutive_months"
+        ]
+      },
+      {
+        "mutation": "Wrong margin denominator (gross profit / COGS)",
+        "module": "financial_analysis.py",
+        "caught": true,
+        "caught_by": [
+          "G02",
+          "test_margin_calculation"
+        ]
+      },
+      {
+        "mutation": "Wrong margin denominator (gross profit / COGS)",
+        "module": "abc_workbook_adapter.py",
+        "caught": true,
+        "caught_by": [
+          "G13",
+          "test_approved_pack_has_blank_signoff_and_open_questions"
+        ]
+      }
+    ],
+    "total": 13,
+    "caught": 13,
+    "source": "outputs/mutation_report.md"
+  },
+  "unit": {
+    "total": 90,
+    "passed": 90,
+    "source": "ai_solutions_builder_free/evals/FINAL_RUN.md"
+  }
+}

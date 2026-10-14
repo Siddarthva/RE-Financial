@@ -1,0 +1,79 @@
+{
+  "workbook": "xyz_financials.xlsx",
+  "sha256": "9005063328d08edf10604e60d5b0a98494d642ffacce72918ac37736cad45efc",
+  "sheets_detected": [
+    "P&L"
+  ],
+  "period_start": "2025-04",
+  "period_end": "2026-05",
+  "months": 14,
+  "checks": [
+    {
+      "check": "Income statement sheet present",
+      "passed": true,
+      "cell_ref": "P&L",
+      "detail": ""
+    },
+    {
+      "check": "Header row found",
+      "passed": true,
+      "cell_ref": "P&L!A4",
+      "detail": "Line Item"
+    },
+    {
+      "check": "Month columns contiguous",
+      "passed": true,
+      "cell_ref": "P&L!B4:O4",
+      "detail": "14 month columns"
+    },
+    {
+      "check": "Total row present: Total Revenue",
+      "passed": true,
+      "cell_ref": "P&L!O8",
+      "detail": "revenue"
+    },
+    {
+      "check": "Total row present: Total Cost of Sales",
+      "passed": true,
+      "cell_ref": "P&L!O12",
+      "detail": "cost_of_goods_sold"
+    },
+    {
+      "check": "Total row present: Gross Margin",
+      "passed": true,
+      "cell_ref": "P&L!O13",
+      "detail": "gross_profit"
+    },
+    {
+      "check": "Total row present: Total Expenses",
+      "passed": true,
+      "cell_ref": "P&L!O23",
+      "detail": "operating_expenses"
+    },
+    {
+      "check": "Total row present: Operating Profit",
+      "passed": true,
+      "cell_ref": "P&L!O24",
+      "detail": "operating_income"
+    },
+    {
+      "check": "Total row present: Net Profit",
+      "passed": true,
+      "cell_ref": "P&L!O26",
+      "detail": "net_income"
+    },
+    {
+      "check": "Gross profit = revenue - COGS (latest month)",
+      "passed": true,
+      "cell_ref": "P&L!O13",
+      "detail": ""
+    },
+    {
+      "check": "Operating income = gross profit - opex (latest month)",
+      "passed": true,
+      "cell_ref": "P&L!O24",
+      "detail": ""
+    }
+  ],
+  "status": "pass"
+}

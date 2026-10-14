@@ -1,0 +1,19 @@
+# secrets
+.env
+.env.*
+!.env.example
+!*.env.example
+tokens.json
+*token*.json
+*credential*
+.mcp.json
+# local / generated
+.claude/settings.local.json
+**/.claude/settings.local.json
+node_modules/
+dist/
+coverage/
+__pycache__/
+*.pyc
+.pytest_cache/
+capture-*.txt

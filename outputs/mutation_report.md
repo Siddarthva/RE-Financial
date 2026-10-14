@@ -1,0 +1,19 @@
+# Mutation test report
+
+| Mutation | Module | Caught? | By which test |
+|---|---|---|---|
+| Reverse month order | `financial_analysis.py` | ✅ yes | G01, G03, G07, G14, test_mom_revenue_change, test_ttm_only_after_12_months |
+| Reverse month order | `abc_workbook_adapter.py` | ✅ yes | G09, G10, G11, G12, G13, G15, G16, G17, test_abc_config_reproduces_existing_engine_numbers, test_abc_fiscal_ytd_matches_balance_sheet_current_year_earnings, test_approved_pack_has_blank_signoff_and_open_questions, test_balance_sheet_cash_and_runway, test_bug5_category_mom_pct_sign_uses_absolute_prior, test_current_year_earnings_ties_to_ytd_net_income, test_dec_2025_negative_opex_posts_as_a_credit, test_jun_2026_amounts_come_from_source_cells, test_packet_has_source_cell_values, test_spot_cells, test_xyz_one_off_audit_fee_detected |
+| Flip revenue sign | `financial_analysis.py` | ✅ yes | G01, G02, G03, G07, G14, test_margin_calculation, test_mom_revenue_change, test_ttm_only_after_12_months |
+| Flip revenue sign | `abc_workbook_adapter.py` | ✅ yes | G11, G13, test_abc_config_reproduces_existing_engine_numbers, test_every_entry_balances_and_its_p_and_l_effect_is_workbook_net_income, test_jun_2026_amounts_come_from_source_cells, test_packet_has_source_cell_values, test_spot_cells, test_ttm_available_for_twelve_consecutive_months |
+| Sum subtotals twice | `abc_workbook_adapter.py` | ✅ yes | test_abc_config_reproduces_existing_engine_numbers, test_category_rollups_sum_to_total_opex_every_month, test_opex_categories_sum_to_total_operating_expenses_every_month, test_subtotal_rows_excluded_from_categories |
+| Shift months by one | `financial_analysis.py` | ✅ yes | G14 |
+| Shift months by one | `abc_workbook_adapter.py` | ✅ yes | G09, G10, G11, G12, G13, G15, G16, G17, test_a_single_wrong_month_is_reported, test_abc_config_reproduces_existing_engine_numbers, test_abc_fiscal_ytd_matches_balance_sheet_current_year_earnings, test_approved_pack_has_blank_signoff_and_open_questions, test_balance_sheet_cash_and_runway, test_bug3_rows_after_total_operating_expenses_are_not_opex, test_bug5_category_mom_pct_sign_uses_absolute_prior, test_current_year_earnings_ties_to_ytd_net_income, test_dec_2025_negative_opex_posts_as_a_credit, test_jun_2026_amounts_come_from_source_cells, test_months_parsed_ascending_without_gaps, test_packet_has_source_cell_values, test_spot_cells, test_xyz_layout_fiscal_year_and_ttm, test_xyz_one_off_audit_fee_detected |
+| Drop one opex category | `financial_analysis.py` | ✅ yes | G06, test_category_mom |
+| Drop one opex category | `abc_workbook_adapter.py` | ✅ yes | test_abc_config_reproduces_existing_engine_numbers, test_bug2_expense_trends_do_not_depend_on_module_global, test_bug3_rows_after_total_operating_expenses_are_not_opex, test_category_rollups_sum_to_total_opex_every_month, test_opex_categories_sum_to_total_operating_expenses_every_month |
+| TTM over 11 months | `financial_analysis.py` | ✅ yes | G03, test_ttm_only_after_12_months |
+| TTM over 11 months | `abc_workbook_adapter.py` | ✅ yes | G11, G13, test_abc_config_reproduces_existing_engine_numbers, test_ttm_available_for_twelve_consecutive_months |
+| Wrong margin denominator (gross profit / COGS) | `financial_analysis.py` | ✅ yes | G02, test_margin_calculation |
+| Wrong margin denominator (gross profit / COGS) | `abc_workbook_adapter.py` | ✅ yes | G13, test_approved_pack_has_blank_signoff_and_open_questions |
+
+13/13 mutants caught; 0 survived.

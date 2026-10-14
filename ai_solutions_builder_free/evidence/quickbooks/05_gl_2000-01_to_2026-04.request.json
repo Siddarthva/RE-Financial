@@ -1,0 +1,10 @@
+{
+  "server": "quickbooks (local MCP, read-only: QUICKBOOKS_DISABLE_WRITE/UPDATE/DELETE=true)",
+  "tool": "get_general_ledger",
+  "params": {
+    "start_date": "2000-01-01",
+    "end_date": "2026-04-30",
+    "accounting_method": "Accrual"
+  },
+  "called_at": "2026-10-12 (report Header.Time values 06:59:05-06:59:37 America/Los_Angeles)"
+}

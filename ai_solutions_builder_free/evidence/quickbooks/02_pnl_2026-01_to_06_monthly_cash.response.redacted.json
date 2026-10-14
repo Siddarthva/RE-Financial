@@ -1,0 +1,663 @@
+{
+  "Header": {
+    "Time": "2026-10-12T06:59:20-07:00",
+    "ReportName": "ProfitAndLoss",
+    "ReportBasis": "Cash",
+    "StartPeriod": "2026-01-01",
+    "EndPeriod": "2026-06-30",
+    "SummarizeColumnsBy": "Month",
+    "Currency": "USD",
+    "Option": [
+      {
+        "Name": "AccountingStandard",
+        "Value": "GAAP"
+      },
+      {
+        "Name": "NoReportData",
+        "Value": "false"
+      }
+    ]
+  },
+  "Columns": {
+    "Column": [
+      {
+        "ColTitle": "",
+        "ColType": "Account",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "account"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Jan 2026",
+        "ColType": "Money",
+        "MetaData": [
+          {
+            "Name": "StartDate",
+            "Value": "2026-01-01"
+          },
+          {
+            "Name": "EndDate",
+            "Value": "2026-01-31"
+          },
+          {
+            "Name": "ColKey",
+            "Value": "Jan 2026"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Feb 2026",
+        "ColType": "Money",
+        "MetaData": [
+          {
+            "Name": "StartDate",
+            "Value": "2026-02-01"
+          },
+          {
+            "Name": "EndDate",
+            "Value": "2026-02-28"
+          },
+          {
+            "Name": "ColKey",
+            "Value": "Feb 2026"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Mar 2026",
+        "ColType": "Money",
+        "MetaData": [
+          {
+            "Name": "StartDate",
+            "Value": "2026-03-01"
+          },
+          {
+            "Name": "EndDate",
+            "Value": "2026-03-31"
+          },
+          {
+            "Name": "ColKey",
+            "Value": "Mar 2026"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Apr 2026",
+        "ColType": "Money",
+        "MetaData": [
+          {
+            "Name": "StartDate",
+            "Value": "2026-04-01"
+          },
+          {
+            "Name": "EndDate",
+            "Value": "2026-04-30"
+          },
+          {
+            "Name": "ColKey",
+            "Value": "Apr 2026"
+          }
+        ]
+      },
+      {
+        "ColTitle": "May 2026",
+        "ColType": "Money",
+        "MetaData": [
+          {
+            "Name": "StartDate",
+            "Value": "2026-05-01"
+          },
+          {
+            "Name": "EndDate",
+            "Value": "2026-05-31"
+          },
+          {
+            "Name": "ColKey",
+            "Value": "May 2026"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Jun 2026",
+        "ColType": "Money",
+        "MetaData": [
+          {
+            "Name": "StartDate",
+            "Value": "2026-06-01"
+          },
+          {
+            "Name": "EndDate",
+            "Value": "2026-06-30"
+          },
+          {
+            "Name": "ColKey",
+            "Value": "Jun 2026"
+          }
+        ]
+      },
+      {
+        "ColTitle": "Total",
+        "ColType": "Money",
+        "MetaData": [
+          {
+            "Name": "ColKey",
+            "Value": "total"
+          }
+        ]
+      }
+    ]
+  },
+  "Rows": {
+    "Row": [
+      {
+        "Header": {
+          "ColData": [
+            {
+              "value": "Income"
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            }
+          ]
+        },
+        "Rows": {
+          "Row": [
+            {
+              "Header": {
+                "ColData": [
+                  {
+                    "value": "Landscaping Services",
+                    "id": "45"
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": "190.00"
+                  },
+                  {
+                    "value": "190.00"
+                  }
+                ]
+              },
+              "Rows": {
+                "Row": [
+                  {
+                    "Header": {
+                      "ColData": [
+                        {
+                          "value": "Job Materials",
+                          "id": "46"
+                        },
+                        {
+                          "value": ""
+                        },
+                        {
+                          "value": ""
+                        },
+                        {
+                          "value": ""
+                        },
+                        {
+                          "value": ""
+                        },
+                        {
+                          "value": ""
+                        },
+                        {
+                          "value": ""
+                        },
+                        {
+                          "value": "0.00"
+                        }
+                      ]
+                    },
+                    "Rows": {
+                      "Row": [
+                        {
+                          "ColData": [
+                            {
+                              "value": "Plants and Soil",
+                              "id": "49"
+                            },
+                            {
+                              "value": ""
+                            },
+                            {
+                              "value": ""
+                            },
+                            {
+                              "value": ""
+                            },
+                            {
+                              "value": ""
+                            },
+                            {
+                              "value": ""
+                            },
+                            {
+                              "value": "131.25"
+                            },
+                            {
+                              "value": "131.25"
+                            }
+                          ],
+                          "type": "Data"
+                        }
+                      ]
+                    },
+                    "Summary": {
+                      "ColData": [
+                        {
+                          "value": "Total Job Materials"
+                        },
+                        {
+                          "value": "0.00"
+                        },
+                        {
+                          "value": "0.00"
+                        },
+                        {
+                          "value": "0.00"
+                        },
+                        {
+                          "value": "0.00"
+                        },
+                        {
+                          "value": "0.00"
+                        },
+                        {
+                          "value": "131.25"
+                        },
+                        {
+                          "value": "131.25"
+                        }
+                      ]
+                    },
+                    "type": "Section"
+                  }
+                ]
+              },
+              "Summary": {
+                "ColData": [
+                  {
+                    "value": "Total Landscaping Services"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "321.25"
+                  },
+                  {
+                    "value": "321.25"
+                  }
+                ]
+              },
+              "type": "Section"
+            },
+            {
+              "ColData": [
+                {
+                  "value": "Pest Control Services",
+                  "id": "54"
+                },
+                {
+                  "value": ""
+                },
+                {
+                  "value": ""
+                },
+                {
+                  "value": ""
+                },
+                {
+                  "value": ""
+                },
+                {
+                  "value": ""
+                },
+                {
+                  "value": "70.00"
+                },
+                {
+                  "value": "70.00"
+                }
+              ],
+              "type": "Data"
+            }
+          ]
+        },
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Total Income"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "391.25"
+            },
+            {
+              "value": "391.25"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "Income"
+      },
+      {
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Gross Profit"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "391.25"
+            },
+            {
+              "value": "391.25"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "GrossProfit"
+      },
+      {
+        "Header": {
+          "ColData": [
+            {
+              "value": "Expenses"
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            },
+            {
+              "value": ""
+            }
+          ]
+        },
+        "Rows": {
+          "Row": [
+            {
+              "Header": {
+                "ColData": [
+                  {
+                    "value": "Legal & Professional Fees",
+                    "id": "12"
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": ""
+                  },
+                  {
+                    "value": "0.00"
+                  }
+                ]
+              },
+              "Rows": {
+                "Row": [
+                  {
+                    "ColData": [
+                      {
+                        "value": "Lawyer",
+                        "id": "71"
+                      },
+                      {
+                        "value": ""
+                      },
+                      {
+                        "value": ""
+                      },
+                      {
+                        "value": ""
+                      },
+                      {
+                        "value": ""
+                      },
+                      {
+                        "value": ""
+                      },
+                      {
+                        "value": "300.00"
+                      },
+                      {
+                        "value": "300.00"
+                      }
+                    ],
+                    "type": "Data"
+                  }
+                ]
+              },
+              "Summary": {
+                "ColData": [
+                  {
+                    "value": "Total Legal & Professional Fees"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "0.00"
+                  },
+                  {
+                    "value": "300.00"
+                  },
+                  {
+                    "value": "300.00"
+                  }
+                ]
+              },
+              "type": "Section"
+            }
+          ]
+        },
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Total Expenses"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "300.00"
+            },
+            {
+              "value": "300.00"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "Expenses"
+      },
+      {
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Net Operating Income"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "91.25"
+            },
+            {
+              "value": "91.25"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "NetOperatingIncome"
+      },
+      {
+        "Summary": {
+          "ColData": [
+            {
+              "value": "Net Income"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "0.00"
+            },
+            {
+              "value": "91.25"
+            },
+            {
+              "value": "91.25"
+            }
+          ]
+        },
+        "type": "Section",
+        "group": "NetIncome"
+      }
+    ]
+  }
+}

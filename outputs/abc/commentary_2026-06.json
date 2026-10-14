@@ -1,0 +1,268 @@
+{
+  "period": "2026-06",
+  "lines": [
+    "1. Revenue for 2026-06 was $195,898.16, a decrease of $12,452.80 (-5.98%) from 2026-05.",
+    "2. Gross profit for 2026-06 was $137,425.72, a decrease of $2,255.71 (-1.61%) from 2026-05, at a gross margin of 70.15%, up 3.11 percentage points from 2026-05.",
+    "3. Operating expenses for 2026-06 were $468,181.80, a decrease of $10,599.23 (-2.21%) from 2026-05.",
+    "4. Net income for 2026-06 was -$330,756.08, an improvement of $8,343.52 from 2026-05, at a net margin of -168.84%, down 6.09 percentage points from 2026-05.",
+    "5. The largest line-item movement in 2026-06 was Events & Conferences, up $17,970.67 from 2026-05.",
+    "6. The second-largest line-item movement in 2026-06 was Bad Debts, down $14,741.53 from $12,935.29 in 2026-05 to a credit balance of -$1,806.24 in 2026-06.",
+    "7. The third-largest line-item movement in 2026-06 was Usage Fees, down $11,142.74 from 2026-05.",
+    "8. Trailing-twelve-month revenue ended 2026-06 was $2,303,975.51 and trailing-twelve-month net income was -$3,089,779.59.",
+    "9. The cash balance at 2026-06 was $713,481.26, a decrease of $215,543.33 (-23.20%) from 2026-05.",
+    "10. Runway at 2026-06 was 3.40 months, based on the 3-month average burn of $209,656.62.",
+    "11. The packet reports no data-quality warnings for 2026-06.",
+    "12. The packet reports no one-off items in 2026-06."
+  ],
+  "grade": {
+    "passed": true,
+    "numbers_checked": 27,
+    "numbers_matched": 27,
+    "numbers": [
+      {
+        "token": "$195,898.16",
+        "kind": "amount",
+        "value": 195898.16,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 195898.16
+      },
+      {
+        "token": "$12,452.80",
+        "kind": "amount",
+        "value": 12452.8,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 12452.8
+      },
+      {
+        "token": "-5.98%",
+        "kind": "percent",
+        "value": 5.98,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 5.9768
+      },
+      {
+        "token": "$137,425.72",
+        "kind": "amount",
+        "value": 137425.72,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 137425.72
+      },
+      {
+        "token": "$2,255.71",
+        "kind": "amount",
+        "value": 2255.71,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 2255.71
+      },
+      {
+        "token": "-1.61%",
+        "kind": "percent",
+        "value": 1.61,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 1.6149
+      },
+      {
+        "token": "70.15%",
+        "kind": "percent",
+        "value": 70.15,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 70.1516
+      },
+      {
+        "token": "3.11 percentage points",
+        "kind": "pp",
+        "value": 3.11,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 3.110199
+      },
+      {
+        "token": "$468,181.80",
+        "kind": "amount",
+        "value": 468181.8,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 468181.8
+      },
+      {
+        "token": "$10,599.23",
+        "kind": "amount",
+        "value": 10599.23,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 10599.23
+      },
+      {
+        "token": "-2.21%",
+        "kind": "percent",
+        "value": 2.21,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 2.2138
+      },
+      {
+        "token": "-$330,756.08",
+        "kind": "amount",
+        "value": 330756.08,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 330756.08
+      },
+      {
+        "token": "$8,343.52",
+        "kind": "amount",
+        "value": 8343.52,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 8343.52
+      },
+      {
+        "token": "-168.84%",
+        "kind": "percent",
+        "value": 168.84,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 168.8408
+      },
+      {
+        "token": "6.09 percentage points",
+        "kind": "pp",
+        "value": 6.09,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 6.086793
+      },
+      {
+        "token": "$17,970.67",
+        "kind": "amount",
+        "value": 17970.67,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 17970.67
+      },
+      {
+        "token": "$14,741.53",
+        "kind": "amount",
+        "value": 14741.53,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 14741.53
+      },
+      {
+        "token": "$12,935.29",
+        "kind": "amount",
+        "value": 12935.29,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 12935.29
+      },
+      {
+        "token": "-$1,806.24",
+        "kind": "amount",
+        "value": 1806.24,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 1806.24
+      },
+      {
+        "token": "$11,142.74",
+        "kind": "amount",
+        "value": 11142.74,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 11142.74
+      },
+      {
+        "token": "$2,303,975.51",
+        "kind": "amount",
+        "value": 2303975.51,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 2303975.51
+      },
+      {
+        "token": "-$3,089,779.59",
+        "kind": "amount",
+        "value": 3089779.59,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 3089779.59
+      },
+      {
+        "token": "$713,481.26",
+        "kind": "amount",
+        "value": 713481.26,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 713481.26
+      },
+      {
+        "token": "$215,543.33",
+        "kind": "amount",
+        "value": 215543.33,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 215543.33
+      },
+      {
+        "token": "-23.20%",
+        "kind": "percent",
+        "value": 23.2,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 23.201
+      },
+      {
+        "token": "3.40",
+        "kind": "amount",
+        "value": 3.4,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 3.403094
+      },
+      {
+        "token": "$209,656.62",
+        "kind": "amount",
+        "value": 209656.62,
+        "tol": 0.0050000010000000004,
+        "matched": true,
+        "fact": 209656.62
+      }
+    ],
+    "top_movements": [
+      {
+        "account": "Events & Conferences",
+        "mom_change": 17970.67,
+        "mentioned": true
+      },
+      {
+        "account": "Bad Debts",
+        "mom_change": -14741.53,
+        "mentioned": true
+      },
+      {
+        "account": "Usage Fees",
+        "mom_change": -11142.74,
+        "mentioned": true
+      }
+    ],
+    "cash_risk": {
+      "covered": true,
+      "cash_stated": true,
+      "runway_stated": true,
+      "cash": 713481.26,
+      "runway_months": {
+        "1m": 3.310152,
+        "3m": 3.403094,
+        "6m": 2.286999
+      }
+    }
+  }
+}

@@ -1,0 +1,115 @@
+[
+  {
+    "claim": "Monthly P&L returns all six months Jan-Jun 2026 as columns (request parameters are correct)",
+    "passed": true,
+    "detail": [
+      "Jan 2026",
+      "Feb 2026",
+      "Mar 2026",
+      "Apr 2026",
+      "May 2026",
+      "Jun 2026"
+    ]
+  },
+  {
+    "claim": "Every accrual P&L row: months sum to Total (transcription integrity)",
+    "passed": true,
+    "detail": "all rows"
+  },
+  {
+    "claim": "Every cash P&L row: months sum to Total (transcription integrity)",
+    "passed": true,
+    "detail": "all rows"
+  },
+  {
+    "claim": "Accrual: Jan-Apr 2026 are zero on every line; activity only in May and Jun",
+    "passed": true,
+    "detail": {
+      "Total Income": {
+        "Jan 2026": 0.0,
+        "Feb 2026": 0.0,
+        "Mar 2026": 0.0,
+        "Apr 2026": 0.0,
+        "May 2026": 391.25,
+        "Jun 2026": 365.0,
+        "Total": 756.25
+      },
+      "Net Income": {
+        "Jan 2026": 0.0,
+        "Feb 2026": 0.0,
+        "Mar 2026": 0.0,
+        "Apr 2026": 0.0,
+        "May 2026": 91.25,
+        "Jun 2026": 365.0,
+        "Total": 456.25
+      }
+    }
+  },
+  {
+    "claim": "Cash basis: only June has activity (May accrual income 391.25 was not yet received in cash)",
+    "passed": true,
+    "detail": {
+      "Jan 2026": 0.0,
+      "Feb 2026": 0.0,
+      "Mar 2026": 0.0,
+      "Apr 2026": 0.0,
+      "May 2026": 0.0,
+      "Jun 2026": 391.25,
+      "Total": 391.25
+    }
+  },
+  {
+    "claim": "General ledger 2026-01-01..2026-04-30 has no transactions",
+    "passed": true,
+    "detail": {
+      "NoReportData": "true"
+    }
+  },
+  {
+    "claim": "General ledger 2000-01-01..2026-04-30 has no transactions",
+    "passed": true,
+    "detail": {
+      "NoReportData": "true"
+    }
+  },
+  {
+    "claim": "No invoices dated before 2026-05-01",
+    "passed": true,
+    "detail": "Found 0 invoices"
+  },
+  {
+    "claim": "With no parameters the tool defaults to 'this calendar year-to-date', one Total column",
+    "passed": true,
+    "detail": {
+      "DateMacro": "this calendar year-to-date",
+      "StartPeriod": "2026-01-01",
+      "EndPeriod": "2026-10-12",
+      "SummarizeColumnsBy": "Total"
+    }
+  },
+  {
+    "claim": "Sandbox company was created 2026-10-10 (sample data is generated relative to this date)",
+    "passed": true,
+    "detail": {
+      "CompanyStartDate": "2026-10-10",
+      "CreateTime": "2026-10-10T21:00:19-07:00"
+    }
+  },
+  {
+    "claim": "Balance Sheet 2026-06-30: assets = liabilities + equity",
+    "passed": true,
+    "detail": {
+      "assets": 5488.75,
+      "liabilities": 32.5,
+      "equity": 5456.25
+    }
+  },
+  {
+    "claim": "Balance Sheet net income (456.25) ties to P&L Jan-Jun 2026 accrual net income total",
+    "passed": true,
+    "detail": {
+      "balance_sheet": 456.25,
+      "pnl_total": 456.25
+    }
+  }
+]
