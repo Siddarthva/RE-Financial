@@ -150,4 +150,6 @@ Any of the following is a regression and blocks the change:
 - Reference commentary `outputs/reference_commentary_jun2026.md` (positive control): 13/13 numbers, 3/3 movements, cash risk covered → **PASS**.
 - Engine `generate_commentary()`, reviewed text and saved skill output (`outputs/skill_commentary.md`): all **PASS** as of the 2026-10-13 clean re-run (28/28, 27/27 and 36/36 numbers; 3/3 movements; cash risk covered). The earlier FAILs for the engine text and the saved skill output are kept in `03_evals/FINAL_RUN.md`. The skill output was graded as saved, not regenerated live.
 
+Live consistency: three headless `claude -p` runs of `/monthly-analysis abc 2026-06` all pass this grader with different wording and the same graded facts; see [`live_consistency_2026-10-15.md`](live_consistency_2026-10-15.md).
+
 The latest full run, with commands, counts and the failures along the way, is in `03_evals/FINAL_RUN.md` (unit tests 129/129, golden 22/22, mutation 13/13, robustness 32/32 as of 2026-10-14).

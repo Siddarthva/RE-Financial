@@ -319,7 +319,7 @@ The rule "flag gross-margin drops over 5 pp" was added as a rehearsed on-the-spo
 
 ## 9. Part 3: Evaluation suite
 
-**Folder:** [`03_evals/`](03_evals/) · **Grading approach:** [`GRADING.md`](03_evals/GRADING.md)
+**Folder:** [`03_evals/`](03_evals/) · **Grading approach:** [`GRADING.md`](03_evals/GRADING.md) · **Live consistency (3 headless runs, wording varies, graded facts don't):** [`live_consistency_2026-10-15.md`](03_evals/live_consistency_2026-10-15.md)
 
 ### 9.1 The layers
 
