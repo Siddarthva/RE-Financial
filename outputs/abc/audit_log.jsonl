@@ -1,3 +1,6 @@
 {"ts": "2026-10-13T16:36:01+00:00", "event": "pipeline_run", "run_id": "20261013T163600Z-abc-2026-06", "client": "abc", "period": "2026-06", "status": "success", "actor": "pipeline"}
 {"ts": "2026-10-13T16:37:03+00:00", "event": "qbo_test_connection", "client": "abc", "actor": "workspace", "status": "failed"}
 {"ts": "2026-10-13T16:37:39+00:00", "event": "pipeline_run", "run_id": "20261013T163737Z-abc-2026-06", "client": "abc", "period": "2026-06", "status": "success", "actor": "pipeline"}
+{"ts": "2026-10-14T02:42:15+00:00", "event": "qbo_test_connection", "client": "abc", "actor": "workspace", "status": "ok"}
+{"ts": "2026-10-14T02:42:48+00:00", "event": "qbo_test_connection", "client": "abc", "actor": "workspace", "status": "ok"}
+{"ts": "2026-10-14T02:51:08+00:00", "event": "pipeline_run", "run_id": "20261014T025107Z-abc-2026-06", "client": "abc", "period": "2026-06", "status": "success", "actor": "pipeline"}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-14T01:24:47+00:00",
+  "generated_at": "2026-10-14T02:51:10+00:00",
   "golden": {
     "cases": [
       {
@@ -622,6 +622,6 @@
   "unit": {
     "total": 90,
     "passed": 90,
-    "source": "ai_solutions_builder_free/evals/FINAL_RUN.md"
+    "source": "03_evals/FINAL_RUN.md"
   }
 }

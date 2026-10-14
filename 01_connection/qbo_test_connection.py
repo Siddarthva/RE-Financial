@@ -48,6 +48,42 @@ def last_retrieval() -> str | None:
     return max(dates) if dates else None
 
 
+SERVER_DIR = "quickbooks-online-mcp-server"
+# (code, pattern, what to do). First match wins, so the specific causes come before the generic ones.
+DIAGNOSES = (
+    ("bad_request", r"input validation|invalid arguments|required at",
+     "The test sent a request the server rejects (a bug in this script, not in QuickBooks). Report it; do not re-authorize."),
+    ("bad_client", r"invalid_client|client id|client secret|client_id|client_secret",
+     f"QuickBooks does not accept the app keys. In {SERVER_DIR}'s environment file check the Development client ID and secret from developer.intuit.com (Keys & credentials), then run 'npm run auth' there."),
+    ("expired_token", r"invalid_grant|authorization is invalid or expired|failed to refresh|refresh token|not authenticated|unauthor|401|token (has )?expired",
+     f"The refresh token is expired or revoked. In {SERVER_DIR} run 'npm run auth', sign in to the sandbox company in the browser, then retest. Refresh tokens last 100 days and rotate on use."),
+    ("wrong_environment", r"production|realm|403|applicationauthorizationfailed|authorizationfault|not authorized",
+     f"The token does not match the environment. Set QUICKBOOKS_ENVIRONMENT=sandbox in {SERVER_DIR}'s environment file, use the app's Development keys, and re-run 'npm run auth' with the sandbox company."),
+    ("network", r"econnreset|econnrefused|enotfound|etimedout|eai_again|fetch failed|socket hang up|network",
+     "The server could not reach quickbooks.api.intuit.com. Check internet access, VPN or proxy, then retest."),
+    ("not_configured", r"must be set|missing|enoent|not found|no such file|absolute path",
+     f"The server is missing configuration. Check that {SERVER_DIR}'s environment file exists and has the app keys, then run 'npm run auth'."),
+    ("rate_or_outage", r"429|5\d\d|servicefault|unavailable|throttl",
+     "QuickBooks is rate-limiting or having an outage. Wait a few minutes and retest."),
+)
+
+
+def mask(text: str, limit: int = 160) -> str:
+    """Make a server message safe to store: long digit runs (realm IDs) and long token-like strings are removed."""
+    text = re.sub(r"\d{6,}", "<N>", text)
+    text = re.sub(r"[A-Za-z0-9_\-./+=]{24,}", "<TOKEN>", text)
+    return " ".join(text.split())[:limit]
+
+
+def diagnose(text: str) -> dict:
+    """Map a failure text from the server to a cause and a next step. The text itself is stored only after mask()."""
+    for code, pattern, advice in DIAGNOSES:
+        if re.search(pattern, text, re.I):
+            return {"cause": code, "message": advice, "server_said": mask(text)}
+    return {"cause": "unknown", "message": f"QuickBooks returned an error that is not recognised. Run 'node dist/index.js' in {SERVER_DIR} from a terminal and read its output.",
+            "server_said": mask(text)}
+
+
 def _reader(stream, q):
     for line in iter(stream.readline, ""):
         q.put(line)
@@ -80,32 +116,39 @@ def test_connection() -> dict:
     env = {**os.environ, **{f: "true" for f in FLAGS}}
     try:
         proc = subprocess.Popen(["node", str(SERVER)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                stderr=subprocess.DEVNULL, text=True, encoding="utf-8", env=env, cwd=SERVER.parents[1])
+                                stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace", env=env, cwd=SERVER.parents[1])
     except OSError:
         return {**base, "ok": False, "message": "Node.js was not found. Install Node.js and make sure 'node' is on PATH."}
     q: queue.Queue = queue.Queue()
+    errq: queue.Queue = queue.Queue()
     threading.Thread(target=_reader, args=(proc.stdout, q), daemon=True).start()
+    threading.Thread(target=_reader, args=(proc.stderr, errq), daemon=True).start()
     try:
         _rpc(proc, q, {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
             "protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "close-review-workspace", "version": "1"}}}, 1)
         _rpc(proc, q, {"jsonrpc": "2.0", "method": "notifications/initialized"})
         resp = _rpc(proc, q, {"jsonrpc": "2.0", "id": 2, "method": "tools/call",
-                              "params": {"name": "get_company_info", "arguments": {}}}, 2)
+                              "params": {"name": "get_company_info", "arguments": {"params": {}}}}, 2)  # the server wraps every tool's arguments in "params"
     except TimeoutError:
         return {**base, "ok": False, "message": "No response within 45 seconds. Check your network and that the server can start."}
     except (OSError, ValueError):
-        return {**base, "ok": False, "message": "The QuickBooks MCP server exited unexpectedly. Run it once from a terminal to see why."}
+        stderr = ""
+        while not errq.empty():
+            stderr += errq.get()
+        return {**base, "ok": False, **(diagnose(stderr) if stderr.strip() else {"cause": "server_exited",
+                "message": "The QuickBooks MCP server exited unexpectedly. Run 'node dist/index.js' in its folder to see why."})}
     finally:
         proc.kill()
-    blob = json.dumps(resp or {})
-    if "error" in (resp or {}) or (resp or {}).get("result", {}).get("isError"):
-        if re.search(r"401|auth|token|invalid_grant|refresh|unauthor", blob, re.I):
-            msg = "QuickBooks rejected the credentials. Re-authorize the app (new refresh token) and try again."
-        else:
-            msg = "QuickBooks returned an error. Details are withheld; check the server's own logs."
-        return {**base, "ok": False, "message": msg}
+    result = (resp or {}).get("result", {})
     try:
-        text = resp["result"]["content"][0]["text"]
+        text = result["content"][0]["text"]
+    except (KeyError, IndexError, TypeError):
+        text = ""
+    # The server reports QuickBooks failures as text starting "Error:" without isError, so check both.
+    if "error" in (resp or {}) or result.get("isError") or text.startswith("Error"):
+        failure = text or json.dumps((resp or {}).get("error", ""))
+        return {**base, "ok": False, **diagnose(failure)}
+    try:
         name = (json.loads(text).get("CompanyName") or json.loads(text).get("CompanyInfo", {}).get("CompanyName"))
     except (KeyError, IndexError, ValueError, AttributeError):
         name = None
