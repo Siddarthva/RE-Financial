@@ -1,0 +1,10 @@
+{
+  "client": "abc",
+  "period": "2026-05",
+  "status": "rejected",
+  "reviewer": "Test",
+  "reason": "manual test",
+  "decided_at": "2026-10-14T08:09:08+00:00",
+  "review_verdict": null,
+  "packet_sha256": "ac3f39be1a87759b860b8a9d8fda4d567f292742540d7e0a969585e1a1f08d0a"
+}

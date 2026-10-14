@@ -1,0 +1,35 @@
+{
+  "run_id": "20261014T080901Z-abc-2026-05",
+  "client": "abc",
+  "period": "2026-05",
+  "started_at": "2026-10-14T08:09:01+00:00",
+  "finished_at": "2026-10-14T08:09:07+00:00",
+  "source": {
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sha256": "75da8d679a89551f9e46b3563b7cfc724d9aaeabe0444b0214d455a0b335a0ea"
+  },
+  "skill_version": "monthly-financial-analysis@59884e52e344",
+  "git_sha": "2d1a3a2",
+  "status": "success",
+  "stages": [
+    {
+      "name": "Intake",
+      "status": "done",
+      "duration_s": 0.478
+    },
+    {
+      "name": "Calculate",
+      "status": "done",
+      "duration_s": 5.572
+    },
+    {
+      "name": "Grade commentary",
+      "status": "done",
+      "duration_s": 0.0
+    }
+  ],
+  "diff_vs_previous": {
+    "previous_run_id": "20261014T080823Z-abc-2026-05",
+    "changed": []
+  }
+}

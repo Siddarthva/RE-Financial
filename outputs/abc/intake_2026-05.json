@@ -1,0 +1,104 @@
+{
+  "workbook": "ABC Inc - Financial Statements.xlsx",
+  "sha256": "75da8d679a89551f9e46b3563b7cfc724d9aaeabe0444b0214d455a0b335a0ea",
+  "sheets_detected": [
+    "Income Statement",
+    "Balance Sheet"
+  ],
+  "period_start": "2025-01",
+  "period_end": "2026-06",
+  "months": 18,
+  "checks": [
+    {
+      "check": "Income statement sheet present",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Header row found",
+      "passed": true,
+      "cell_ref": "Income Statement!B5",
+      "detail": "Account"
+    },
+    {
+      "check": "Month columns contiguous",
+      "passed": true,
+      "cell_ref": "Income Statement!C5:T5",
+      "detail": "18 month columns"
+    },
+    {
+      "check": "Total row present: Total Income",
+      "passed": true,
+      "cell_ref": "Income Statement!C14",
+      "detail": "revenue"
+    },
+    {
+      "check": "Total row present: Total Cost of Goods Sold",
+      "passed": true,
+      "cell_ref": "Income Statement!C24",
+      "detail": "cost_of_goods_sold"
+    },
+    {
+      "check": "Total row present: Gross Profit",
+      "passed": true,
+      "cell_ref": "Income Statement!C26",
+      "detail": "gross_profit"
+    },
+    {
+      "check": "Total row present: Total Operating Expenses",
+      "passed": true,
+      "cell_ref": "Income Statement!C103",
+      "detail": "operating_expenses"
+    },
+    {
+      "check": "Total row present: Operating Income",
+      "passed": true,
+      "cell_ref": "Income Statement!C105",
+      "detail": "operating_income"
+    },
+    {
+      "check": "Total row present: Net Income",
+      "passed": true,
+      "cell_ref": "Income Statement!C107",
+      "detail": "net_income"
+    },
+    {
+      "check": "Every amount is a number",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Gross profit = revenue - COGS (every month)",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Operating income = gross profit - opex (every month)",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Total Income foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Total Cost of Goods Sold foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Total Operating Expenses foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    }
+  ],
+  "status": "pass"
+}

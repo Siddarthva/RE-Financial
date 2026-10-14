@@ -1,0 +1,1558 @@
+{
+  "latest_month": "2026-05",
+  "prior_month": "2026-04",
+  "months": {
+    "2025-01": {
+      "revenue": {
+        "value": 167587.5,
+        "ttm": null
+      },
+      "cost_of_goods_sold": {
+        "value": 36950.54,
+        "ttm": null
+      },
+      "gross_profit": {
+        "value": 130636.96,
+        "ttm": null,
+        "margin": 0.779515
+      },
+      "operating_expenses": {
+        "value": 513541.99,
+        "ttm": null
+      },
+      "operating_income": {
+        "value": -382905.03,
+        "ttm": null,
+        "margin": -2.284807
+      },
+      "net_income": {
+        "value": -382905.03,
+        "ttm": null,
+        "margin": -2.284807
+      }
+    },
+    "2025-02": {
+      "revenue": {
+        "value": 176651.19,
+        "ttm": null,
+        "mom_change": 9063.69,
+        "mom_pct": 0.054083
+      },
+      "cost_of_goods_sold": {
+        "value": 37476.29,
+        "ttm": null,
+        "mom_change": 525.75,
+        "mom_pct": 0.014228
+      },
+      "gross_profit": {
+        "value": 139174.9,
+        "ttm": null,
+        "mom_change": 8537.94,
+        "mom_pct": 0.065356,
+        "margin": 0.787851,
+        "margin_change_pp": 0.833653
+      },
+      "operating_expenses": {
+        "value": 555578.55,
+        "ttm": null,
+        "mom_change": 42036.56,
+        "mom_pct": 0.081856
+      },
+      "operating_income": {
+        "value": -416403.65,
+        "ttm": null,
+        "mom_change": -33498.62,
+        "mom_pct": -0.087485,
+        "margin": -2.357208,
+        "margin_change_pp": -7.240167
+      },
+      "net_income": {
+        "value": -416403.65,
+        "ttm": null,
+        "mom_change": -33498.62,
+        "mom_pct": -0.087485,
+        "margin": -2.357208,
+        "margin_change_pp": -7.240167
+      }
+    },
+    "2025-03": {
+      "revenue": {
+        "value": 170550.65,
+        "ttm": null,
+        "mom_change": -6100.54,
+        "mom_pct": -0.034534
+      },
+      "cost_of_goods_sold": {
+        "value": 49999.34,
+        "ttm": null,
+        "mom_change": 12523.05,
+        "mom_pct": 0.334159
+      },
+      "gross_profit": {
+        "value": 120551.31,
+        "ttm": null,
+        "mom_change": -18623.59,
+        "mom_pct": -0.133814,
+        "margin": 0.706836,
+        "margin_change_pp": -8.101564
+      },
+      "operating_expenses": {
+        "value": 533111.68,
+        "ttm": null,
+        "mom_change": -22466.87,
+        "mom_pct": -0.040439
+      },
+      "operating_income": {
+        "value": -412560.37,
+        "ttm": null,
+        "mom_change": 3843.28,
+        "mom_pct": 0.00923,
+        "margin": -2.41899,
+        "margin_change_pp": -6.178202
+      },
+      "net_income": {
+        "value": -412560.37,
+        "ttm": null,
+        "mom_change": 3843.28,
+        "mom_pct": 0.00923,
+        "margin": -2.41899,
+        "margin_change_pp": -6.178202
+      }
+    },
+    "2025-04": {
+      "revenue": {
+        "value": 154136.03,
+        "ttm": null,
+        "mom_change": -16414.62,
+        "mom_pct": -0.096245
+      },
+      "cost_of_goods_sold": {
+        "value": 49550.71,
+        "ttm": null,
+        "mom_change": -448.63,
+        "mom_pct": -0.008973
+      },
+      "gross_profit": {
+        "value": 104585.32,
+        "ttm": null,
+        "mom_change": -15965.99,
+        "mom_pct": -0.132441,
+        "margin": 0.678526,
+        "margin_change_pp": -2.830972
+      },
+      "operating_expenses": {
+        "value": 495053.56,
+        "ttm": null,
+        "mom_change": -38058.12,
+        "mom_pct": -0.071389
+      },
+      "operating_income": {
+        "value": -390468.24,
+        "ttm": null,
+        "mom_change": 22092.13,
+        "mom_pct": 0.053549,
+        "margin": -2.53327,
+        "margin_change_pp": -11.428007
+      },
+      "net_income": {
+        "value": -390468.24,
+        "ttm": null,
+        "mom_change": 22092.13,
+        "mom_pct": 0.053549,
+        "margin": -2.53327,
+        "margin_change_pp": -11.428007
+      }
+    },
+    "2025-05": {
+      "revenue": {
+        "value": 169403.74,
+        "ttm": null,
+        "mom_change": 15267.71,
+        "mom_pct": 0.099053
+      },
+      "cost_of_goods_sold": {
+        "value": 50211.89,
+        "ttm": null,
+        "mom_change": 661.18,
+        "mom_pct": 0.013344
+      },
+      "gross_profit": {
+        "value": 119191.85,
+        "ttm": null,
+        "mom_change": 14606.53,
+        "mom_pct": 0.139661,
+        "margin": 0.703596,
+        "margin_change_pp": 2.507023
+      },
+      "operating_expenses": {
+        "value": 473844.16,
+        "ttm": null,
+        "mom_change": -21209.4,
+        "mom_pct": -0.042843
+      },
+      "operating_income": {
+        "value": -354652.31,
+        "ttm": null,
+        "mom_change": 35815.93,
+        "mom_pct": 0.091726,
+        "margin": -2.093533,
+        "margin_change_pp": 43.973744
+      },
+      "net_income": {
+        "value": -354652.31,
+        "ttm": null,
+        "mom_change": 35815.93,
+        "mom_pct": 0.091726,
+        "margin": -2.093533,
+        "margin_change_pp": 43.973744
+      }
+    },
+    "2025-06": {
+      "revenue": {
+        "value": 190555.65,
+        "ttm": null,
+        "mom_change": 21151.91,
+        "mom_pct": 0.124861
+      },
+      "cost_of_goods_sold": {
+        "value": 48929.91,
+        "ttm": null,
+        "mom_change": -1281.98,
+        "mom_pct": -0.025531
+      },
+      "gross_profit": {
+        "value": 141625.74,
+        "ttm": null,
+        "mom_change": 22433.89,
+        "mom_pct": 0.188217,
+        "margin": 0.743225,
+        "margin_change_pp": 3.962876
+      },
+      "operating_expenses": {
+        "value": 497871.96,
+        "ttm": null,
+        "mom_change": 24027.8,
+        "mom_pct": 0.050708
+      },
+      "operating_income": {
+        "value": -356246.22,
+        "ttm": null,
+        "mom_change": -1593.91,
+        "mom_pct": -0.004494,
+        "margin": -1.869513,
+        "margin_change_pp": 22.402018
+      },
+      "net_income": {
+        "value": -356246.22,
+        "ttm": null,
+        "mom_change": -1593.91,
+        "mom_pct": -0.004494,
+        "margin": -1.869513,
+        "margin_change_pp": 22.402018
+      }
+    },
+    "2025-07": {
+      "revenue": {
+        "value": 183919.1,
+        "ttm": null,
+        "mom_change": -6636.55,
+        "mom_pct": -0.034827
+      },
+      "cost_of_goods_sold": {
+        "value": 54581.14,
+        "ttm": null,
+        "mom_change": 5651.23,
+        "mom_pct": 0.115496
+      },
+      "gross_profit": {
+        "value": 129337.96,
+        "ttm": null,
+        "mom_change": -12287.78,
+        "mom_pct": -0.086762,
+        "margin": 0.703233,
+        "margin_change_pp": -3.99922
+      },
+      "operating_expenses": {
+        "value": 455324.92,
+        "ttm": null,
+        "mom_change": -42547.04,
+        "mom_pct": -0.085458
+      },
+      "operating_income": {
+        "value": -325986.96,
+        "ttm": null,
+        "mom_change": 30259.26,
+        "mom_pct": 0.084939,
+        "margin": -1.772448,
+        "margin_change_pp": 9.70652
+      },
+      "net_income": {
+        "value": -325986.96,
+        "ttm": null,
+        "mom_change": 30259.26,
+        "mom_pct": 0.084939,
+        "margin": -1.772448,
+        "margin_change_pp": 9.70652
+      }
+    },
+    "2025-08": {
+      "revenue": {
+        "value": 181747.2,
+        "ttm": null,
+        "mom_change": -2171.9,
+        "mom_pct": -0.011809
+      },
+      "cost_of_goods_sold": {
+        "value": 67212.5,
+        "ttm": null,
+        "mom_change": 12631.36,
+        "mom_pct": 0.231424
+      },
+      "gross_profit": {
+        "value": 114534.7,
+        "ttm": null,
+        "mom_change": -14803.26,
+        "mom_pct": -0.114454,
+        "margin": 0.630187,
+        "margin_change_pp": -7.304601
+      },
+      "operating_expenses": {
+        "value": 431306.59,
+        "ttm": null,
+        "mom_change": -24018.33,
+        "mom_pct": -0.05275
+      },
+      "operating_income": {
+        "value": -316771.89,
+        "ttm": null,
+        "mom_change": 9215.07,
+        "mom_pct": 0.028268,
+        "margin": -1.742926,
+        "margin_change_pp": 2.952173
+      },
+      "net_income": {
+        "value": -316771.89,
+        "ttm": null,
+        "mom_change": 9215.07,
+        "mom_pct": 0.028268,
+        "margin": -1.742926,
+        "margin_change_pp": 2.952173
+      }
+    },
+    "2025-09": {
+      "revenue": {
+        "value": 181508.47,
+        "ttm": null,
+        "mom_change": -238.73,
+        "mom_pct": -0.001314
+      },
+      "cost_of_goods_sold": {
+        "value": 58015.06,
+        "ttm": null,
+        "mom_change": -9197.44,
+        "mom_pct": -0.136841
+      },
+      "gross_profit": {
+        "value": 123493.41,
+        "ttm": null,
+        "mom_change": 8958.71,
+        "mom_pct": 0.078218,
+        "margin": 0.680373,
+        "margin_change_pp": 5.018584
+      },
+      "operating_expenses": {
+        "value": 483844.86,
+        "ttm": null,
+        "mom_change": 52538.27,
+        "mom_pct": 0.121812
+      },
+      "operating_income": {
+        "value": -360351.45,
+        "ttm": null,
+        "mom_change": -43579.56,
+        "mom_pct": -0.137574,
+        "margin": -1.985315,
+        "margin_change_pp": -24.238896
+      },
+      "net_income": {
+        "value": -360351.45,
+        "ttm": null,
+        "mom_change": -43579.56,
+        "mom_pct": -0.137574,
+        "margin": -1.985315,
+        "margin_change_pp": -24.238896
+      }
+    },
+    "2025-10": {
+      "revenue": {
+        "value": 191426.63,
+        "ttm": null,
+        "mom_change": 9918.16,
+        "mom_pct": 0.054643
+      },
+      "cost_of_goods_sold": {
+        "value": 58737.07,
+        "ttm": null,
+        "mom_change": 722.01,
+        "mom_pct": 0.012445
+      },
+      "gross_profit": {
+        "value": 132689.56,
+        "ttm": null,
+        "mom_change": 9196.15,
+        "mom_pct": 0.074467,
+        "margin": 0.693161,
+        "margin_change_pp": 1.278874
+      },
+      "operating_expenses": {
+        "value": 479083.78,
+        "ttm": null,
+        "mom_change": -4761.08,
+        "mom_pct": -0.00984
+      },
+      "operating_income": {
+        "value": -346394.22,
+        "ttm": null,
+        "mom_change": 13957.23,
+        "mom_pct": 0.038732,
+        "margin": -1.80954,
+        "margin_change_pp": 17.577439
+      },
+      "net_income": {
+        "value": -346394.22,
+        "ttm": null,
+        "mom_change": 13957.23,
+        "mom_pct": 0.038732,
+        "margin": -1.80954,
+        "margin_change_pp": 17.577439
+      }
+    },
+    "2025-11": {
+      "revenue": {
+        "value": 187800.63,
+        "ttm": null,
+        "mom_change": -3626.0,
+        "mom_pct": -0.018942
+      },
+      "cost_of_goods_sold": {
+        "value": 54447.63,
+        "ttm": null,
+        "mom_change": -4289.44,
+        "mom_pct": -0.073028
+      },
+      "gross_profit": {
+        "value": 133353.0,
+        "ttm": null,
+        "mom_change": 663.44,
+        "mom_pct": 0.005,
+        "margin": 0.710077,
+        "margin_change_pp": 1.691604
+      },
+      "operating_expenses": {
+        "value": 420263.04,
+        "ttm": null,
+        "mom_change": -58820.74,
+        "mom_pct": -0.122778
+      },
+      "operating_income": {
+        "value": -286910.04,
+        "ttm": null,
+        "mom_change": 59484.18,
+        "mom_pct": 0.171724,
+        "margin": -1.527737,
+        "margin_change_pp": 28.180303
+      },
+      "net_income": {
+        "value": -286910.04,
+        "ttm": null,
+        "mom_change": 59484.18,
+        "mom_pct": 0.171724,
+        "margin": -1.527737,
+        "margin_change_pp": 28.180303
+      }
+    },
+    "2025-12": {
+      "revenue": {
+        "value": 190029.49,
+        "ttm": 2145316.28,
+        "mom_change": 2228.86,
+        "mom_pct": 0.011868
+      },
+      "cost_of_goods_sold": {
+        "value": 57620.17,
+        "ttm": 623732.25,
+        "mom_change": 3172.54,
+        "mom_pct": 0.058268
+      },
+      "gross_profit": {
+        "value": 132409.32,
+        "ttm": 1521584.03,
+        "mom_change": -943.68,
+        "mom_pct": -0.007077,
+        "margin": 0.696783,
+        "margin_change_pp": -1.329448,
+        "ttm_margin": 0.709259
+      },
+      "operating_expenses": {
+        "value": -402142.09,
+        "ttm": 4936683.0,
+        "mom_change": -822405.13,
+        "mom_pct": -1.956882
+      },
+      "operating_income": {
+        "value": 534551.41,
+        "ttm": -3415098.97,
+        "mom_change": 821461.45,
+        "mom_pct": 2.863132,
+        "margin": 2.812992,
+        "margin_change_pp": 434.072923,
+        "ttm_margin": -1.591886
+      },
+      "net_income": {
+        "value": 534551.41,
+        "ttm": -3415098.97,
+        "mom_change": 821461.45,
+        "mom_pct": 2.863132,
+        "margin": 2.812992,
+        "margin_change_pp": 434.072923,
+        "ttm_margin": -1.591886
+      }
+    },
+    "2026-01": {
+      "revenue": {
+        "value": 204153.96,
+        "ttm": 2181882.74,
+        "mom_change": 14124.47,
+        "mom_pct": 0.074328
+      },
+      "cost_of_goods_sold": {
+        "value": 60755.11,
+        "ttm": 647536.82,
+        "mom_change": 3134.94,
+        "mom_pct": 0.054407
+      },
+      "gross_profit": {
+        "value": 143398.85,
+        "ttm": 1534345.92,
+        "mom_change": 10989.53,
+        "mom_pct": 0.082997,
+        "margin": 0.702405,
+        "margin_change_pp": 0.562242,
+        "ttm_margin": 0.703221
+      },
+      "operating_expenses": {
+        "value": 487711.23,
+        "ttm": 4910852.24,
+        "mom_change": 889853.32,
+        "mom_pct": 2.212783
+      },
+      "operating_income": {
+        "value": -344312.38,
+        "ttm": -3376506.32,
+        "mom_change": -878863.79,
+        "mom_pct": -1.644115,
+        "margin": -1.686533,
+        "margin_change_pp": -449.952482,
+        "ttm_margin": -1.54752
+      },
+      "net_income": {
+        "value": -344312.38,
+        "ttm": -3376506.32,
+        "mom_change": -878863.79,
+        "mom_pct": -1.644115,
+        "margin": -1.686533,
+        "margin_change_pp": -449.952482,
+        "ttm_margin": -1.54752
+      }
+    },
+    "2026-02": {
+      "revenue": {
+        "value": 183160.3,
+        "ttm": 2188391.85,
+        "mom_change": -20993.66,
+        "mom_pct": -0.102832
+      },
+      "cost_of_goods_sold": {
+        "value": 59234.68,
+        "ttm": 669295.21,
+        "mom_change": -1520.43,
+        "mom_pct": -0.025026
+      },
+      "gross_profit": {
+        "value": 123925.62,
+        "ttm": 1519096.64,
+        "mom_change": -19473.23,
+        "mom_pct": -0.135798,
+        "margin": 0.676597,
+        "margin_change_pp": -2.580892,
+        "ttm_margin": 0.694161
+      },
+      "operating_expenses": {
+        "value": 500504.05,
+        "ttm": 4855777.74,
+        "mom_change": 12792.82,
+        "mom_pct": 0.02623
+      },
+      "operating_income": {
+        "value": -376578.43,
+        "ttm": -3336681.1,
+        "mom_change": -32266.05,
+        "mom_pct": -0.093712,
+        "margin": -2.056005,
+        "margin_change_pp": -36.947171,
+        "ttm_margin": -1.524718
+      },
+      "net_income": {
+        "value": -376578.43,
+        "ttm": -3336681.1,
+        "mom_change": -32266.05,
+        "mom_pct": -0.093712,
+        "margin": -2.056005,
+        "margin_change_pp": -36.947171,
+        "ttm_margin": -1.524718
+      }
+    },
+    "2026-03": {
+      "revenue": {
+        "value": 191468.19,
+        "ttm": 2209309.39,
+        "mom_change": 8307.89,
+        "mom_pct": 0.045359
+      },
+      "cost_of_goods_sold": {
+        "value": 45856.99,
+        "ttm": 665152.86,
+        "mom_change": -13377.69,
+        "mom_pct": -0.225842
+      },
+      "gross_profit": {
+        "value": 145611.2,
+        "ttm": 1544156.53,
+        "mom_change": 21685.58,
+        "mom_pct": 0.174989,
+        "margin": 0.760498,
+        "margin_change_pp": 8.390162,
+        "ttm_margin": 0.698932
+      },
+      "operating_expenses": {
+        "value": 421605.3,
+        "ttm": 4744271.36,
+        "mom_change": -78898.75,
+        "mom_pct": -0.157639
+      },
+      "operating_income": {
+        "value": -275994.1,
+        "ttm": -3200114.83,
+        "mom_change": 100584.33,
+        "mom_pct": 0.267101,
+        "margin": -1.441462,
+        "margin_change_pp": 61.454276,
+        "ttm_margin": -1.448468
+      },
+      "net_income": {
+        "value": -275994.1,
+        "ttm": -3200114.83,
+        "mom_change": 100584.33,
+        "mom_pct": 0.267101,
+        "margin": -1.441462,
+        "margin_change_pp": 61.454276,
+        "ttm_margin": -1.448468
+      }
+    },
+    "2026-04": {
+      "revenue": {
+        "value": 204512.42,
+        "ttm": 2259685.78,
+        "mom_change": 13044.23,
+        "mom_pct": 0.068127
+      },
+      "cost_of_goods_sold": {
+        "value": 59945.28,
+        "ttm": 675547.43,
+        "mom_change": 14088.29,
+        "mom_pct": 0.307222
+      },
+      "gross_profit": {
+        "value": 144567.14,
+        "ttm": 1584138.35,
+        "mom_change": -1044.06,
+        "mom_pct": -0.00717,
+        "margin": 0.706887,
+        "margin_change_pp": -5.361128,
+        "ttm_margin": 0.701044
+      },
+      "operating_expenses": {
+        "value": 465742.99,
+        "ttm": 4714960.79,
+        "mom_change": 44137.69,
+        "mom_pct": 0.10469
+      },
+      "operating_income": {
+        "value": -321175.85,
+        "ttm": -3130822.44,
+        "mom_change": -45181.75,
+        "mom_pct": -0.163705,
+        "margin": -1.570447,
+        "margin_change_pp": -12.898478,
+        "ttm_margin": -1.385512
+      },
+      "net_income": {
+        "value": -321175.85,
+        "ttm": -3130822.44,
+        "mom_change": -45181.75,
+        "mom_pct": -0.163705,
+        "margin": -1.570447,
+        "margin_change_pp": -12.898478,
+        "ttm_margin": -1.385512
+      }
+    },
+    "2026-05": {
+      "revenue": {
+        "value": 208350.96,
+        "ttm": 2298633.0,
+        "mom_change": 3838.54,
+        "mom_pct": 0.018769
+      },
+      "cost_of_goods_sold": {
+        "value": 68669.53,
+        "ttm": 694005.07,
+        "mom_change": 8724.25,
+        "mom_pct": 0.145537
+      },
+      "gross_profit": {
+        "value": 139681.43,
+        "ttm": 1604627.93,
+        "mom_change": -4885.71,
+        "mom_pct": -0.033795,
+        "margin": 0.670414,
+        "margin_change_pp": -3.647271,
+        "ttm_margin": 0.698079
+      },
+      "operating_expenses": {
+        "value": 478781.03,
+        "ttm": 4719897.66,
+        "mom_change": 13038.04,
+        "mom_pct": 0.027994
+      },
+      "operating_income": {
+        "value": -339099.6,
+        "ttm": -3115269.73,
+        "mom_change": -17923.75,
+        "mom_pct": -0.055807,
+        "margin": -1.62754,
+        "margin_change_pp": -5.70937,
+        "ttm_margin": -1.355271
+      },
+      "net_income": {
+        "value": -339099.6,
+        "ttm": -3115269.73,
+        "mom_change": -17923.75,
+        "mom_pct": -0.055807,
+        "margin": -1.62754,
+        "margin_change_pp": -5.70937,
+        "ttm_margin": -1.355271
+      }
+    },
+    "2026-06": {
+      "revenue": {
+        "value": 195898.16,
+        "ttm": 2303975.51,
+        "mom_change": -12452.8,
+        "mom_pct": -0.059768
+      },
+      "cost_of_goods_sold": {
+        "value": 58472.44,
+        "ttm": 703547.6,
+        "mom_change": -10197.09,
+        "mom_pct": -0.148495
+      },
+      "gross_profit": {
+        "value": 137425.72,
+        "ttm": 1600427.91,
+        "mom_change": -2255.71,
+        "mom_pct": -0.016149,
+        "margin": 0.701516,
+        "margin_change_pp": 3.110199,
+        "ttm_margin": 0.694638
+      },
+      "operating_expenses": {
+        "value": 468181.8,
+        "ttm": 4690207.5,
+        "mom_change": -10599.23,
+        "mom_pct": -0.022138
+      },
+      "operating_income": {
+        "value": -330756.08,
+        "ttm": -3089779.59,
+        "mom_change": 8343.52,
+        "mom_pct": 0.024605,
+        "margin": -1.688408,
+        "margin_change_pp": -6.086793,
+        "ttm_margin": -1.341064
+      },
+      "net_income": {
+        "value": -330756.08,
+        "ttm": -3089779.59,
+        "mom_change": 8343.52,
+        "mom_pct": 0.024605,
+        "margin": -1.688408,
+        "margin_change_pp": -6.086793,
+        "ttm_margin": -1.341064
+      }
+    }
+  },
+  "line_items": {
+    "Platform Revenue": {
+      "section": "income",
+      "value": 26666.66,
+      "prior_value": 26666.66,
+      "mom_change": 0.0,
+      "mom_pct": 0.0
+    },
+    "Partnership Income": {
+      "section": "income",
+      "value": 476.73,
+      "prior_value": 0.0,
+      "mom_change": 476.73,
+      "mom_pct": null
+    },
+    "Professional Services": {
+      "section": "income",
+      "value": 833.33,
+      "prior_value": 833.33,
+      "mom_change": 0.0,
+      "mom_pct": 0.0
+    },
+    "Usage Fees": {
+      "section": "income",
+      "value": 177924.24,
+      "prior_value": 164562.43,
+      "mom_change": 13361.81,
+      "mom_pct": 0.081196
+    },
+    "White-Label": {
+      "section": "income",
+      "value": 2450.0,
+      "prior_value": 2450.0,
+      "mom_change": 0.0,
+      "mom_pct": 0.0
+    },
+    "SKU Profiling": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 10000.0,
+      "mom_change": -10000.0,
+      "mom_pct": -1.0
+    },
+    "Customer Success - Payroll benefits": {
+      "section": "cost of goods sold",
+      "value": 985.51,
+      "prior_value": 870.56,
+      "mom_change": 114.95,
+      "mom_pct": 0.132041
+    },
+    "Customer Success - Workers Comp Insurance": {
+      "section": "cost of goods sold",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null
+    },
+    "Customer Success Payroll": {
+      "section": "cost of goods sold",
+      "value": 30987.83,
+      "prior_value": 28434.22,
+      "mom_change": 2553.61,
+      "mom_pct": 0.089808
+    },
+    "Customer Success Payroll Taxes": {
+      "section": "cost of goods sold",
+      "value": 2870.61,
+      "prior_value": 2632.24,
+      "mom_change": 238.37,
+      "mom_pct": 0.090558
+    },
+    "Hosting": {
+      "section": "cost of goods sold",
+      "value": 17869.17,
+      "prior_value": 17682.32,
+      "mom_change": 186.85,
+      "mom_pct": 0.010567
+    },
+    "Referral Fees": {
+      "section": "cost of goods sold",
+      "value": 2830.0,
+      "prior_value": 2830.0,
+      "mom_change": 0.0,
+      "mom_pct": 0.0
+    },
+    "Sales Commission": {
+      "section": "cost of goods sold",
+      "value": 13126.41,
+      "prior_value": 7495.94,
+      "mom_change": 5630.47,
+      "mom_pct": 0.751136
+    },
+    "Accounting & Tax": {
+      "section": "operating expenses",
+      "value": 13500.0,
+      "prior_value": 13500.0,
+      "mom_change": 0.0,
+      "mom_pct": 0.0,
+      "share_of_opex": 0.028197
+    },
+    "Advisory Services": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Bad Debts": {
+      "section": "operating expenses",
+      "value": 12935.29,
+      "prior_value": 0.0,
+      "mom_change": 12935.29,
+      "mom_pct": null,
+      "share_of_opex": 0.027017
+    },
+    "Bank Service Charges": {
+      "section": "operating expenses",
+      "value": 424.17,
+      "prior_value": 73.28,
+      "mom_change": 350.89,
+      "mom_pct": 4.788346,
+      "share_of_opex": 0.000886
+    },
+    "Bonus": {
+      "section": "operating expenses",
+      "value": 11189.0,
+      "prior_value": 10889.0,
+      "mom_change": 300.0,
+      "mom_pct": 0.027551,
+      "share_of_opex": 0.02337
+    },
+    "Consulting": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Contribution to Charities": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Depreciation": {
+      "section": "operating expenses",
+      "value": 441.04,
+      "prior_value": 441.04,
+      "mom_change": 0.0,
+      "mom_pct": 0.0,
+      "share_of_opex": 0.000921
+    },
+    "Development - Contractor": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Development Payroll": {
+      "section": "operating expenses",
+      "value": 125754.16,
+      "prior_value": 121047.96,
+      "mom_change": 4706.2,
+      "mom_pct": 0.038879,
+      "share_of_opex": 0.262655
+    },
+    "Employee Training expenses": {
+      "section": "operating expenses",
+      "value": 432.25,
+      "prior_value": 432.25,
+      "mom_change": 0.0,
+      "mom_pct": 0.0,
+      "share_of_opex": 0.000903
+    },
+    "Federal & State Taxes": {
+      "section": "operating expenses",
+      "value": 1561.67,
+      "prior_value": 3269.0,
+      "mom_change": -1707.33,
+      "mom_pct": -0.522279,
+      "share_of_opex": 0.003262
+    },
+    "General Expenses": {
+      "section": "operating expenses",
+      "value": 324.75,
+      "prior_value": 148.75,
+      "mom_change": 176.0,
+      "mom_pct": 1.183193,
+      "share_of_opex": 0.000678
+    },
+    "Health Insurance": {
+      "section": "operating expenses",
+      "value": 15164.37,
+      "prior_value": 13921.1,
+      "mom_change": 1243.27,
+      "mom_pct": 0.089308,
+      "share_of_opex": 0.031673
+    },
+    "Insurance": {
+      "section": "operating expenses",
+      "value": 4228.61,
+      "prior_value": 1506.88,
+      "mom_change": 2721.73,
+      "mom_pct": 1.806202,
+      "share_of_opex": 0.008832
+    },
+    "Interest Expense": {
+      "section": "operating expenses",
+      "value": 517.45,
+      "prior_value": 350.25,
+      "mom_change": 167.2,
+      "mom_pct": 0.477373,
+      "share_of_opex": 0.001081
+    },
+    "Interest Income": {
+      "section": "operating expenses",
+      "value": -1553.29,
+      "prior_value": -2086.99,
+      "mom_change": 533.7,
+      "mom_pct": 0.255727,
+      "share_of_opex": -0.003244
+    },
+    "Legal Expenses": {
+      "section": "operating expenses",
+      "value": 2212.5,
+      "prior_value": 0.0,
+      "mom_change": 2212.5,
+      "mom_pct": null,
+      "share_of_opex": 0.004621
+    },
+    "S & M Payroll": {
+      "section": "operating expenses",
+      "value": null,
+      "prior_value": null,
+      "mom_change": null,
+      "mom_pct": null,
+      "share_of_opex": null
+    },
+    "Marketing - Payroll": {
+      "section": "operating expenses",
+      "value": 27612.5,
+      "prior_value": 26666.66,
+      "mom_change": 945.84,
+      "mom_pct": 0.035469,
+      "share_of_opex": 0.057673
+    },
+    "Marketing - Payroll benefits": {
+      "section": "operating expenses",
+      "value": 561.69,
+      "prior_value": 562.99,
+      "mom_change": -1.3,
+      "mom_pct": -0.002309,
+      "share_of_opex": 0.001173
+    },
+    "Marketing - Payroll Taxes": {
+      "section": "operating expenses",
+      "value": 2187.36,
+      "prior_value": 2111.44,
+      "mom_change": 75.92,
+      "mom_pct": 0.035957,
+      "share_of_opex": 0.004569
+    },
+    "Marketing - Workers Comp Insurance": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Partnerships - Payroll": {
+      "section": "operating expenses",
+      "value": 10833.34,
+      "prior_value": 10833.34,
+      "mom_change": 0.0,
+      "mom_pct": 0.0,
+      "share_of_opex": 0.022627
+    },
+    "Partnerships - Payroll benefits": {
+      "section": "operating expenses",
+      "value": 109.82,
+      "prior_value": 109.82,
+      "mom_change": 0.0,
+      "mom_pct": 0.0,
+      "share_of_opex": 0.000229
+    },
+    "Partnerships - Payroll Taxes": {
+      "section": "operating expenses",
+      "value": 1202.58,
+      "prior_value": 1234.61,
+      "mom_change": -32.03,
+      "mom_pct": -0.025943,
+      "share_of_opex": 0.002512
+    },
+    "Sales - Payroll": {
+      "section": "operating expenses",
+      "value": 77012.5,
+      "prior_value": 73750.0,
+      "mom_change": 3262.5,
+      "mom_pct": 0.044237,
+      "share_of_opex": 0.160851
+    },
+    "Sales - Payroll benefits": {
+      "section": "operating expenses",
+      "value": 2442.09,
+      "prior_value": 2563.23,
+      "mom_change": -121.14,
+      "mom_pct": -0.047261,
+      "share_of_opex": 0.005101
+    },
+    "Sales - Payroll Taxes": {
+      "section": "operating expenses",
+      "value": 6108.86,
+      "prior_value": 6072.95,
+      "mom_change": 35.91,
+      "mom_pct": 0.005913,
+      "share_of_opex": 0.012759
+    },
+    "Sales - Workers Comp Insurance": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Marketing": {
+      "section": "operating expenses",
+      "value": null,
+      "prior_value": null,
+      "mom_change": null,
+      "mom_pct": null,
+      "share_of_opex": null
+    },
+    "Marketing/Advertising": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Marketing/Advertising: Ad Spend": {
+      "section": "operating expenses",
+      "value": 4423.61,
+      "prior_value": 5206.96,
+      "mom_change": -783.35,
+      "mom_pct": -0.150443,
+      "share_of_opex": 0.009239
+    },
+    "Marketing/Advertising: Print & Digital": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 8500.0,
+      "mom_change": -8500.0,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Marketing/Advertising: 3rd Party Content Syndication": {
+      "section": "operating expenses",
+      "value": 902.17,
+      "prior_value": 902.17,
+      "mom_change": 0.0,
+      "mom_pct": 0.0,
+      "share_of_opex": 0.001884
+    },
+    "Events & Conferences": {
+      "section": "operating expenses",
+      "value": 11323.91,
+      "prior_value": 23662.36,
+      "mom_change": -12338.45,
+      "mom_pct": -0.521438,
+      "share_of_opex": 0.023652
+    },
+    "Marketing/Advertising: Content": {
+      "section": "operating expenses",
+      "value": 6666.67,
+      "prior_value": 6666.67,
+      "mom_change": 0.0,
+      "mom_pct": 0.0,
+      "share_of_opex": 0.013924
+    },
+    "Marketing/Advertising: Membership Dues/Subscriptions": {
+      "section": "operating expenses",
+      "value": 3615.91,
+      "prior_value": 3812.78,
+      "mom_change": -196.87,
+      "mom_pct": -0.051634,
+      "share_of_opex": 0.007552
+    },
+    "Marketing/Advertising: Miscellaneous": {
+      "section": "operating expenses",
+      "value": 1119.31,
+      "prior_value": 1335.04,
+      "mom_change": -215.73,
+      "mom_pct": -0.161591,
+      "share_of_opex": 0.002338
+    },
+    "Marketing/Advertising: Website": {
+      "section": "operating expenses",
+      "value": 162.19,
+      "prior_value": 369.14,
+      "mom_change": -206.95,
+      "mom_pct": -0.560627,
+      "share_of_opex": 0.000339
+    },
+    "Marketing/Advertising: Partner Marketing": {
+      "section": "operating expenses",
+      "value": 12415.08,
+      "prior_value": 0.0,
+      "mom_change": 12415.08,
+      "mom_pct": null,
+      "share_of_opex": 0.025931
+    },
+    "Meals & Entertainment": {
+      "section": "operating expenses",
+      "value": 486.73,
+      "prior_value": 135.62,
+      "mom_change": 351.11,
+      "mom_pct": 2.588925,
+      "share_of_opex": 0.001017
+    },
+    "Merchant fees": {
+      "section": "operating expenses",
+      "value": 321.56,
+      "prior_value": 344.22,
+      "mom_change": -22.66,
+      "mom_pct": -0.06583,
+      "share_of_opex": 0.000672
+    },
+    "Office Expenses": {
+      "section": "operating expenses",
+      "value": 468.44,
+      "prior_value": 2943.29,
+      "mom_change": -2474.85,
+      "mom_pct": -0.840845,
+      "share_of_opex": 0.000978
+    },
+    "Operating Payroll": {
+      "section": "operating expenses",
+      "value": 32645.82,
+      "prior_value": 31666.66,
+      "mom_change": 979.16,
+      "mom_pct": 0.030921,
+      "share_of_opex": 0.068185
+    },
+    "Operations - Payroll benefits": {
+      "section": "operating expenses",
+      "value": 505.95,
+      "prior_value": 422.25,
+      "mom_change": 83.7,
+      "mom_pct": 0.198224,
+      "share_of_opex": 0.001057
+    },
+    "Operations - Workers Comp Insurance": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Operations Payroll Taxes": {
+      "section": "operating expenses",
+      "value": 2344.43,
+      "prior_value": 2269.53,
+      "mom_change": 74.9,
+      "mom_pct": 0.033002,
+      "share_of_opex": 0.004897
+    },
+    "Payroll Service Fee": {
+      "section": "operating expenses",
+      "value": 2597.48,
+      "prior_value": 2577.88,
+      "mom_change": 19.6,
+      "mom_pct": 0.007603,
+      "share_of_opex": 0.005425
+    },
+    "Postage & Delivery": {
+      "section": "operating expenses",
+      "value": 273.16,
+      "prior_value": 0.0,
+      "mom_change": 273.16,
+      "mom_pct": null,
+      "share_of_opex": 0.000571
+    },
+    "Printing & Stationery": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Product - Payroll benefits": {
+      "section": "operating expenses",
+      "value": 3611.89,
+      "prior_value": 3820.04,
+      "mom_change": -208.15,
+      "mom_pct": -0.054489,
+      "share_of_opex": 0.007544
+    },
+    "Product - Workers Comp Insurance": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Product Payroll Taxes": {
+      "section": "operating expenses",
+      "value": 9577.84,
+      "prior_value": 9207.62,
+      "mom_change": 370.22,
+      "mom_pct": 0.040208,
+      "share_of_opex": 0.020005
+    },
+    "Professional Fees": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Recruiting Expense": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Rent": {
+      "section": "operating expenses",
+      "value": 4781.45,
+      "prior_value": 6393.95,
+      "mom_change": -1612.5,
+      "mom_pct": -0.252192,
+      "share_of_opex": 0.009987
+    },
+    "Sales & Marketing - Contractor": {
+      "section": "operating expenses",
+      "value": 6633.33,
+      "prior_value": 6633.33,
+      "mom_change": 0.0,
+      "mom_pct": 0.0,
+      "share_of_opex": 0.013855
+    },
+    "Sales & Marketing - Workers Comp Insurance": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Sales & Marketing Payroll": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Sales & Marketing Payroll Taxes": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Sales and Marketing - Payroll benefits": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Severance": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Software & SaaS": {
+      "section": "operating expenses",
+      "value": 30748.11,
+      "prior_value": 27735.33,
+      "mom_change": 3012.78,
+      "mom_pct": 0.108626,
+      "share_of_opex": 0.064222
+    },
+    "Telephone & Internet": {
+      "section": "operating expenses",
+      "value": 477.38,
+      "prior_value": 477.38,
+      "mom_change": 0.0,
+      "mom_pct": 0.0,
+      "share_of_opex": 0.000997
+    },
+    "Travel": {
+      "section": "operating expenses",
+      "value": 401.15,
+      "prior_value": 975.2,
+      "mom_change": -574.05,
+      "mom_pct": -0.588648,
+      "share_of_opex": 0.000838
+    },
+    "Partnerships Commission": {
+      "section": "operating expenses",
+      "value": 10800.0,
+      "prior_value": 9000.0,
+      "mom_change": 1800.0,
+      "mom_pct": 0.2,
+      "share_of_opex": 0.022557
+    },
+    "Workers Compensation Insurance": {
+      "section": "operating expenses",
+      "value": 285.88,
+      "prior_value": 287.78,
+      "mom_change": -1.9,
+      "mom_pct": -0.006602,
+      "share_of_opex": 0.000597
+    },
+    "Stock-Based Compensation Expense": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Sales & Marketing - Travel, Meals & Entertainment": {
+      "section": "operating expenses",
+      "value": 15127.44,
+      "prior_value": 22407.15,
+      "mom_change": -7279.71,
+      "mom_pct": -0.324883,
+      "share_of_opex": 0.031596
+    },
+    "Income Tax Benefit": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "AI Token Cost": {
+      "section": "operating expenses",
+      "value": 861.43,
+      "prior_value": 593.08,
+      "mom_change": 268.35,
+      "mom_pct": 0.452468,
+      "share_of_opex": 0.001799
+    }
+  },
+  "top_movements": [
+    {
+      "account": "Usage Fees",
+      "mom_change": 13361.81
+    },
+    {
+      "account": "Bad Debts",
+      "mom_change": 12935.29
+    },
+    {
+      "account": "Marketing/Advertising: Partner Marketing",
+      "mom_change": 12415.08
+    }
+  ],
+  "gross_margin_drop_threshold_pp": 5,
+  "gross_margin_flags": [
+    {
+      "month": "2025-03",
+      "gross_margin_pct": 0.7068358285353941,
+      "change_pp": -8.101564305673048
+    },
+    {
+      "month": "2025-08",
+      "gross_margin_pct": 0.6301868749559828,
+      "change_pp": -7.3046013852194225
+    },
+    {
+      "month": "2026-04",
+      "gross_margin_pct": 0.7068868482412951,
+      "change_pp": -5.361127941113642
+    }
+  ],
+  "cash": {
+    "month": "2026-05",
+    "value": 929024.59,
+    "prior_value": 1033067.44,
+    "mom_change": -104042.85,
+    "mom_pct": -0.100713,
+    "burn": {
+      "1m": 104042.85,
+      "3m": 212092.506667,
+      "6m": 344227.825
+    },
+    "runway_months": {
+      "1m": 8.92925,
+      "3m": 4.38028,
+      "6m": 2.698865
+    },
+    "primary_window": "3m"
+  },
+  "client": "abc",
+  "display_name": "ABC Inc",
+  "one_offs": [
+    {
+      "account": "Recruiting Expense",
+      "section": "operating expenses",
+      "month": "2025-01",
+      "amount": 15750.0
+    },
+    {
+      "account": "Severance",
+      "section": "operating expenses",
+      "month": "2025-07",
+      "amount": 9533.76
+    },
+    {
+      "account": "Income Tax Benefit",
+      "section": "operating expenses",
+      "month": "2025-12",
+      "amount": -1244429.84
+    },
+    {
+      "account": "Stock-Based Compensation Expense",
+      "section": "operating expenses",
+      "month": "2025-12",
+      "amount": 334660.53
+    },
+    {
+      "account": "SKU Profiling",
+      "section": "income",
+      "month": "2026-04",
+      "amount": 10000.0
+    }
+  ],
+  "warnings": []
+}

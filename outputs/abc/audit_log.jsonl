@@ -2,3 +2,7 @@
 {"ts": "2026-10-14T07:49:54+00:00", "event": "pipeline_run", "run_id": "20261014T074950Z-abc-2026-06", "client": "abc", "period": "2026-06", "status": "success", "actor": "pipeline"}
 {"ts": "2026-10-14T07:55:09+00:00", "event": "qbo_test_connection", "client": "abc", "actor": "workspace", "status": "ok"}
 {"ts": "2026-10-14T07:55:54+00:00", "event": "pipeline_run", "run_id": "20261014T075551Z-abc-2026-06", "client": "abc", "period": "2026-06", "status": "success", "actor": "pipeline"}
+{"ts": "2026-10-14T08:07:58+00:00", "event": "qbo_test_connection", "client": "abc", "actor": "workspace", "status": "ok"}
+{"ts": "2026-10-14T08:08:29+00:00", "event": "pipeline_run", "run_id": "20261014T080823Z-abc-2026-05", "client": "abc", "period": "2026-05", "status": "success", "actor": "pipeline"}
+{"ts": "2026-10-14T08:09:07+00:00", "event": "pipeline_run", "run_id": "20261014T080901Z-abc-2026-05", "client": "abc", "period": "2026-05", "status": "success", "actor": "pipeline"}
+{"ts": "2026-10-14T08:09:08+00:00", "event": "period_rejected", "client": "abc", "period": "2026-05", "actor": "Test", "reason": "manual test", "status": "rejected"}
