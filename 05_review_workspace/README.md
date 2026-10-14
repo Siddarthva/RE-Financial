@@ -32,7 +32,7 @@ python scripts/run_pipeline.py abc 2026-06        # generate the JSON the UI rea
 streamlit run 05_review_workspace/app/Home.py
 ```
 
-Without data the app shows "No clients found in outputs/" and the command to generate it. Page-by-page failure behaviour: [`workflows/f_review_workspace_ui.md`](../04_architecture/workflows/f_review_workspace_ui.md).
+The repo-root [`.streamlit/config.toml`](../.streamlit/config.toml) binds the server to `127.0.0.1` and turns usage statistics off, so `streamlit run` (from the repo root) prints a single local URL and sends nothing to Streamlit. Without data the app shows "No clients found in outputs/" and the command to generate it. Page-by-page failure behaviour: [`workflows/f_review_workspace_ui.md`](../04_architecture/workflows/f_review_workspace_ui.md).
 
 ## Screenshots
 

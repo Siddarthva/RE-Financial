@@ -76,6 +76,7 @@ Full detail, with a reason for every item: [`brief_traceability.md`](04_architec
 | [`scripts/`](scripts/) | Pipeline, approval, eval export, secret scan, link check, `package_submission.py` |
 | [`config/`](config/) | Template for the sandbox write credential |
 | [`outputs/`](outputs/) | Generated files, one folder per client |
+| [`.streamlit/`](.streamlit/config.toml) | UI server binds to `127.0.0.1` only; usage statistics off (nothing leaves the machine) |
 | [`.claude/`](.claude/) | Skills, `/monthly-analysis`, reviewer agent, safety hooks |
 | [`CLAUDE.md`](CLAUDE.md) | Standing rules: secrets, read-only workbook, read-only QuickBooks |
 
