@@ -88,3 +88,13 @@ Thin coverage worth knowing (caught, but by a single eval): adapter gross-margin
   - `03_evals/golden_cases.json`, `03_evals/run_golden_evals.py`: golden case G18 (flags exactly 2025-03, 2025-08, 2026-04, hand-computed from rows 14 and 26)
   - `tests/test_monthly_review.py`: `test_gross_margin_drop_flags`
 - **Result:** golden 18/18, unit 102/102.
+
+## 2026-10-14 — clean-state re-verification (Phase 1)
+
+`outputs/` was moved aside and regenerated from scratch. Details: `04_architecture/verification_matrix.md`.
+- **Stale committed output:** `outputs/abc/review_packet_2026-06.json` lacked `gross_margin_flags`; the rehearsed modification never regenerated it. Regenerated.
+- **Test-order dependency:** `tests/test_ui_numbers.py` crashed on a clean `outputs/` (no `commentary_grade.json` yet). Missing global files now shrink the allowed set instead.
+- **False-clean secret scan:** `scripts/scan_secrets.py` given file paths scanned 0 files and reported 0 findings; a misspelt path also passed. Fixed; `test_file_paths_are_scanned_and_missing_paths_fail`.
+- **Failed connection test reported success:** `qbo_test_connection.py --test` exited 0 on failure, and the review UI gates on the exit code. Now exits 1.
+- **Result:** unit 103/103, golden 18/18, mutation 13/13 (first run since G18).
+- **Independent reviewer:** `tests/test_qbo_load.py` `--apply` test wrote the real `outputs/abc/qbo_load_plan.json` before failing on the missing env file. The loader now fails before any side effect; the test uses a temp output root and asserts it stays empty (fails without the fix).

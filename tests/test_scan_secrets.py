@@ -34,6 +34,15 @@ class ScanTests(unittest.TestCase):
         self.assertEqual(findings, [])
         self.assertEqual(sorted(p.name for p in files), [".env", "oauth_token.json"])
 
+    def test_file_paths_are_scanned_and_missing_paths_fail(self):
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "a.json"
+            f.write_text('{"realmId": "1234567890123456"}', encoding="utf-8")
+            findings, _, scanned, _ = scan.scan([str(f)])
+            self.assertEqual((scanned, [k for _, _, k in findings]), (1, ["realm_id"]))
+            with self.assertRaises(SystemExit):
+                scan.scan([str(Path(d) / "missing.json")])
+
     def test_values_are_never_in_the_report_output(self):
         import contextlib
         import io

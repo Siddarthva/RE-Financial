@@ -1,0 +1,11 @@
+{
+  "server": "quickbooks (local MCP, read-only: QUICKBOOKS_DISABLE_WRITE/UPDATE/DELETE=true)",
+  "tool": "get_profit_and_loss",
+  "params": {
+    "start_date": "2026-01-01",
+    "end_date": "2026-06-30",
+    "summarize_column_by": "Month",
+    "accounting_method": "Accrual"
+  },
+  "called_at": "2026-10-14T04:35:40+00:00"
+}

@@ -22,7 +22,8 @@ from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parents[1]
 OUT = PROJECT / "outputs"
-SERVER = PROJECT / "quickbooks-online-mcp-server" / "dist" / "index.js"
+# QBO_MCP_SERVER_DIR overrides the server location (another checkout, or a missing folder to test the failure message).
+SERVER = Path(os.environ.get("QBO_MCP_SERVER_DIR") or PROJECT / "quickbooks-online-mcp-server") / "dist" / "index.js"
 EVIDENCE = Path(__file__).resolve().parent / "evidence" / "quickbooks"
 EXAMPLE = Path(__file__).resolve().parent / ".mcp.json.example"
 FLAGS = ("QUICKBOOKS_DISABLE_WRITE", "QUICKBOOKS_DISABLE_UPDATE", "QUICKBOOKS_DISABLE_DELETE")
@@ -113,8 +114,9 @@ def test_connection() -> dict:
     base = {"tested_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
     if not SERVER.is_file():
         if not SERVER.parents[1].is_dir():
-            msg = ("The QuickBooks MCP server is not part of this repo. Clone Intuit's quickbooks-online-mcp-server into "
-                   f"'{SERVER_DIR}' beside this repo, then run 'npm install', 'npm run build' and 'npm run auth' there.")
+            msg = (f"The QuickBooks MCP server was not found at '{SERVER.parents[1]}'. It is not part of this repo: clone Intuit's "
+                   "quickbooks-online-mcp-server there (or set QBO_MCP_SERVER_DIR to your checkout), then run 'npm install', "
+                   "'npm run build' and 'npm run auth' in it.")
         else:
             msg = f"The QuickBooks MCP server is not built. Run 'npm install' and 'npm run build' in {SERVER_DIR}."
         return {**base, "ok": False, "cause": "server_missing", "message": msg}
@@ -183,7 +185,7 @@ def main() -> int:
                                 "client": client, "actor": "workspace", "status": "ok" if status["last_test"]["ok"] else "failed"}) + "\n")
     path.write_text(json.dumps(status, indent=2), encoding="utf-8")
     print(json.dumps(status["last_test"] or {"message": "status refreshed"}))
-    return 0
+    return 1 if "--test" in sys.argv and not status["last_test"]["ok"] else 0  # callers (and the UI) gate on the exit code
 
 
 if __name__ == "__main__":

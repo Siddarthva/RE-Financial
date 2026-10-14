@@ -275,6 +275,8 @@ def main(argv=None):
     ap.add_argument("--from", dest="start", metavar="YYYY-MM"), ap.add_argument("--to", dest="end", metavar="YYYY-MM")
     args = ap.parse_args(argv)
     sys.stdout.reconfigure(encoding="utf-8")
+    if args.apply and not args.env_file.exists():  # fail before any file or network side effect
+        raise SystemExit(f"--apply needs the write-scoped env file: {args.env_file} (not found; nothing was changed)")
     monthly = load_monthly_totals()
     out_dir = run_client.OUTPUTS_ROOT / CLIENT
 

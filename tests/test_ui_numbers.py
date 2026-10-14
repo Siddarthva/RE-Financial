@@ -103,7 +103,7 @@ def allowed_tokens(client, period):
     allowed = {k: set() for k in TOKEN}
     files = [p for p in (OUTPUTS / client).glob("*.json") if not p.name.startswith(("manifest", "qbo_"))]
     files += [OUTPUTS / "commentary_grade.json", OUTPUTS / "eval_results.json"]  # global: the Evaluations page
-    for p in files:
+    for p in filter(Path.is_file, files):  # absent before the eval scripts run; fewer allowed tokens, never more
         raw = p.read_text(encoding="utf-8")
         for k, t in tokens(raw).items():  # amounts the engine already wrote as text (commentary lines, grader tokens)
             allowed[k] |= t

@@ -1,6 +1,6 @@
 # QBO vs workbook
 
-QBO P&L: `01_pnl_2026-01_to_06_monthly_accrual.response.redacted.json`. Workbook: ABC monthly totals.
+QBO P&L: `02_pnl_2026-01_to_06_monthly_accrual.response.redacted.json`. Workbook: ABC monthly totals.
 
 | Metric | Month | Workbook | QBO | QBO - workbook | Note |
 |---|---|---|---|---|---|

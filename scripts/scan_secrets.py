@@ -51,8 +51,10 @@ def scan_text(text: str):
 def scan(paths):
     findings, secret_files, allowed, scanned = [], [], [], 0
     for root in map(Path, paths):
-        for p in sorted(root.rglob("*")):
-            if not p.is_file() or SKIP_DIRS & set(p.relative_to(root).parts[:-1]):
+        if not root.exists():
+            raise SystemExit(f"scan_secrets: path not found: {root}")  # a typo must not read as a clean scan
+        for p in [root] if root.is_file() else sorted(root.rglob("*")):
+            if not p.is_file() or (p is not root and SKIP_DIRS & set(p.relative_to(root).parts[:-1])):
                 continue
             if is_secret_name(p.name):
                 secret_files.append(p)  # name only: never opened
@@ -80,7 +82,7 @@ def main(argv=None):
     findings, secret_files, scanned, allowed = scan(paths)
     serious = [f for f in findings if f[2] not in INFO_ONLY]
     info = [f for f in findings if f[2] in INFO_ONLY]
-    print(f"Scanned {scanned} text files in {len(paths)} folder(s).")
+    print(f"Scanned {scanned} text files in {len(paths)} path(s).")
     print(f"Secret-like findings: {len(serious)}")
     for p, n, name in serious:
         print(f"  {name}: {p}:{n}")

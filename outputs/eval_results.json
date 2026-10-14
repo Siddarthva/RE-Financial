@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-14T03:54:06+00:00",
+  "generated_at": "2026-10-14T04:25:53+00:00",
   "golden": {
     "cases": [
       {
@@ -495,6 +495,7 @@
           "G15",
           "G16",
           "G17",
+          "G18",
           "test_abc_config_reproduces_existing_engine_numbers",
           "test_abc_fiscal_ytd_matches_balance_sheet_current_year_earnings",
           "test_approved_pack_has_blank_signoff_and_open_questions",
@@ -502,6 +503,7 @@
           "test_bug5_category_mom_pct_sign_uses_absolute_prior",
           "test_current_year_earnings_ties_to_ytd_net_income",
           "test_dec_2025_negative_opex_posts_as_a_credit",
+          "test_gross_margin_drop_flags",
           "test_jun_2026_amounts_come_from_source_cells",
           "test_packet_has_source_cell_values",
           "test_spot_cells",
@@ -530,8 +532,10 @@
         "caught_by": [
           "G11",
           "G13",
+          "G18",
           "test_abc_config_reproduces_existing_engine_numbers",
           "test_every_entry_balances_and_its_p_and_l_effect_is_workbook_net_income",
+          "test_gross_margin_drop_flags",
           "test_jun_2026_amounts_come_from_source_cells",
           "test_packet_has_source_cell_values",
           "test_spot_cells",
@@ -570,6 +574,7 @@
           "G15",
           "G16",
           "G17",
+          "G18",
           "test_a_single_wrong_month_is_reported",
           "test_abc_config_reproduces_existing_engine_numbers",
           "test_abc_fiscal_ytd_matches_balance_sheet_current_year_earnings",
@@ -579,6 +584,7 @@
           "test_bug5_category_mom_pct_sign_uses_absolute_prior",
           "test_current_year_earnings_ties_to_ytd_net_income",
           "test_dec_2025_negative_opex_posts_as_a_credit",
+          "test_gross_margin_drop_flags",
           "test_jun_2026_amounts_come_from_source_cells",
           "test_months_parsed_ascending_without_gaps",
           "test_packet_has_source_cell_values",
@@ -643,7 +649,9 @@
         "caught": true,
         "caught_by": [
           "G13",
-          "test_approved_pack_has_blank_signoff_and_open_questions"
+          "G18",
+          "test_approved_pack_has_blank_signoff_and_open_questions",
+          "test_gross_margin_drop_flags"
         ]
       }
     ],

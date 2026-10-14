@@ -107,8 +107,12 @@ class LoadTests(unittest.TestCase):
 
     def test_apply_without_env_file_stops_before_any_network_call(self):
         missing = Path(tempfile.gettempdir()) / "no_such_qbo_write.env"
-        with mock.patch("urllib.request.urlopen") as net, self.assertRaises(SystemExit):
-            loader.main(["--apply", "--env-file", str(missing)])
+        with tempfile.TemporaryDirectory() as out, mock.patch.object(loader.run_client, "OUTPUTS_ROOT", Path(out)), \
+                mock.patch("urllib.request.urlopen") as net, self.assertRaises(SystemExit):
+            try:
+                loader.main(["--apply", "--env-file", str(missing)])
+            finally:
+                self.assertEqual(list(Path(out).rglob("*")), [])  # no plan file written, and never into the real outputs/
         net.assert_not_called()
 
 

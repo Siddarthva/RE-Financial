@@ -1484,6 +1484,24 @@
       "mom_change": -11142.74
     }
   ],
+  "gross_margin_drop_threshold_pp": 5,
+  "gross_margin_flags": [
+    {
+      "month": "2025-03",
+      "gross_margin_pct": 0.7068358285353941,
+      "change_pp": -8.101564305673048
+    },
+    {
+      "month": "2025-08",
+      "gross_margin_pct": 0.6301868749559828,
+      "change_pp": -7.3046013852194225
+    },
+    {
+      "month": "2026-04",
+      "gross_margin_pct": 0.7068868482412951,
+      "change_pp": -5.361127941113642
+    }
+  ],
   "cash": {
     "month": "2026-06",
     "value": 713481.26,
