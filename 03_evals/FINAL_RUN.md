@@ -17,6 +17,22 @@ python src/run_client.py xyz
 python scripts/scan_secrets.py . outputs
 ```
 
+## Result: v2.0 final, 2026-10-14
+
+Run at commit `c9336d2` (clean tree). Unit and golden suites were re-run for this entry; the mutation and robustness results are from the run earlier the same day on the same source (no source change since).
+
+| Check | Result | Counts |
+|---|---|---|
+| Unit tests | **PASS** | 129 run, 129 OK |
+| Golden cases | **PASS** | 22/22 |
+| Mutation test | **PASS** | 13/13 caught, 0 survived |
+| Robustness (fault injection) | **PASS** | 32/32 pass, source workbook hash unchanged |
+| Secret scan (git-tracked files) | **PASS** | 0 findings, 175 text files |
+| Link check | **PASS** | 62 files, 155 links, 0 broken |
+| Clean-room zip | **PASS** | 193 files; 129 unit tests OK and golden 22/22 from the unzipped copy |
+
+Not re-run in this pass: the commentary grader, the abc/xyz pipeline, the loader dry run and the live QuickBooks checks (last results in the v1.5-final block below).
+
 ## Result: v1.5-final clean run, 2026-10-14
 
 Machine: Windows 11 Home (10.0.26300), Python 3.13.5. Local times UTC+05:30. Run at commit `9711420` plus the uncommitted v1.5 doc and PDF-pack changes (committed afterwards as `dc43a60`). `outputs/` was moved aside to a scratch folder and recreated empty; nothing was copied back from that folder. Two kinds of file were then taken from git HEAD instead, because no script produces them: model-authored commentary and reviews (`commentary_2026-06*`, `skill_commentary*`, `reference_commentary_jun2026.md`, `review_2026-06*`, `monthly_review_2026-06*.xlsx`, `reconciliation_3_months.md`, `ABC_Inc_Financial_Analysis.xlsx`, `qbo_vs_workbook.md`, `outputs/README.md`). Earlier run manifests and the earlier audit-log lines were not restored; the new audit logs hold only this run (the old ones remain in git history). Workbook SHA-256 `75da8d679a89551f…` unchanged.
