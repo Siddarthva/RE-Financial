@@ -11,7 +11,7 @@ Submission for the RE Financial Services build exercise. Seven PDFs, generated f
 | 3 | `01_Connection_Architecture.pdf` | 4 | Component and credential diagrams, read-only enforcement, team hosting (proposed), evidence |
 | 4 | `02_Skill_and_Analysis_Workflow.pdf` | 4 | End-to-end flow, skill anatomy, client-config model, sample output |
 | 5 | `03_Evals_and_Regression.pdf` | 4 | Eval layers, golden cases, mutation and robustness results, regression procedure |
-| 6 | `06_Verification_and_Robustness_Report.pdf` | 7 | Brief-to-proof matrix and the 32-fault robustness report, with dates |
+| 6 | `06_Verification_and_Robustness_Report.pdf` | 8 | Brief-to-proof matrix and the 32-fault robustness report, with dates |
 | 7 | `05_Workflows_Appendix.pdf` | 20 | Seven workflow pages with diagrams (supplementary to the one-page note) |
 
 ## Rebuild
