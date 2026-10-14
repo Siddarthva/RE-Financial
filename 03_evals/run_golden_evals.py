@@ -223,8 +223,42 @@ def run_real_case(case):
     return False, f"Unknown case type: {typ}"
 
 
+def run_intake_case(case):
+    """G19-G22: a perturbed values-only copy of the workbook (temp file) must be refused by the intake gate
+    (close_artifacts.intake_gate, shared by run_pipeline and /monthly-analysis) with a message naming the cause."""
+    import io
+    import tempfile
+    import close_artifacts
+    import run_client
+    pert = case["perturbation"]
+    if pert.get("file") == "formulas_without_cached_values":
+        wb = openpyxl.load_workbook(io.BytesIO(WORKBOOK.read_bytes()), data_only=False)
+    else:
+        wb = openpyxl.load_workbook(io.BytesIO(WORKBOOK.read_bytes()), data_only=True)
+        for ch in pert.get("cells_changed", []):
+            cell = wb[ch["sheet"]][ch["cell"]]
+            if cell.value != ch["original"]:
+                raise ValueError(f"{ch['cell']}: recorded original {ch['original']!r} != workbook {cell.value!r}")
+            cell.value = ch["new"]
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / "perturbed.xlsx"
+        wb.save(path)
+        cfg = {**run_client.load_config("abc"), "workbook_path": path}
+        try:
+            report, _, _ = close_artifacts.intake_gate(cfg, case["input"]["month"], abc)
+            message = close_artifacts.refusal(report, case["input"]["month"])
+        except ValueError as exc:
+            message = str(exc)
+    if not message:
+        return False, "intake gate accepted the perturbed workbook"
+    missing = [s for s in case["expected"]["message_contains"] if s not in message]
+    return not missing, (f"missing {missing} in: " if missing else "refused: ") + message[:160]
+
+
 def run_case(case):
     typ, data, expected = case["type"], case["input"], case["expected"]
+    if typ == "intake_gate":
+        return run_intake_case(case)
     if isinstance(case.get("source"), str) and case["source"].startswith("workbook"):
         return run_real_case(case)
     if typ.startswith("abc_"):

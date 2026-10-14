@@ -124,6 +124,98 @@ def build_flux(packet: dict, loc: dict) -> dict:
             "items": items}
 
 
+def _first(refs: list[str], n: int = 5) -> str:
+    return ", ".join(refs[:n]) + (f" (+{len(refs) - n} more)" if len(refs) > n else "")
+
+
+def preflight(cfg: dict, month: str | None = None) -> list[str]:
+    """Checks that must pass before the workbook is parsed. Returns plain-language problems naming the file,
+    sheet or cell; an empty list means the engine may read the workbook. Never modifies the file."""
+    path = Path(cfg["workbook_path"])
+    try:
+        with open(path, "rb") as f:
+            head = f.read(4)
+    except FileNotFoundError:
+        return [f"Workbook not found: {path}. Check 'workbook' in the client's config.yaml."]
+    except PermissionError:
+        return [f"Workbook is open or locked by another program: {path}. Close it (for example in Excel) and re-run."]
+    if head != b"PK\x03\x04":
+        return [f"Not a valid .xlsx workbook (the file is not a zip package): {path.name}. Re-export it from the source system."]
+    try:
+        values = load_workbook(path, data_only=True)
+        formulas = load_workbook(path, data_only=False)
+    except Exception as exc:  # zip present but not a readable workbook
+        return [f"Cannot open {path.name} as an .xlsx workbook ({type(exc).__name__}). Re-export it from the source system."]
+    lay = _layout(cfg)
+    wanted = [lay["sheet"]] + ([cfg["sheets"]["balance_sheet"]] if cfg["sheets"].get("balance_sheet") else [])
+    missing = [s for s in wanted if s not in values.sheetnames]
+    if missing:
+        return [f"Sheet {s!r} not found in {path.name}; sheets present: {values.sheetnames}." for s in missing]
+    problems = []
+    for s in wanted:
+        uncached = [c.coordinate for row in formulas[s].iter_rows() for c in row
+                    if isinstance(c.value, str) and c.value.startswith("=") and values[s][c.coordinate].value is None]
+        if uncached:
+            problems.append(f"{s}: {len(uncached)} formula cells have no saved value ({_first(uncached)}). "
+                            "The file was saved without calculating; open it in Excel, save, and re-run.")
+        errors = [f"{c.coordinate} {c.value}" for row in values[s].iter_rows() for c in row if c.data_type == "e"]
+        if errors:  # pandas reads Excel error values as blanks, so they must be caught here
+            problems.append(f"{s}: {len(errors)} cells hold an Excel error value ({_first(errors)}). Fix the formula and re-run.")
+    ws = values[lay["sheet"]]
+    rows = [list(r) for r in ws.iter_rows(max_row=15, values_only=True)]
+    hr = next((i for i, r in enumerate(rows) if lay["header_label"] in [str(v) for v in r]), None)
+    if hr is None:
+        return problems + [f"{lay['sheet']}: header row with {lay['header_label']!r} not found in rows 1-15."]
+    merged = [str(m) for m in ws.merged_cells.ranges if m.min_row <= hr + 1 <= m.max_row]
+    if merged:
+        problems.append(f"{lay['sheet']}: header cells are merged ({_first(merged)}); unmerge them so each month has its own header.")
+    months: dict = {}
+    for j, v in enumerate(rows[hr]):
+        p = pd.to_datetime(str(v), format=lay["month_format"], errors="coerce") if v is not None else pd.NaT
+        if pd.notna(p):
+            months.setdefault(f"{p:%Y-%m}", []).append(f"{get_column_letter(j + 1)}{hr + 1}")
+    for m, cells in months.items():
+        if len(cells) > 1:
+            problems.append(f"{lay['sheet']}: month {m} appears in more than one column ({', '.join(cells)}).")
+    if month:
+        prior = f"{pd.Period(month, 'M') - 1}"
+        for m, role in ((month, "the requested month"), (prior, f"the prior month of {month}")):
+            if m not in months:
+                problems.append(f"{lay['sheet']}: no column for {m} ({role}) in header row {hr + 1}; "
+                                f"months found: {min(months, default='-')} to {max(months, default='-')}.")
+    labels = {str(r[c]).strip().casefold() for r in ws.iter_rows(min_row=hr + 2, values_only=True) for c in range(min(len(r), 3)) if r[c] is not None}
+    for key, label in cfg["totals"].items():
+        if label.casefold() not in labels:
+            problems.append(f"{lay['sheet']}: total row {label!r} ({key}) not found. It is required; check for a renamed or deleted row.")
+    for sid, (_, total) in lay["sections"].items():
+        if total.casefold() not in labels:
+            problems.append(f"{lay['sheet']}: section total row {total!r} not found; the {sid} section cannot be closed or footed.")
+    values.close()
+    formulas.close()
+    return problems
+
+
+def intake_gate(cfg: dict, month: str, engine) -> tuple[dict, pd.DataFrame, dict]:
+    """The one intake gate for every path that produces numbers (run_pipeline and monthly_review.prepare).
+    Raises ValueError if the file cannot be read safely; otherwise returns (report, account_month, locator).
+    The caller must refuse to continue when refusal(report) is not None."""
+    problems = preflight(cfg, month)
+    if problems:
+        raise ValueError("Intake refused the workbook: " + " | ".join(problems))
+    am = engine.parse_wide_income_statement(cfg["workbook_path"], _layout(cfg))
+    monthly = engine.build_monthly_summary(am, cfg["totals"])
+    loc = locate(cfg)
+    return build_intake(cfg, loc, monthly, am), am, loc
+
+
+def refusal(report: dict, month: str) -> str | None:
+    if report["status"] == "pass":
+        return None
+    failed = [f"{c['check']} at {c['cell_ref']}" + (f" ({c['detail']})" if c["detail"] else "")
+              for c in report["checks"] if not c["passed"]]
+    return f"Intake checks failed (details in intake_{month}.json): " + " | ".join(failed)
+
+
 def build_intake(cfg: dict, loc: dict, monthly: pd.DataFrame, account_month: pd.DataFrame) -> dict:
     """Workbook card data: sheets, period range, hash, and pass/fail checks with cell refs."""
     path = Path(cfg["workbook_path"])
@@ -149,12 +241,28 @@ def build_intake(cfg: dict, loc: dict, monthly: pd.DataFrame, account_month: pd.
     for key, label in cfg["totals"].items():
         ref = cell_ref(loc, label, None, latest)
         add(f"Total row present: {label}", ref is not None, ref or sheet, key)
-    m = monthly.iloc[-1]
-    gp_ok = abs(m["revenue"] - m["cost_of_goods_sold"] - m["gross_profit"]) <= 0.005
-    add("Gross profit = revenue - COGS (latest month)", gp_ok, cell_ref(loc, cfg["totals"]["gross_profit"], None, latest) or sheet)
-    oi_ok = abs(m["gross_profit"] - m["operating_expenses"] - m["operating_income"]) <= 0.005
-    add("Operating income = gross profit - opex (latest month)", oi_ok,
-        cell_ref(loc, cfg["totals"]["operating_income"], None, latest) or sheet)
+    bad = account_month.attrs.get("bad_cells", [])
+    add("Every amount is a number", not bad, _first([b[0] for b in bad]) if bad else sheet,
+        "; ".join(f"{a} {m}: {why}" for _, a, m, why in bad[:3]))
+    mon = monthly.set_index("month")
+    for name, total, parts, sign in (("Gross profit = revenue - COGS", "gross_profit", ("revenue", "cost_of_goods_sold"), -1),
+                                     ("Operating income = gross profit - opex", "operating_income", ("gross_profit", "operating_expenses"), -1)):
+        diff = mon[parts[0]] + sign * mon[parts[1]] - mon[total]
+        off = [f"{m:%Y-%m}" for m, d in diff.items() if not abs(d) <= 0.005]  # NaN counts as off
+        add(f"{name} (every month)", not off, _first([cell_ref(loc, cfg["totals"][total], None, m) or m for m in off]) if off else sheet,
+            f"off in {_first(off)}" if off else "")
+    # Each section's detail lines must foot to its total row in every month; otherwise some number is wrong.
+    sections = account_month.attrs.get("sections", {})
+    sub = {s.casefold() for s in cfg.get("subtotal_rows", [])}
+    for sid, v in cfg["sections"].items():
+        detail = [a for a in account_month.index if sections.get(a) == sid and a.casefold() not in sub]
+        if v["total"] not in account_month.index or not detail:
+            continue
+        diff = account_month.loc[detail].sum(min_count=1) - account_month.loc[v["total"]]
+        off = [(f"{m:%Y-%m}", d) for m, d in diff.items() if not abs(d) <= 0.01]
+        add(f"{v['total']} foots to its lines (every month)", not off,
+            _first([cell_ref(loc, v["total"], None, m) or m for m, _ in off]) if off else sheet,
+            "; ".join(f"{m}: lines - total = {d:,.2f}" for m, d in off[:3]))
     return {
         "workbook": path.name, "sha256": sha256_file(path), "sheets_detected": sheets,
         "period_start": f"{monthly['month'].iloc[0]:%Y-%m}", "period_end": latest, "months": len(monthly),

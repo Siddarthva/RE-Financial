@@ -63,15 +63,39 @@
       "detail": "net_income"
     },
     {
-      "check": "Gross profit = revenue - COGS (latest month)",
+      "check": "Every amount is a number",
       "passed": true,
-      "cell_ref": "P&L!O13",
+      "cell_ref": "P&L",
       "detail": ""
     },
     {
-      "check": "Operating income = gross profit - opex (latest month)",
+      "check": "Gross profit = revenue - COGS (every month)",
       "passed": true,
-      "cell_ref": "P&L!O24",
+      "cell_ref": "P&L",
+      "detail": ""
+    },
+    {
+      "check": "Operating income = gross profit - opex (every month)",
+      "passed": true,
+      "cell_ref": "P&L",
+      "detail": ""
+    },
+    {
+      "check": "Total Revenue foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "P&L",
+      "detail": ""
+    },
+    {
+      "check": "Total Cost of Sales foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "P&L",
+      "detail": ""
+    },
+    {
+      "check": "Total Expenses foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "P&L",
       "detail": ""
     }
   ],

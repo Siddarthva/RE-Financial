@@ -1,4 +1,4 @@
-Running 18 golden cases
+Running 22 golden cases
 PASS G01 — Month-over-month revenue change: change=9063.690000000002, pct=0.054083329603938246
 PASS G02 — Gross margin: gross_margin=0.7795149399567389
 PASS G03 — TTM requires twelve consecutive months: ttm_after_11=nan, ttm_after_12=2145316.28
@@ -17,5 +17,9 @@ PASS G15 — ABC Platform Revenue step-down (Jan 2026): 45,000.00 -> 26,666.66 (
 PASS G16 — ABC Bad Debts charge (May 2026): values match; May 2026 mom_pct=nan
 PASS G17 — ABC Jun 2026 cash and runway: cash=713,481.26; 3m burn=209,656.62; runway=3.40 months
 PASS G18 — ABC gross-margin drops over 5 pp: 3 months flagged: 2025-03, 2025-08, 2026-04
+PASS G19 — Intake STOP (structure): prior month column missing: refused: Intake refused the workbook: Income Statement: no column for 2026-05 (the prior month of 2026-06) in header row 5; months found: 2025-01 to 2026-06.
+PASS G20 — Intake STOP (values): text 'n/a' in an amount cell: refused: Intake checks failed (details in intake_2026-06.json): Every amount is a number at Income Statement!C11 (Usage Fees Jun 2026: text, not a number: 'n/a') | Total
+PASS G21 — Intake STOP (labels/footing): a line no longer foots to Total Income: refused: Intake checks failed (details in intake_2026-06.json): Total Income foots to its lines (every month) at Income Statement!F14 (2026-03: lines - total = 1,000.00)
+PASS G22 — Intake STOP (coverage): formulas saved without cached values: refused: Intake refused the workbook: Income Statement: 144 formula cells have no saved value (C14, D14, E14, F14, G14 (+139 more)). The file was saved without calculati
 
-Score: 18/18 (100%)
+Score: 22/22 (100%)

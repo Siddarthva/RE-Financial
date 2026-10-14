@@ -656,5 +656,123 @@
       }
     },
     "grading": "Exactly these three months are flagged; margins within 0.000001; change in pp within 0.0001."
+  },
+  {
+    "id": "G19",
+    "name": "Intake STOP (structure): prior month column missing",
+    "type": "intake_gate",
+    "source": "workbook+perturbation",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Income Statement",
+    "input": {
+      "month": "2026-06"
+    },
+    "expected": {
+      "refused": true,
+      "message_contains": [
+        "no column for 2026-05",
+        "the prior month of 2026-06"
+      ]
+    },
+    "perturbation": {
+      "cells_changed": [
+        {
+          "sheet": "Income Statement",
+          "cell": "D5",
+          "label": "May 2026 header",
+          "original": "May 2026",
+          "new": null
+        }
+      ],
+      "purpose": "Without a May 2026 column, June's MoM would silently compare with April. Robustness fault F01 (values-only copy, header blanked)."
+    },
+    "grading": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string."
+  },
+  {
+    "id": "G20",
+    "name": "Intake STOP (values): text 'n/a' in an amount cell",
+    "type": "intake_gate",
+    "source": "workbook+perturbation",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Income Statement",
+    "input": {
+      "month": "2026-06"
+    },
+    "expected": {
+      "refused": true,
+      "message_contains": [
+        "Every amount is a number",
+        "Income Statement!C11",
+        "n/a"
+      ]
+    },
+    "perturbation": {
+      "cells_changed": [
+        {
+          "sheet": "Income Statement",
+          "cell": "C11",
+          "label": "Usage Fees, Jun 2026 (B11)",
+          "original": 166781.5,
+          "new": "n/a"
+        }
+      ],
+      "purpose": "pandas' default NA list used to turn 'n/a' into a silent blank. Robustness fault F12."
+    },
+    "grading": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string."
+  },
+  {
+    "id": "G21",
+    "name": "Intake STOP (labels/footing): a line no longer foots to Total Income",
+    "type": "intake_gate",
+    "source": "workbook+perturbation",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Income Statement",
+    "input": {
+      "month": "2026-06"
+    },
+    "expected": {
+      "refused": true,
+      "message_contains": [
+        "Total Income foots to its lines",
+        "Income Statement!F14",
+        "2026-03: lines - total = 1,000.00"
+      ]
+    },
+    "perturbation": {
+      "cells_changed": [
+        {
+          "sheet": "Income Statement",
+          "cell": "F11",
+          "label": "Usage Fees, Mar 2026 (B11, F5)",
+          "original": 166126.29,
+          "new": 167126.29
+        }
+      ],
+      "purpose": "+1,000 on one line with Total Income (F14 = 191,468.19) unchanged. Previously ran to success with wrong Mar 2026 numbers. Robustness fault F26."
+    },
+    "grading": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string."
+  },
+  {
+    "id": "G22",
+    "name": "Intake STOP (coverage): formulas saved without cached values",
+    "type": "intake_gate",
+    "source": "workbook+perturbation",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Income Statement",
+    "input": {
+      "month": "2026-06"
+    },
+    "expected": {
+      "refused": true,
+      "message_contains": [
+        "144 formula cells have no saved value",
+        "Income Statement"
+      ]
+    },
+    "perturbation": {
+      "file": "formulas_without_cached_values",
+      "purpose": "The workbook re-saved by openpyxl with formulas kept: every formula cell (144 on the Income Statement, counted 2026-10-14) loses its cached value. Robustness fault F28."
+    },
+    "grading": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string."
   }
 ]

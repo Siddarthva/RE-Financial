@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-14T04:25:53+00:00",
+  "generated_at": "2026-10-14T05:49:04+00:00",
   "golden": {
     "cases": [
       {
@@ -462,10 +462,88 @@
         "actual": "3 months flagged: 2025-03, 2025-08, 2026-04",
         "tolerance": "Exactly these three months are flagged; margins within 0.000001; change in pp within 0.0001.",
         "perturbation": null
+      },
+      {
+        "id": "G19",
+        "name": "Intake STOP (structure): prior month column missing",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "month": "2026-06"
+        },
+        "expected": {
+          "refused": true,
+          "message_contains": [
+            "no column for 2026-05",
+            "the prior month of 2026-06"
+          ]
+        },
+        "actual": "prior month column missing: refused: Intake refused the workbook: Income Statement: no column for 2026-05 (the prior month of 2026-06) in header row 5; months found: 2025-01 to 2026-06.",
+        "tolerance": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string.",
+        "perturbation": "Without a May 2026 column, June's MoM would silently compare with April. Robustness fault F01 (values-only copy, header blanked)."
+      },
+      {
+        "id": "G20",
+        "name": "Intake STOP (values): text 'n/a' in an amount cell",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "month": "2026-06"
+        },
+        "expected": {
+          "refused": true,
+          "message_contains": [
+            "Every amount is a number",
+            "Income Statement!C11",
+            "n/a"
+          ]
+        },
+        "actual": "text 'n/a' in an amount cell: refused: Intake checks failed (details in intake_2026-06.json): Every amount is a number at Income Statement!C11 (Usage Fees Jun 2026: text, not a number: 'n/a') | Total",
+        "tolerance": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string.",
+        "perturbation": "pandas' default NA list used to turn 'n/a' into a silent blank. Robustness fault F12."
+      },
+      {
+        "id": "G21",
+        "name": "Intake STOP (labels/footing): a line no longer foots to Total Income",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "month": "2026-06"
+        },
+        "expected": {
+          "refused": true,
+          "message_contains": [
+            "Total Income foots to its lines",
+            "Income Statement!F14",
+            "2026-03: lines - total = 1,000.00"
+          ]
+        },
+        "actual": "a line no longer foots to Total Income: refused: Intake checks failed (details in intake_2026-06.json): Total Income foots to its lines (every month) at Income Statement!F14 (2026-03: lines - total = 1,000.00)",
+        "tolerance": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string.",
+        "perturbation": "+1,000 on one line with Total Income (F14 = 191,468.19) unchanged. Previously ran to success with wrong Mar 2026 numbers. Robustness fault F26."
+      },
+      {
+        "id": "G22",
+        "name": "Intake STOP (coverage): formulas saved without cached values",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "month": "2026-06"
+        },
+        "expected": {
+          "refused": true,
+          "message_contains": [
+            "144 formula cells have no saved value",
+            "Income Statement"
+          ]
+        },
+        "actual": "formulas saved without cached values: refused: Intake refused the workbook: Income Statement: 144 formula cells have no saved value (C14, D14, E14, F14, G14 (+139 more)). The file was saved without calculati",
+        "tolerance": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string.",
+        "perturbation": "The workbook re-saved by openpyxl with formulas kept: every formula cell (144 on the Income Statement, counted 2026-10-14) loses its cached value. Robustness fault F28."
       }
     ],
-    "total": 18,
-    "passed": 18
+    "total": 22,
+    "passed": 22
   },
   "mutation": {
     "rows": [

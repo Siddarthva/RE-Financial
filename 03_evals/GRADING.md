@@ -1,23 +1,25 @@
 # Grading
 
-There are three graders. Each is pass/fail and must be green before a change is called done.
+There are four graders. Each is pass/fail and must be green before a change is called done.
 
 | Grader | Command | Checks |
 |---|---|---|
 | Golden cases | `python 03_evals\run_golden_evals.py` | Numbers and flags produced by the engine (`src/`) |
 | Commentary | `python 03_evals\grade_commentary.py [--commentary FILE \| --run-skill]` | Every number in written commentary, coverage of the top movements, and the cash risk |
 | Mutation | `python 03_evals\mutation_test.py` | That the two graders above actually catch known bug classes |
+| Robustness | `python 03_evals\robustness\fault_injection.py` | 32 corrupted copies of the workbook: each must STOP, WARN or be HANDLED as declared, on both entry points (`run_pipeline.py` and the `/monthly-analysis` prepare step); never a successful run with wrong numbers and no warning |
 
 Unit tests (`python -m unittest discover -s tests`) guard individual bugs; see `03_evals/evals_caught.md`.
 
 ## 1. Numbers (golden cases)
 
-`03_evals/golden_cases.json` has 18 cases in three `source` groups: `workbook` 4 (G01, G02, G03, G06), `workbook+perturbation` 5 (G04, G05, G07, G08, G14) and ABC cell-sourced 9 (G09–G13, G15–G18). They fall into two kinds:
+`03_evals/golden_cases.json` has 22 cases in three `source` groups: `workbook` 4 (G01, G02, G03, G06), `workbook+perturbation` 9 (G04, G05, G07, G08, G14, G19–G22) and ABC cell-sourced 9 (G09–G13, G15–G18). They fall into three kinds:
 
 - **G01–G08 and G14, real workbook (in memory, never modified):** the same engine rules as before (MoM, margin, TTM eligibility, validation errors, month labels kept intact), now fed from cached Income Statement cells. Each case records `source`, `perturbation.cells_changed` (sheet, cell, label, original, new) and a one-line `perturbation.purpose`. The runner refuses a case whose recorded original differs from the workbook. Expected values were computed in plain Python from the source cells, not from the engine.
   - `workbook+perturbation` (G04, G05, G07, G08, G14): one or two cells changed to trigger the rule. Where a changed cell is a formula (G07, T14), its cached value is overridden directly.
   - `workbook` (G01, G02, G03, G06): real data already triggers the rule, so no cell is changed.
   - None remain synthetic.
+- **G19–G22, intake gate:** a perturbed values-only copy is written to a temp file; `close_artifacts.intake_gate` must refuse it, and its message must contain every `expected.message_contains` string. Recorded originals are checked against the workbook, as for G04 and the other perturbation cases.
 - **G09–G13 and G15–G18, real ABC workbook:** expected values were computed by hand from cached source-cell values, not from the adapter. Each case's `source.cells` gives the cells or `SUM` ranges used. Both sheets run newest first: on the Income Statement, column C = Jun 2026 … column T = Jan 2025; on the Balance Sheet, column D = 30 Jun 2026 … column U = 31 Jan 2025 (one column to the right).
 
 | Case | What it pins | Key source cells |
@@ -30,6 +32,7 @@ Unit tests (`python -m unittest discover -s tests`) guard individual bugs; see `
 | G15 | Platform Revenue steps down 45,000 → 26,666.66 in Jan 2026 (−18,333.34, −40.7%) and holds through Jun 2026 | I8, H8, C8:H8 |
 | G16 | Bad Debts 12,935.29 in May 2026 (% change null: prior 0), reversing to −1,806.24 in Jun 2026 | E31, D31, C31 |
 | G17 | Jun 2026 cash 713,481.26 and runway: 3.40 months at the 3-month average cash decline (1- and 6-month: 3.31, 2.29) | BS D15, E15, G15, J15 |
+| G19–G22 | Intake gate STOP, one per fault family (perturbed values-only copy in a temp file): G19 structure, prior month's header blanked (D5); G20 values, 'n/a' in C11; G21 footing, F11 +1,000 with F14 unchanged; G22 coverage, formulas saved without cached values | D5, C11, F11/F14, all 144 formula cells |
 | G18 | Gross margin falls by more than 5 pp (config `thresholds.gross_margin_drop_pp`) flag exactly Mar 2025 (−8.10 pp), Aug 2025 (−7.30 pp) and Apr 2026 (−5.36 pp) | R/S, M/N, E/F rows 14 and 26 |
 
 **Tolerances:** currency within ±0.005 (one half-cent). Ratios, percentages and margins within ±0.000001. Identity fields (account, month, peak month) must match exactly.
@@ -100,7 +103,17 @@ Only the magnitude is compared. Direction words ("down", "fell") are checked by 
 
 The report goes to `outputs/mutation_report.md`.
 
-## 5. What counts as a regression
+## 5. Robustness (fault injection)
+
+`03_evals/robustness/fault_injection.py` writes a corrupted COPY of the workbook into a temp folder for each of 32 faults: structure, values, labels and coverage. It never touches `data/` or `outputs/<client>/`, and it checks the source SHA-256 before and after. It then runs both entry points that produce numbers on that copy: `scripts/run_pipeline.py --clients-root/--outputs-root` and `monthly_review.prepare`. The required behaviour is declared per fault before it runs:
+
+- **STOP:** intake refuses with a message naming the cell, sheet or cause, and no review packet is written.
+- **WARN:** the run continues, and the warning appears in the review packet (Open Questions in the sign-off pack) and in the analysis workbook's Data Quality sheet.
+- **HANDLE:** no new warning, and every review-packet number and every account amount equals the baseline.
+
+A successful run with different numbers and no warning is **SILENT-WRONG** and always fails. The report is `03_evals/robustness/ROBUSTNESS_REPORT.md` (generated) and `outputs/robustness_results.json`. The same suite against the pre-fix code scored 9/32 with 8 SILENT-WRONG (`03_evals/robustness/BEFORE_FIX.md`). Fast unit-level guards for each fix are in `tests/test_robustness.py`. G19–G22 pin one STOP per family.
+
+## 6. What counts as a regression
 
 Any of the following is a regression and blocks the change:
 
@@ -112,6 +125,7 @@ Any of the following is a regression and blocks the change:
 6. Any mutant that was caught now survives `mutation_test.py`.
 7. Any client-isolation test fails (`tests/test_client_isolation.py`): a run reading another client's folder or outputs, or writing outside `outputs/<client>/`.
 8. A client config change produces a data-quality warning that wasn't there before, unless the change was intended and reviewed.
+9. Any fault in `fault_injection.py` stops behaving as required on either entry point, or any SILENT-WRONG appears (run it after any change to `src/`, `scripts/run_pipeline.py` or a client config).
 
 **Not a regression:**
 - Wording changes in commentary that keep every number matching and every top movement named.

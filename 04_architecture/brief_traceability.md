@@ -28,9 +28,9 @@ Source: "Build Exercise — AI Solutions Builder" (RE Financial Services), the P
 
 | Requirement | Where | Status | Reason |
 |---|---|---|---|
-| At least five golden cases (data state plus expected output) | `03_evals/golden_cases.json`, `03_evals/run_golden_evals.py` | **Done** | 18 cases by `source`: `workbook` 4 (G01, G02, G03, G06), `workbook+perturbation` 5 (G04, G05, G07, G08, G14), ABC cell-sourced 9 (G09–G13, G15–G18). Expected values for the real-workbook cases were derived by hand from source cells, not from the adapter. |
+| At least five golden cases (data state plus expected output) | `03_evals/golden_cases.json`, `03_evals/run_golden_evals.py` | **Done** | 22 cases by `source`: `workbook` 4 (G01, G02, G03, G06), `workbook+perturbation` 9 (G04, G05, G07, G08, G14, G19–G22), ABC cell-sourced 9 (G09–G13, G15–G18). Expected values for the real-workbook cases were derived by hand from source cells, not from the adapter. |
 | How the system is graded | `03_evals/GRADING.md`, `03_evals/grade_commentary.py` | **Done** | Three graders: numbers, commentary (numbers, top-3 movements, cash risk), and mutation. |
-| How a regression is detected after a change | `03_evals/mutation_test.py`, `scripts/export_eval_results.py`, `.claude/hooks/test_after_edit.py` | **Done** | 13 injected bugs must each fail a test or case. The post-edit hook reruns unit tests after edits under `src/`. There is no CI service; the checks run on demand. |
+| How a regression is detected after a change | `03_evals/mutation_test.py`, `scripts/export_eval_results.py`, `.claude/hooks/test_after_edit.py` | **Done** | 13 injected bugs must each fail a test or case. 32 corrupted-workbook faults (`03_evals/robustness/fault_injection.py`) must each STOP, WARN or be handled as declared on both entry points; the pre-fix code scored 9/32 with 8 silent wrong results. The post-edit hook reruns unit tests after edits under `src/`. There is no CI service; the checks run on demand. |
 | Grading quality of the commentary itself | `03_evals/GRADING.md` | **Partial** | Numbers and coverage are graded; tone, usefulness and causal reasoning are not. |
 
 ## Part 4 — One-page architecture note

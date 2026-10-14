@@ -12,6 +12,7 @@ import json
 import re
 import sys
 from pathlib import Path
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -74,11 +75,48 @@ def data_quality(cfg, account_month, monthly, expense_trends, rollup) -> list[st
         if abs(sums.get(m, 0) - total) > 0.005:
             warnings.append(f"Category rollup {sums.get(m, 0):,.2f} != total OPEX {total:,.2f} in {m:%b %Y}")
     months = pd.to_datetime(monthly["month"])
-    if not ((months.dt.year * 12 + months.dt.month).diff().dropna() == 1).all():
-        warnings.append("Months are not consecutive; TTM is withheld for windows with gaps.")
+    gaps = sorted(set(pd.period_range(months.min(), months.max(), freq="M")) - set(months.dt.to_period("M")))
+    if gaps:
+        warnings.append(f"Months missing from the source: {', '.join(p.strftime('%b %Y') for p in gaps)}. TTM is withheld for windows "
+                        "with gaps, and no month-over-month change is reported across a gap.")
     if monthly["revenue_ttm"].isna().all():
         warnings.append(f"TTM not available: {len(monthly)} months supplied, 12 consecutive required.")
+    warnings += cell_warnings(account_month)
+    for m, r in monthly.set_index("month")["revenue"].items():
+        if r == 0:
+            warnings.append(f"Revenue is zero in {m:%b %Y}; margins for that month are reported as not available.")
     return warnings
+
+
+OUTLIER_RATIO, OUTLIER_MIN = 100, 5000.0  # ABC's largest normal ratio is ~54x (2026-10-14 profile)
+
+
+def cell_warnings(account_month) -> list[str]:
+    """Cell-level data-quality warnings recorded by the parser, plus label and outlier screens."""
+    out, attrs = [], account_month.attrs
+    for ref, account, month, why in attrs.get("bad_cells", []):
+        out.append(f"Not read as a number, treated as missing: {ref} ({account}, {month}): {why}")
+    blanks = attrs.get("blank_cells", [])
+    if blanks:
+        out.append(f"{len(blanks)} blank cell(s) inside rows that have values, treated as missing (not zero): "
+                   + ", ".join(f"{ref} ({a}, {m})" for ref, a, m in blanks[:5]) + (" ..." if len(blanks) > 5 else ""))
+    sections = attrs.get("sections", {})
+    for account in account_month.index:
+        if any(ord(ch) > 127 for ch in account):
+            out.append(f"Account label has non-ASCII characters (possible look-alike or typo): {account!r}")
+        if not sections.get(account) or account.casefold().startswith("total "):
+            continue
+        row = account_month.loc[account]
+        absval = np.abs(row.to_numpy(dtype=float))
+        for k in np.flatnonzero(absval >= OUTLIER_MIN):
+            others = np.delete(absval, k)
+            others = others[others > 0]
+            if len(others) >= 3 and absval[k] > OUTLIER_RATIO * np.median(others):
+                month = row.index[k]
+                ref = engine.cell_name(account_month, account, month) or account
+                out.append(f"Possible outlier: {account} in {month:%b %Y} is {row.iloc[k]:,.2f}, over "
+                           f"{OUTLIER_RATIO}x its median month ({np.median(others):,.2f}). Check {ref}.")
+    return out
 
 
 def run(client: str, clients_root: Path = CLIENTS_ROOT, outputs_root: Path = OUTPUTS_ROOT) -> dict:

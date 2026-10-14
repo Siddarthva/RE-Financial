@@ -1,6 +1,6 @@
 """Run the deterministic stages of the monthly close for one client and month, and write a run manifest.
 
-    python scripts/run_pipeline.py abc 2026-06
+    python scripts/run_pipeline.py abc 2026-06 [--clients-root DIR --outputs-root DIR]
 
 Stages run here: Intake (workbook hash + checks) -> Calculate (existing src/monthly_review.py prepare,
 then the flux table). The later stages (Skill draft, Review, Package) are done by the
@@ -9,6 +9,7 @@ Writes only under outputs/<client>/. Refuses to re-run a period that has been ap
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import subprocess
@@ -64,13 +65,16 @@ def audit(out_dir: Path, event: dict) -> None:
         f.write(json.dumps({"ts": now(), **event}) + "\n")
 
 
-def main() -> int:
-    if len(sys.argv) != 3:
-        print(__doc__)
-        return 2
-    client, month = sys.argv[1], sys.argv[2]
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("client"), ap.add_argument("month")
+    # Other roots: used by 03_evals/robustness to run on corrupted copies without touching clients/ or outputs/.
+    ap.add_argument("--clients-root", type=Path, default=run_client.CLIENTS_ROOT)
+    ap.add_argument("--outputs-root", type=Path, default=OUT)
+    args = ap.parse_args(argv)
+    client, month, clients_root, outputs_root = args.client, args.month, args.clients_root, args.outputs_root
     sys.stdout.reconfigure(encoding="utf-8")
-    out_dir = OUT / client
+    out_dir = outputs_root / client
     approval = out_dir / f"approval_{month}.json"
     if approval.is_file() and json.loads(approval.read_text(encoding="utf-8")).get("status") == "approved":
         print(f"{client} {month} is approved and locked; not re-running.")
@@ -101,25 +105,22 @@ def main() -> int:
 
     def intake():
         nonlocal source
-        with client_sandbox(client, run_client.CLIENTS_ROOT, OUT):
-            cfg = run_client.load_config(client)
-            lay = ca._layout(cfg)
-            am = engine.parse_wide_income_statement(cfg["workbook_path"], lay)
-            monthly = engine.build_monthly_summary(am, cfg["totals"])
-            loc = ca.locate(cfg)
-            report = ca.build_intake(cfg, loc, monthly, am)
+        with client_sandbox(client, clients_root, outputs_root):
+            cfg = run_client.load_config(client, clients_root)
+            report, am, loc = ca.intake_gate(cfg, month, engine)
             out_dir.mkdir(parents=True, exist_ok=True)
             (out_dir / f"intake_{month}.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
             tables = ca.build_tables(cfg, am, engine)
             (out_dir / f"tables_{month}.json").write_text(json.dumps(tables, indent=2), encoding="utf-8")
             ctx["loc"], source = loc, {"workbook": report["workbook"], "sha256": report["sha256"]}
-            if report["status"] != "pass":
-                raise ValueError("intake checks failed; see intake JSON")
+            refused = ca.refusal(report, month)
+            if refused:
+                raise ValueError(refused)
 
     def calculate():
-        monthly_review.prepare(client, month)
+        monthly_review.prepare(client, month, clients_root, outputs_root)
         packet = json.loads(packet_path.read_text(encoding="utf-8"))
-        with client_sandbox(client, run_client.CLIENTS_ROOT, OUT):
+        with client_sandbox(client, clients_root, outputs_root):
             (out_dir / f"flux_{month}.json").write_text(json.dumps(ca.build_flux(packet, ctx["loc"]), indent=2), encoding="utf-8")
 
     def grade_commentary():

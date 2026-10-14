@@ -64,15 +64,39 @@
       "detail": "net_income"
     },
     {
-      "check": "Gross profit = revenue - COGS (latest month)",
+      "check": "Every amount is a number",
       "passed": true,
-      "cell_ref": "Income Statement!C26",
+      "cell_ref": "Income Statement",
       "detail": ""
     },
     {
-      "check": "Operating income = gross profit - opex (latest month)",
+      "check": "Gross profit = revenue - COGS (every month)",
       "passed": true,
-      "cell_ref": "Income Statement!C105",
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Operating income = gross profit - opex (every month)",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Total Income foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Total Cost of Goods Sold foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "Income Statement",
+      "detail": ""
+    },
+    {
+      "check": "Total Operating Expenses foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "Income Statement",
       "detail": ""
     }
   ],

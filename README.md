@@ -18,9 +18,10 @@ This repo is a submission for RE Financial Services' "Build Exercise — AI Solu
 
 | Check | Result |
 |---|---|
-| Unit tests (includes 15 UI tests) | 103 run, 103 OK |
-| Golden cases | 18 / 18 (`workbook` 4: G01, G02, G03, G06; `workbook+perturbation` 5: G04, G05, G07, G08, G14; ABC cell-sourced 9: G09–G13, G15–G18) |
+| Unit tests (includes 15 UI and 14 robustness tests) | 117 run, 117 OK |
+| Golden cases | 22 / 22 (`workbook` 4: G01, G02, G03, G06; `workbook+perturbation` 9: G04, G05, G07, G08, G14, G19–G22; ABC cell-sourced 9: G09–G13, G15–G18) |
 | Mutation test | 13 / 13 mutants caught, 0 survived |
+| Robustness (fault injection) | 32 / 32 corrupted-workbook faults STOP, WARN or HANDLE as declared, on both the pipeline and the `/monthly-analysis` path; 0 silent wrong numbers ([report](03_evals/robustness/ROBUSTNESS_REPORT.md)) |
 | Commentary grader (engine text, reviewed text, saved skill output) | all three PASS |
 | Source workbook SHA-256 | unchanged (`75da8d679a89551f…`) |
 | Secret scan (git-tracked files: 145 text files scanned) | 0 findings |
@@ -34,12 +35,13 @@ Python 3.11+; built on 3.13 and Windows 11. From the repo root:
 
 ```powershell
 pip install -r requirements.txt
-python -m unittest discover -s tests          # ~1 min, expect: OK (103 tests)
-python 03_evals/run_golden_evals.py            # expect: Score: 18/18
+python -m unittest discover -s tests          # ~1 min, expect: OK (117 tests)
+python 03_evals/run_golden_evals.py            # expect: Score: 22/22
 python scripts/run_pipeline.py abc 2026-06     # intake gate + calculate + flux -> outputs/abc/
 python 03_evals/grade_commentary.py            # grades the engine's own commentary: PASS
 streamlit run 05_review_workspace/app/Home.py  # optional UI, reads outputs/ only
 python 03_evals/mutation_test.py               # optional, ~6 min: expect 13/13 mutants caught
+python 03_evals/robustness/fault_injection.py  # optional, ~3 min: expect 32/32 faults as required
 ```
 
 Then open [`02_skill/sample_outputs/`](02_skill/sample_outputs/) (Excel sign-off pack, commentary, flux) to see what a reviewer receives. In Claude Code, `/monthly-analysis abc 2026-06` runs the full draft-and-review flow.

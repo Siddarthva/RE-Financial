@@ -3,9 +3,11 @@
 Defaults match the ABC Inc workbook. Other clients pass their labels from clients/<client>/config.yaml
 (see src/run_client.py), so a new client needs a config file, not a code change.
 """
+import re
 from pathlib import Path
 import pandas as pd
 import numpy as np
+from openpyxl.utils import get_column_letter
 
 # Canonical section ids used throughout the engine, independent of a client's labels.
 SECTIONS = ("income", "cost of goods sold", "operating expenses")
@@ -35,10 +37,44 @@ ABC_SUBTOTAL_ROWS = ("S & M Payroll", "Total S & M Payroll", "Marketing", "Total
 ABC_BS_LAYOUT = {"sheet": "Balance Sheet", "header_label": "Account", "month_format": "%d %b %Y", "sections": {}}
 ABC_CASH_ROW = "Total Cash and Cash Equivalents"
 
+_MONEY_TEXT = re.compile(r"^\s*(-)?\s*\(?\s*(-)?\s*[$€£₹]?\s*([0-9][0-9,]*(?:\.[0-9]+)?)\s*\)?\s*$")
+
+
+def to_number(value):
+    """A cell value as a finite float, or (None, reason). Accepts '$1,234.50', '(1,234)', '-$1,234'."""
+    if value is None or (isinstance(value, float) and np.isnan(value)):
+        return None, "blank"
+    if isinstance(value, bool):
+        return None, f"not a number: {value!r}"
+    if isinstance(value, (int, float, np.integer, np.floating)):
+        return (float(value), None) if np.isfinite(value) else (None, f"not a finite number: {value!r}")
+    text = str(value).strip()
+    if not text:
+        return None, "blank"
+    m = _MONEY_TEXT.match(text)
+    if m and text.count("(") == text.count(")"):
+        n = float(m.group(3).replace(",", ""))
+        return (-n if (m.group(1) or m.group(2) or text.startswith("(")) else n), None
+    return None, f"text, not a number: {text[:20]!r}"
+
+
+def cell_name(account_month, account, month):
+    """'Income Statement!C14' for a parsed value, or None if the parser did not record the position."""
+    rows, cols = account_month.attrs.get("row_of", {}), account_month.attrs.get("col_of", {})
+    if account not in rows or month not in cols:
+        return None
+    return f"{account_month.attrs.get('sheet')}!{cols[month]}{rows[account]}"
+
+
 def parse_wide_income_statement(path, layout=None):
+    """One row per account, one column per month. attrs carry the section map, each value's source cell
+    (row_of/col_of), and the cells that could not be read as numbers (bad_cells) or were blank inside a
+    row that has values elsewhere (blank_cells). Bad cells become NaN; callers decide whether to stop."""
     layout = layout or ABC_LAYOUT
     sheet, header_label = layout["sheet"], layout["header_label"]
-    raw = pd.read_excel(path, sheet_name=sheet, header=None)
+    # keep_default_na=False: pandas would otherwise turn text like 'n/a', 'NA' or 'NaN' into a silent blank.
+    raw = pd.read_excel(path, sheet_name=sheet, header=None, keep_default_na=False)
+    raw = raw.mask(raw.eq(""))  # truly empty cells are blank again
     header_row = None
     for i in range(min(15, len(raw))):
         vals = raw.iloc[i].astype(str).tolist()
@@ -58,10 +94,16 @@ def parse_wide_income_statement(path, layout=None):
             date_cols.append((j, parsed.to_period("M").to_timestamp()))
     if len(date_cols) < 2:
         raise ValueError(f"Expected at least two monthly columns in {sheet}.")
+    seen = {}
+    for j, month in date_cols:
+        if month in seen:
+            raise ValueError(f"{sheet}: month {month:%b %Y} appears twice, in cells {get_column_letter(seen[month] + 1)}{header_row + 1} "
+                             f"and {get_column_letter(j + 1)}{header_row + 1}. Remove the duplicate column.")
+        seen[month] = j
     headers_to_section = {h.casefold(): sid for sid, (h, _) in layout["sections"].items()}
     totals_to_section = {t.casefold(): sid for sid, (_, t) in layout["sections"].items()}
     rows = []
-    sections = {}
+    sections, row_of, bad_cells, blank_cells = {}, {}, [], []
     section = None
     for i in range(header_row + 1, len(raw)):
         account = raw.iloc[i, account_col]
@@ -78,14 +120,24 @@ def parse_wide_income_statement(path, layout=None):
         if section is not None and totals_to_section.get(account.casefold()) == section:
             section = None
         sections[account] = section
-        row = {"account": account}
+        row_of.setdefault(account, i + 1)
+        row, blanks = {"account": account}, []
         for j, month in date_cols:
-            row[month] = pd.to_numeric(raw.iloc[i, j], errors="coerce")
+            value, problem = to_number(raw.iloc[i, j])
+            row[month] = np.nan if value is None else value
+            ref = (f"{sheet}!{get_column_letter(j + 1)}{i + 1}", account, f"{month:%b %Y}")
+            if problem == "blank":
+                blanks.append(ref)
+            elif problem:
+                bad_cells.append((*ref, problem))
+        if len(blanks) < len(date_cols):  # a row blank in every month is a block header, not missing data
+            blank_cells += blanks
         rows.append(row)
     data = pd.DataFrame(rows).set_index("account")
     data = data.loc[:, sorted([m for _, m in date_cols])]
     data.columns.name = "month"
-    data.attrs["sections"] = sections
+    data.attrs.update(sections=sections, sheet=sheet, row_of=row_of, bad_cells=bad_cells, blank_cells=blank_cells,
+                      col_of={m: get_column_letter(j + 1) for j, m in date_cols})
     return data
 
 def build_monthly_summary(account_month, totals=None):
@@ -174,7 +226,8 @@ def add_fiscal_year(monthly, start_month=1):
 def margin_drop_flags(monthly, threshold_pp):
     """Months whose gross margin fell by more than `threshold_pp` percentage points versus the prior month."""
     m = (monthly if "month" in monthly.columns else monthly.reset_index()).sort_values("month").reset_index(drop=True)
-    change_pp = (m["gross_margin_pct"].diff() * 100)
+    adjacent = m["month"].diff().dt.days.between(28, 31)  # no change is measured across a missing month
+    change_pp = (m["gross_margin_pct"].diff() * 100).where(adjacent)
     return [{"month": f"{r.month:%Y-%m}", "gross_margin_pct": float(r.gross_margin_pct), "change_pp": float(c)}
             for r, c in zip(m.itertuples(), change_pp) if pd.notna(c) and c < -threshold_pp]
 

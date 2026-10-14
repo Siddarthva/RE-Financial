@@ -98,3 +98,21 @@ Thin coverage worth knowing (caught, but by a single eval): adapter gross-margin
 - **Failed connection test reported success:** `qbo_test_connection.py --test` exited 0 on failure, and the review UI gates on the exit code. Now exits 1.
 - **Result:** unit 103/103, golden 18/18, mutation 13/13 (first run since G18).
 - **Independent reviewer:** `tests/test_qbo_load.py` `--apply` test wrote the real `outputs/abc/qbo_load_plan.json` before failing on the missing env file. The loader now fails before any side effect; the test uses a temp output root and asserts it stays empty (fails without the fix).
+
+## Robustness (2026-10-14, Phase 2: `03_evals/robustness/fault_injection.py`)
+
+32 faults were injected into copies of the workbook and run through both entry points. Before the fixes, the skill path scored 9/32, with 8 SILENT-WRONG (`03_evals/robustness/BEFORE_FIX.md`). After: 32/32 on both paths (`ROBUSTNESS_REPORT.md`).
+
+| Defect | Faults | Fix | Regression guard |
+|---|---|---|---|
+| `/monthly-analysis` (`monthly_review.prepare`) skipped the intake gate entirely; a non-footing workbook ran to success with wrong numbers | F26 (SILENT-WRONG), F01, F12 | One gate, `close_artifacts.intake_gate`, used by `run_pipeline.py` and `prepare` before anything is written | `test_prepare_refuses_a_non_footing_workbook_and_writes_nothing`, G21 |
+| pandas' default NA list turned 'n/a', 'NA', 'NaN' into silent blanks | F12, F18 | `read_excel(keep_default_na=False)`; text is recorded as a bad cell with its address; intake STOPs | `test_na_text_is_a_bad_cell_not_a_silent_blank`, G20 |
+| Excel error values (#DIV/0!, #REF!) were read as blanks | F19 | Preflight lists error cells (openpyxl `data_type == "e"`) | `test_excel_error_value_stops` |
+| '$1,234.56' and '(1,234.56)' became blanks | F14, F15 | `to_number()` normalises currency and parenthesised negatives | `test_money_text_and_bad_values`, `test_currency_text_is_read_as_the_same_number` |
+| No footing check: a line could disagree with its section total | F26, F32 | Every section's lines must foot to its total in every month; gross and operating profit identities in every month, not only the latest | `test_line_that_does_not_foot_stops`, G21 |
+| MoM was measured across a missing month (Jun vs Apr when May was absent) | F01, F02, F11 | Preflight STOPs when the target or prior month is missing; `build_computed` reports no MoM across a gap; margin-drop flags skip gaps | `test_no_mom_across_a_gap_and_prior_month_required`, `test_margin_flags_skip_a_gap`, G19 |
+| Formulas saved without cached values read as blanks | F28 | Preflight STOPs and names the cells | G22 |
+| Raw library errors instead of a cause (`KeyError`, `IndexError`, `BadZipFile`, `PermissionError`, "truth value of a Series is ambiguous") | F03, F24, F28–F31 | Preflight checks file, zip, sheets, header, merged and duplicate month headers, and required total rows first | `test_corrupt_and_locked_files_stop_with_a_cause`, `test_duplicate_month_raises_naming_both_cells` |
+| No warning for an outlier ×1000, zero revenue, or a look-alike label | F16, F17, F23 | `run_client.cell_warnings`: outlier over 100× the median month (ABC's largest normal ratio is ~54×), zero revenue, non-ASCII labels | `test_outlier_and_lookalike_warnings_and_none_on_clean_data` |
+| Found by the suite in this phase's own new code: the gap warning crashed on `Period` formatting | F02 | `strftime` | `test_gap_warning_names_the_month` |
+| Found while writing the suite: the outlier screen took 9 s per call | — | Vectorised (0.06 s) | — |

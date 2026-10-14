@@ -22,6 +22,7 @@ SRC = Path(__file__).resolve().parent
 sys.path.insert(0, str(SRC))
 sys.path.insert(0, str(SRC.parent / "03_evals"))
 import abc_workbook_adapter as engine  # noqa: E402
+import close_artifacts  # noqa: E402
 import excel_layout  # noqa: E402
 import run_client  # noqa: E402
 from client_sandbox import client_sandbox  # noqa: E402
@@ -46,19 +47,23 @@ def build_computed(account_month, monthly, month, cash=None, gross_margin_drop_p
     if month not in months or months.index(month) == 0:
         raise ValueError(f"{month:%Y-%m} needs a prior month in the data. Available: {months[0]:%Y-%m} (first, no prior) to {months[-1]:%Y-%m}.")
     prior = months[months.index(month) - 1]
+    if prior != month - pd.DateOffset(months=1):
+        raise ValueError(f"{month:%Y-%m} needs its prior month {month - pd.DateOffset(months=1):%Y-%m} in the data; "
+                         f"the previous month present is {prior:%Y-%m}.")
     sections = account_month.attrs["sections"]
     out = {"latest_month": f"{month:%Y-%m}", "prior_month": f"{prior:%Y-%m}", "months": {}, "line_items": {}}
     for i, m in enumerate(months):
         rec = {}
+        adjacent = i and months[i - 1] == m - pd.DateOffset(months=1)  # no MoM across a gap in the months
         for k in METRICS:
-            v, p = monthly.at[m, k], (monthly.at[months[i - 1], k] if i else None)
+            v, p = monthly.at[m, k], (monthly.at[months[i - 1], k] if adjacent else None)
             rec[k] = {"value": _num(v), "ttm": _num(monthly.at[m, f"{k}_ttm"])}
             if p is not None:
                 rec[k]["mom_change"] = _num(v - p)
                 rec[k]["mom_pct"] = _num((v - p) / abs(p)) if p else None
         for k, col in MARGINS.items():
             rec[k]["margin"] = _num(monthly.at[m, col])
-            if i:
+            if adjacent:
                 rec[k]["margin_change_pp"] = _num((monthly.at[m, col] - monthly.at[months[i - 1], col]) * 100)
             if pd.notna(monthly.at[m, "revenue_ttm"]):
                 rec[k]["ttm_margin"] = _num(monthly.at[m, f"{k}_ttm"] / monthly.at[m, "revenue_ttm"])
@@ -89,6 +94,11 @@ def prepare(client, month_text, clients_root=run_client.CLIENTS_ROOT, outputs_ro
     if not MONTH.match(month_text):
         raise ValueError(f"Month must look like 2026-06, got {month_text!r}")
     month = pd.Timestamp(f"{month_text}-01")
+    with client_sandbox(client, clients_root, outputs_root):  # same intake gate as scripts/run_pipeline.py, before anything is written
+        report, _, _ = close_artifacts.intake_gate(run_client.load_config(client, clients_root), month_text, engine)
+        refused = close_artifacts.refusal(report, month_text)
+        if refused:
+            raise ValueError(refused)
     paths = run_client.run(client, clients_root, outputs_root)  # writes analysis.xlsx, summary.json, commentary.md
     with client_sandbox(client, clients_root, outputs_root):
         cfg = run_client.load_config(client, clients_root)
