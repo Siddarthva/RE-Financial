@@ -12,13 +12,13 @@ Unit tests (`python -m unittest discover -s tests`) guard individual bugs; see `
 
 ## 1. Numbers (golden cases)
 
-`03_evals/golden_cases.json` has two kinds of case:
+`03_evals/golden_cases.json` has 18 cases in three `source` groups: `workbook` 4 (G01, G02, G03, G06), `workbook+perturbation` 5 (G04, G05, G07, G08, G14) and ABC cell-sourced 9 (G09–G13, G15–G18). They fall into two kinds:
 
 - **G01–G08 and G14, real workbook (in memory, never modified):** the same engine rules as before (MoM, margin, TTM eligibility, validation errors, month labels kept intact), now fed from cached Income Statement cells. Each case records `source`, `perturbation.cells_changed` (sheet, cell, label, original, new) and a one-line `perturbation.purpose`. The runner refuses a case whose recorded original differs from the workbook. Expected values were computed in plain Python from the source cells, not from the engine.
   - `workbook+perturbation` (G04, G05, G07, G08, G14): one or two cells changed to trigger the rule. Where a changed cell is a formula (G07, T14), its cached value is overridden directly.
   - `workbook` (G01, G02, G03, G06): real data already triggers the rule, so no cell is changed.
   - None remain synthetic.
-- **G09–G13 and G15–G17, real ABC workbook:** expected values were computed by hand from cached source-cell values, not from the adapter. Each case's `source.cells` gives the cells or `SUM` ranges used. Both sheets run newest first: on the Income Statement, column C = Jun 2026 … column T = Jan 2025; on the Balance Sheet, column D = 30 Jun 2026 … column U = 31 Jan 2025 (one column to the right).
+- **G09–G13 and G15–G18, real ABC workbook:** expected values were computed by hand from cached source-cell values, not from the adapter. Each case's `source.cells` gives the cells or `SUM` ranges used. Both sheets run newest first: on the Income Statement, column C = Jun 2026 … column T = Jan 2025; on the Balance Sheet, column D = 30 Jun 2026 … column U = 31 Jan 2025 (one column to the right).
 
 | Case | What it pins | Key source cells |
 |---|---|---|
@@ -30,6 +30,7 @@ Unit tests (`python -m unittest discover -s tests`) guard individual bugs; see `
 | G15 | Platform Revenue steps down 45,000 → 26,666.66 in Jan 2026 (−18,333.34, −40.7%) and holds through Jun 2026 | I8, H8, C8:H8 |
 | G16 | Bad Debts 12,935.29 in May 2026 (% change null: prior 0), reversing to −1,806.24 in Jun 2026 | E31, D31, C31 |
 | G17 | Jun 2026 cash 713,481.26 and runway: 3.40 months at the 3-month average cash decline (1- and 6-month: 3.31, 2.29) | BS D15, E15, G15, J15 |
+| G18 | Gross margin falls by more than 5 pp (config `thresholds.gross_margin_drop_pp`) flag exactly Mar 2025 (−8.10 pp), Aug 2025 (−7.30 pp) and Apr 2026 (−5.36 pp) | R/S, M/N, E/F rows 14 and 26 |
 
 **Tolerances:** currency within ±0.005 (one half-cent). Ratios, percentages and margins within ±0.000001. Identity fields (account, month, peak month) must match exactly.
 

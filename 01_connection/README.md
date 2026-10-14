@@ -11,6 +11,7 @@
 - `load_workbook_to_sandbox.py` — sandbox-only loader for the ABC totals (dry-run by default).
 - `NETWORK_DIAGNOSTICS.md` — connectivity checks for the Windows machine.
 
+**Status:** the live CompanyInfo test passes — `qbo_test_connection.py abc --test` returned `ok: true` on 2026-10-14 (03:49 UTC); 8 evidence pairs saved.
 **What it proves:** a read-only live query worked, secrets never reached the repo (`tests/test_evidence_redaction.py`), and the write path is separate from the read-only server.
 **Not proven:** QuickBooks sample data is not an input to the analysis; the workbook is.
 

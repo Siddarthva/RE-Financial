@@ -8,7 +8,7 @@
   "flags_source": "01_connection/.mcp.json.example (template; values enforced on test calls)",
   "last_successful_retrieval": "2026-10-12",
   "last_test": {
-    "tested_at": "2026-10-14T02:42:48+00:00",
+    "tested_at": "2026-10-14T03:49:22+00:00",
     "ok": true,
     "company_name": "Sandbox Company US a3a1",
     "message": "Connected. Read-only CompanyInfo query succeeded."

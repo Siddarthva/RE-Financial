@@ -75,3 +75,16 @@ Thin coverage worth knowing (caught, but by a single eval): adapter gross-margin
 |---|---|---|---|---|
 | 15 | **Engine commentary incomplete:** `generate_commentary(monthly)` only saw monthly totals, so it could not name line items or cash. | Engine text failed: top movements 0/3, cash risk not covered (Jun 2026 cash 713,481.26 and runway never stated). | `generate_commentary(monthly, account_month, cash)` now names the top 3 latest-month movements by absolute $ change (same ranking as the review packet) and states cash plus 3-month runway (3.4 months, 209,656.62/month burn; the G17 method via `cash_position`). `run_client.py` and the grader's engine path pass these inputs; grading rules unchanged. | `test_engine_commentary_passes_grader_on_real_workbook` |
 | 16 | **Skill contradicted the engine:** `monthly-financial-analysis/SKILL.md` §7 said runway "cannot be calculated without fabricating data", while `cash_position()` and golden G17 compute it from Balance Sheet cash. | Saved skill output (`outputs/skill_commentary.md`) repeated that runway can't be calculated; numbers 43/43 and top movements 3/3 but cash risk not covered, so FAIL. | §7 rewritten: cash and runway come from Balance Sheet cash (3-month window, G17); only CFO/CFI/CFF remain unavailable. Skill output regenerated with `grade_commentary.py --run-skill`. | Same test asserts SKILL.md no longer says runway cannot be calculated; `--run-skill` now PASS. |
+
+## 2026-10-14 — Rehearsed modification
+
+**Request (self-set):** "flag gross-margin drops over 5 pp." Not a bug; a rehearsal of the on-the-spot change from the brief.
+
+- **Time taken:** about 4 minutes from first read of the code (03:49:54 UTC) to the passing commit, including a ~1.5 minute unit-test run. One slip on the way: the first G18 expected value compared March 2025 with the wrong prior column; the engine disagreed, the case's own expected value was corrected from cells S14/S26 (a new case, not an existing eval).
+- **Files touched (6, commit `demo: flag gross-margin drops over 5 pp`):**
+  - `clients/abc/config.yaml`: `thresholds.gross_margin_drop_pp: 5`
+  - `src/abc_workbook_adapter.py`: `margin_drop_flags()`
+  - `src/monthly_review.py`: threshold read from config, `gross_margin_flags` added to the review packet
+  - `03_evals/golden_cases.json`, `03_evals/run_golden_evals.py`: golden case G18 (flags exactly 2025-03, 2025-08, 2026-04, hand-computed from rows 14 and 26)
+  - `tests/test_monthly_review.py`: `test_gross_margin_drop_flags`
+- **Result:** golden 18/18, unit 102/102.

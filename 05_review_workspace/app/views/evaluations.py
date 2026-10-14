@@ -17,12 +17,13 @@ def _tile(col, label, passed, total):
 def _golden(g):
     st.subheader("Golden cases")
     cases = g.get("cases", [])
-    kinds = ["workbook", "perturbed", "synthetic"]
+    kinds = ["workbook", "perturbed", "abc_cells"]
     f = st.columns([2, 1])
     srcs = f[0].multiselect("Source", kinds, default=kinds, key="ev_src")
     res = f[1].selectbox("Result", ["All", "Pass", "Fail"], key="ev_res")
-    if "synthetic" in srcs and not any(c.get("source") == "synthetic" for c in cases):
-        st.caption("No synthetic golden cases exist in 03_evals/golden_cases.json.")
+    by = {k: [c["id"] for c in cases if c.get("source") == k] for k in kinds}
+    st.caption("Source counts: " + "; ".join(f"{k} {len(v)} ({', '.join(v)})" for k, v in by.items() if v) +
+               ". workbook = real data, no cell changed; perturbed = workbook with 1-2 cells changed; abc_cells = hand-derived from named ABC cells.")
     shown = [c for c in cases if c.get("source") in srcs and (res == "All" or c.get("passed") == (res == "Pass"))]
     if not shown:
         return st.caption("No cases match the filters.")

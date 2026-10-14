@@ -25,8 +25,8 @@ LINE = re.compile(r"^(PASS|FAIL) (G\d+) \S+ (.*?): (.*)$")
 def source_kind(src) -> str:
     if isinstance(src, str) and "perturb" in src:
         return "perturbed"
-    if isinstance(src, str) and "synth" in src:
-        return "synthetic"
+    if isinstance(src, dict):
+        return "abc_cells"
     return "workbook"
 
 

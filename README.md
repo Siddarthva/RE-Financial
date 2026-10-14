@@ -18,15 +18,15 @@ This repo is a submission for RE Financial Services' "Build Exercise — AI Solu
 
 | Check | Result |
 |---|---|
-| Unit tests (includes 15 UI tests) | 101 run, 101 OK |
-| Golden cases | 17 / 17 |
+| Unit tests (includes 15 UI tests) | 102 run, 102 OK |
+| Golden cases | 18 / 18 (`workbook` 4: G01, G02, G03, G06; `workbook+perturbation` 5: G04, G05, G07, G08, G14; ABC cell-sourced 9: G09–G13, G15–G18) |
 | Mutation test | 13 / 13 mutants caught, 0 survived |
 | Commentary grader (engine text, reviewed text, saved skill output) | all three PASS |
 | Source workbook SHA-256 | unchanged (`75da8d679a89551f…`) |
 | Secret scan (156 tracked files) | 0 findings |
-| Live QuickBooks read-only test (`qbo_test_connection.py --test`) | passed 2026-10-14 (CompanyInfo) |
+| Live QuickBooks read-only test (`qbo_test_connection.py --test`) | passed 2026-10-14 03:49 UTC (`ok: true`, CompanyInfo, 'Sandbox Company US a3a1'); 8 evidence pairs saved |
 
-These results prove the checks pass on the supplied workbook. They do not prove a live QuickBooks connection or that commentary is insightful.
+These results prove the checks pass on the supplied workbook and that the read-only QuickBooks test passed on the date shown. They do not prove that commentary is insightful.
 
 ## 5-minute quickstart (no QuickBooks credentials)
 
@@ -34,8 +34,8 @@ Python 3.11+; built on 3.13 and Windows 11. From the repo root:
 
 ```powershell
 pip install -r requirements.txt
-python -m unittest discover -s tests          # ~1 min, expect: OK (101 tests)
-python 03_evals/run_golden_evals.py            # expect: Score: 17/17
+python -m unittest discover -s tests          # ~1 min, expect: OK (102 tests)
+python 03_evals/run_golden_evals.py            # expect: Score: 18/18
 python scripts/run_pipeline.py abc 2026-06     # intake gate + calculate + flux -> outputs/abc/
 python 03_evals/grade_commentary.py            # grades the engine's own commentary: PASS
 streamlit run 05_review_workspace/app/Home.py  # optional UI, reads outputs/ only
@@ -47,12 +47,11 @@ Then open [`02_skill/sample_outputs/`](02_skill/sample_outputs/) (Excel sign-off
 ## What's not done
 
 - **Stretch goal not done.** The workbook was never loaded into the sandbox and the skill was never run through the live connection. The loader and an 18-entry dry-run plan exist and are tested against a fake; no live write has been made.
-- **Live connection needs your own setup.** Eight live read-only calls are saved (2026-10-12, secrets redacted) and a fresh test passed on 2026-10-14. A reviewer cannot repeat it without their own Intuit sandbox, the MCP server (below) and `npm run auth`. Without them, `--test` says what is missing.
+- **Live connection needs your own setup.** Eight live read-only calls are saved (2026-10-12, secrets redacted) and `--test` passed again on 2026-10-14 (03:49 UTC). A reviewer cannot repeat it without their own Intuit sandbox, the MCP server (below) and `npm run auth`. Without them, `--test` says what is missing.
 - **Team hosting and ten-client isolation are designs, not builds.** Two clients exist. Isolation is an in-process audit hook plus per-client folders, not an OS or credential boundary.
 - **The MCP server is not in this repo.** It is Intuit's repository, cloned beside it and untracked. Clone, build and authorize it to reproduce the connection. `01_connection/dependency_risk.md` covers its 49 npm audit findings (none fixed).
 - **Different layouts need code.** `clients/xyz` shows a new client needs only a config, but the parser expects a wide sheet with one column per month.
 - **Commentary quality is only partly graded.** Numbers and coverage are checked by code; usefulness and causes rest on an LLM reviewer and a human.
-- **Missing items:** there is no owner memo and no `/close-review` command (close review is a skill). `01_connection/part1-quickbooks-mcp.md` has an outdated paragraph, flagged at its top.
 
 Full detail, with a reason for every item: [`04_architecture/brief_traceability.md`](04_architecture/brief_traceability.md).
 

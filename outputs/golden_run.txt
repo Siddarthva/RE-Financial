@@ -1,4 +1,4 @@
-Running 17 golden cases
+Running 18 golden cases
 PASS G01 — Month-over-month revenue change: change=9063.690000000002, pct=0.054083329603938246
 PASS G02 — Gross margin: gross_margin=0.7795149399567389
 PASS G03 — TTM requires twelve consecutive months: ttm_after_11=nan, ttm_after_12=2145316.28
@@ -16,5 +16,6 @@ PASS G14 — Month labels preserved through normalization: months=['2025-01-01',
 PASS G15 — ABC Platform Revenue step-down (Jan 2026): 45,000.00 -> 26,666.66 (-18,333.34); held 6 months
 PASS G16 — ABC Bad Debts charge (May 2026): values match; May 2026 mom_pct=nan
 PASS G17 — ABC Jun 2026 cash and runway: cash=713,481.26; 3m burn=209,656.62; runway=3.40 months
+PASS G18 — ABC gross-margin drops over 5 pp: 3 months flagged: 2025-03, 2025-08, 2026-04
 
-Score: 17/17 (100%)
+Score: 18/18 (100%)

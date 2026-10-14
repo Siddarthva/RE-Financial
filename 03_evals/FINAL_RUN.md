@@ -17,6 +17,17 @@ python src/run_client.py xyz
 python scripts/scan_secrets.py . outputs
 ```
 
+## Result: v1.4-submission consistency pass, 2026-10-14
+
+Changes since v1.3.1: golden counts made consistent across docs and UI, live test passes, rehearsed modification (G18). Mutation test (13/13) was not re-run after the G18 change.
+
+| Check | Result | Counts |
+|---|---|---|
+| Unit tests (incl. UI) | **PASS** | 102 run, 102 OK |
+| Golden cases | **PASS** | 18/18 (`workbook` 4, `workbook+perturbation` 5, ABC cell-sourced 9) |
+| Commentary grader (engine text) | **PASS** | see `outputs/commentary_grade.json` |
+| Live QuickBooks `--test` | **PASS** | `ok: true`, CompanyInfo, 2026-10-14 03:49 UTC |
+
 ## Result: v1.3.1 clean run and clean-room check, 2026-10-14
 
 **QuickBooks retest fixed.** The failure of 2026-10-13 ("QuickBooks returned an error") was a script bug, not an expired token, wrong environment or query problem. The server's tools take their arguments as `{"params": {...}}`; `01_connection/qbo_test_connection.py` sent `{}`, and the server rejected it at input validation ("Required at params") before calling QuickBooks. Diagnosed without opening any credential file: the error body was read with digit runs and token-like strings masked. Also fixed: the server reports real QuickBooks failures as text starting `Error:` without `isError`, which the script would have reported as success; stderr was discarded. Failures are now classified (bad request, bad app keys, expired token, wrong environment, network, not configured, outage, server missing) with a next step, and the stored server text is masked. New `tests/test_qbo_diagnose.py` (3 tests). After the fix `--test` returned the sandbox CompanyInfo read-only.

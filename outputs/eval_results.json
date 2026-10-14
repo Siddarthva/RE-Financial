@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-14T02:51:10+00:00",
+  "generated_at": "2026-10-14T03:54:06+00:00",
   "golden": {
     "cases": [
       {
@@ -170,7 +170,7 @@
       {
         "id": "G09",
         "name": "ABC seasonal peak: February marketing spend",
-        "source": "workbook",
+        "source": "abc_cells",
         "passed": true,
         "input": {
           "account": "Total Marketing",
@@ -199,7 +199,7 @@
       {
         "id": "G10",
         "name": "ABC one-off items and event month",
-        "source": "workbook",
+        "source": "abc_cells",
         "passed": true,
         "input": {
           "min_abs": 5000
@@ -246,7 +246,7 @@
       {
         "id": "G11",
         "name": "ABC first valid TTM month",
-        "source": "workbook",
+        "source": "abc_cells",
         "passed": true,
         "input": {},
         "expected": {
@@ -267,7 +267,7 @@
       {
         "id": "G12",
         "name": "ABC largest OPEX category spike",
-        "source": "workbook",
+        "source": "abc_cells",
         "passed": true,
         "input": {
           "exclude_one_offs_min_abs": 5000
@@ -295,7 +295,7 @@
       {
         "id": "G13",
         "name": "ABC latest month full summary (Jun 2026)",
-        "source": "workbook",
+        "source": "abc_cells",
         "passed": true,
         "input": {
           "month": "2026-06-01"
@@ -366,7 +366,7 @@
       {
         "id": "G15",
         "name": "ABC Platform Revenue step-down (Jan 2026)",
-        "source": "workbook",
+        "source": "abc_cells",
         "passed": true,
         "input": {
           "account": "Platform Revenue",
@@ -386,7 +386,7 @@
       {
         "id": "G16",
         "name": "ABC Bad Debts charge (May 2026)",
-        "source": "workbook",
+        "source": "abc_cells",
         "passed": true,
         "input": {
           "account": "Bad Debts"
@@ -406,7 +406,7 @@
       {
         "id": "G17",
         "name": "ABC Jun 2026 cash and runway",
-        "source": "workbook",
+        "source": "abc_cells",
         "passed": true,
         "input": {
           "cash_row": "Total Cash and Cash Equivalents",
@@ -430,10 +430,42 @@
         "actual": "cash=713,481.26; 3m burn=209,656.62; runway=3.40 months",
         "tolerance": "Cash and burn within 0.005; runway within 0.000001.",
         "perturbation": null
+      },
+      {
+        "id": "G18",
+        "name": "ABC gross-margin drops over 5 pp",
+        "source": "abc_cells",
+        "passed": true,
+        "input": {
+          "threshold_pp": 5
+        },
+        "expected": {
+          "flags": [
+            {
+              "month": "2025-03",
+              "gross_margin": 0.7068358285353941,
+              "change_pp": -8.101564305673048
+            },
+            {
+              "month": "2025-08",
+              "gross_margin": 0.6301868749559828,
+              "change_pp": -7.3046013852194225
+            },
+            {
+              "month": "2026-04",
+              "gross_margin": 0.7068868482412951,
+              "change_pp": -5.361127941113642
+            }
+          ],
+          "flag_count": 3
+        },
+        "actual": "3 months flagged: 2025-03, 2025-08, 2026-04",
+        "tolerance": "Exactly these three months are flagged; margins within 0.000001; change in pp within 0.0001.",
+        "perturbation": null
       }
     ],
-    "total": 17,
-    "passed": 17
+    "total": 18,
+    "passed": 18
   },
   "mutation": {
     "rows": [

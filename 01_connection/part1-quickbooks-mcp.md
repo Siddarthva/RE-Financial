@@ -1,7 +1,5 @@
 # Part 1 — QuickBooks MCP Integration Record
 
-> **Update 2026-10-13:** the "not yet demonstrated" items below are out of date. A read-only monthly P&L and a Balance Sheet were retrieved live through Claude Code (see `01_connection/evidence/quickbooks/`). The decision and credential flow are now in `connection_decision.md`.
-
 ## Implemented locally
 - Created the Intuit developer app and QuickBooks Online sandbox company.
 - Registered Development redirect URI `http://localhost:8000/callback`.
@@ -11,10 +9,10 @@
 - Confirmed `QUICKBOOKS_DISABLE_WRITE=true`, `QUICKBOOKS_DISABLE_UPDATE=true`, and `QUICKBOOKS_DISABLE_DELETE=true`.
 - Registered a user-scoped stdio MCP server named `quickbooks`; `claude mcp list` reported it as connected.
 
-## Not yet demonstrated
-- Live read-only calls **are** confirmed: 8 redacted request/response pairs in `01_connection/evidence/quickbooks/` (captured 2026-10-12; two reports re-run 2026-10-13 with identical figures). Not shown: the earlier `ECONNRESET` cause, and a write path (disabled by design).
-- Claude Code previously reported `Unable to connect to Anthropic services` / `ECONNRESET` for `api.anthropic.com`. This is a connectivity/authentication blocker to diagnose; a Pro subscription alone is not proof it will resolve.
-- `mcp list: Connected` confirms server registration/handshake, not that OAuth token refresh and live API retrieval work end to end.
+## Current status
+- **Live test passes.** `python 01_connection/qbo_test_connection.py abc --test` returned `ok: true` on 2026-10-14 (03:49 UTC): "Connected. Read-only CompanyInfo query succeeded." (sandbox company "Sandbox Company US a3a1").
+- **Evidence:** 8 redacted request/response pairs in `01_connection/evidence/quickbooks/` (captured 2026-10-12; two reports re-run 2026-10-13 with identical figures).
+- **Not shown:** a write path (disabled by design) and the cause of the earlier `ECONNRESET`.
 
 ## Decision and alternatives
 **Selected:** official open-source Intuit MCP server, run locally over stdio.
