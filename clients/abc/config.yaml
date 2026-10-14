@@ -1,0 +1,119 @@
+# ABC Inc — fictional assessment client. Source workbook is read-only and lives in data/.
+client: abc
+display_name: ABC Inc
+workbook: ../../data/ABC Inc - Financial Statements.xlsx   # relative to this folder
+
+sheets:
+  income_statement: Income Statement
+  balance_sheet: Balance Sheet          # not analyzed yet; used as evidence for fiscal_year below
+
+layout:
+  header_label: Account                 # B5
+  month_format: "%b %Y"                 # C5:T5 = "Jun 2026" ... "Jan 2025" (newest first)
+
+# canonical section -> header/total row labels in the sheet
+sections:
+  income:             {header: Income,             total: Total Income}              # A7, A14
+  cost of goods sold: {header: Cost of Goods Sold, total: Total Cost of Goods Sold}  # A16, A24
+  operating expenses: {header: Operating Expenses, total: Total Operating Expenses}  # A28, A103
+
+totals:
+  revenue: Total Income                       # row 14
+  cost_of_goods_sold: Total Cost of Goods Sold  # row 24
+  gross_profit: Gross Profit                  # row 26
+  operating_expenses: Total Operating Expenses  # row 103 = SUM(details) + row 59 + row 71
+  operating_income: Operating Income          # row 105
+  net_income: Net Income                      # row 107
+
+# Block headers / subtotals inside OPEX; excluded so their child rows are not double-counted.
+subtotal_rows: [S & M Payroll, Total S & M Payroll, Marketing, Total Marketing]   # B47, B59, B60, B71
+
+fiscal_year:
+  start_month: 1   # Evidence: Balance Sheet D63 Current Year Earnings (-1,987,916.44) = SUM Net Income Jan-Jun 2026; E63 = Jan-May 2026.
+
+# Reporting categories for OPEX. Mapping is a first pass for reviewer approval.
+categories:
+  - Payroll & Benefits
+  - Sales & Marketing
+  - Professional Services
+  - Technology
+  - General & Administrative
+  - Finance & Tax
+
+account_to_category:
+  # Payroll & Benefits
+  Bonus: Payroll & Benefits
+  Development Payroll: Payroll & Benefits
+  Employee Training expenses: Payroll & Benefits
+  Health Insurance: Payroll & Benefits
+  Marketing - Payroll: Payroll & Benefits
+  Marketing - Payroll benefits: Payroll & Benefits
+  Marketing - Payroll Taxes: Payroll & Benefits
+  Marketing - Workers Comp Insurance: Payroll & Benefits
+  Partnerships - Payroll: Payroll & Benefits
+  Partnerships - Payroll benefits: Payroll & Benefits
+  Partnerships - Payroll Taxes: Payroll & Benefits
+  Sales - Payroll: Payroll & Benefits
+  Sales - Payroll benefits: Payroll & Benefits
+  Sales - Payroll Taxes: Payroll & Benefits
+  Sales - Workers Comp Insurance: Payroll & Benefits
+  Operating Payroll: Payroll & Benefits
+  Operations - Payroll benefits: Payroll & Benefits
+  Operations - Workers Comp Insurance: Payroll & Benefits
+  Operations Payroll Taxes: Payroll & Benefits
+  Payroll Service Fee: Payroll & Benefits
+  Product - Payroll benefits: Payroll & Benefits
+  Product - Workers Comp Insurance: Payroll & Benefits
+  Product Payroll Taxes: Payroll & Benefits
+  Recruiting Expense: Payroll & Benefits
+  Sales & Marketing - Workers Comp Insurance: Payroll & Benefits
+  Sales & Marketing Payroll: Payroll & Benefits
+  Sales & Marketing Payroll Taxes: Payroll & Benefits
+  Sales and Marketing - Payroll benefits: Payroll & Benefits
+  Severance: Payroll & Benefits
+  Stock-Based Compensation Expense: Payroll & Benefits
+  Workers Compensation Insurance: Payroll & Benefits
+  # Sales & Marketing
+  Marketing/Advertising: Sales & Marketing
+  "Marketing/Advertising: Ad Spend": Sales & Marketing
+  "Marketing/Advertising: Print & Digital": Sales & Marketing
+  "Marketing/Advertising: 3rd Party Content Syndication": Sales & Marketing
+  "Marketing/Advertising: Content": Sales & Marketing
+  "Marketing/Advertising: Membership Dues/Subscriptions": Sales & Marketing
+  "Marketing/Advertising: Miscellaneous": Sales & Marketing
+  "Marketing/Advertising: Website": Sales & Marketing
+  "Marketing/Advertising: Partner Marketing": Sales & Marketing
+  Events & Conferences: Sales & Marketing
+  Partnerships Commission: Sales & Marketing
+  Sales & Marketing - Contractor: Sales & Marketing
+  Sales & Marketing - Travel, Meals & Entertainment: Sales & Marketing
+  # Professional Services
+  Accounting & Tax: Professional Services
+  Advisory Services: Professional Services
+  Consulting: Professional Services
+  Development - Contractor: Professional Services
+  Legal Expenses: Professional Services
+  Professional Fees: Professional Services
+  # Technology
+  AI Token Cost: Technology
+  Software & SaaS: Technology
+  Telephone & Internet: Technology
+  # General & Administrative
+  Bad Debts: General & Administrative
+  Bank Service Charges: General & Administrative
+  Contribution to Charities: General & Administrative
+  Depreciation: General & Administrative
+  General Expenses: General & Administrative
+  Insurance: General & Administrative
+  Meals & Entertainment: General & Administrative
+  Merchant fees: General & Administrative
+  Office Expenses: General & Administrative
+  Postage & Delivery: General & Administrative
+  Printing & Stationery: General & Administrative
+  Rent: General & Administrative
+  Travel: General & Administrative
+  # Finance & Tax — booked inside OPEX in the source; reviewer should confirm placement (see G10)
+  Federal & State Taxes: Finance & Tax
+  Income Tax Benefit: Finance & Tax
+  Interest Expense: Finance & Tax
+  Interest Income: Finance & Tax

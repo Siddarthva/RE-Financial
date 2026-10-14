@@ -1,0 +1,82 @@
+{
+  "client": "abc",
+  "period": "2026-06",
+  "prior_period": "2026-05",
+  "rule": {
+    "min_dollars": 5000.0,
+    "min_pct": 0.1,
+    "sign_flip_dollars": 1000.0
+  },
+  "items": [
+    {
+      "account": "Events & Conferences",
+      "section": "operating expenses",
+      "reason_code": "LARGE_MOVE",
+      "severity": "medium",
+      "metric": "Events & Conferences (operating expenses)",
+      "current": 29294.58,
+      "prior": 11323.91,
+      "dollar_change": 17970.67,
+      "pct_change": 1.586967,
+      "source_cell_current": "Income Statement!C65",
+      "source_cell_prior": "Income Statement!D65",
+      "threshold_rule": "|$\u0394| >= $5,000 and |%\u0394| >= 10%."
+    },
+    {
+      "account": "Bad Debts",
+      "section": "operating expenses",
+      "reason_code": "SIGN_FLIP",
+      "severity": "high",
+      "metric": "Bad Debts (operating expenses)",
+      "current": -1806.24,
+      "prior": 12935.29,
+      "dollar_change": -14741.53,
+      "pct_change": -1.139637,
+      "source_cell_current": "Income Statement!C31",
+      "source_cell_prior": "Income Statement!D31",
+      "threshold_rule": "Sign changed versus prior month. Flagged when |$\u0394| >= $1,000."
+    },
+    {
+      "account": "Partnerships Commission",
+      "section": "operating expenses",
+      "reason_code": "LARGE_MOVE",
+      "severity": "medium",
+      "metric": "Partnerships Commission (operating expenses)",
+      "current": 1800.0,
+      "prior": 10800.0,
+      "dollar_change": -9000.0,
+      "pct_change": -0.833333,
+      "source_cell_current": "Income Statement!C97",
+      "source_cell_prior": "Income Statement!D97",
+      "threshold_rule": "|$\u0394| >= $5,000 and |%\u0394| >= 10%."
+    },
+    {
+      "account": "Marketing/Advertising: Partner Marketing",
+      "section": "operating expenses",
+      "reason_code": "LARGE_MOVE",
+      "severity": "medium",
+      "metric": "Marketing/Advertising: Partner Marketing (operating expenses)",
+      "current": 4020.45,
+      "prior": 12415.08,
+      "dollar_change": -8394.63,
+      "pct_change": -0.676164,
+      "source_cell_current": "Income Statement!C70",
+      "source_cell_prior": "Income Statement!D70",
+      "threshold_rule": "|$\u0394| >= $5,000 and |%\u0394| >= 10%."
+    },
+    {
+      "account": "Sales Commission",
+      "section": "cost of goods sold",
+      "reason_code": "LARGE_MOVE",
+      "severity": "medium",
+      "metric": "Sales Commission (cost of goods sold)",
+      "current": 5926.88,
+      "prior": 13126.41,
+      "dollar_change": -7199.53,
+      "pct_change": -0.548477,
+      "source_cell_current": "Income Statement!C23",
+      "source_cell_prior": "Income Statement!D23",
+      "threshold_rule": "|$\u0394| >= $5,000 and |%\u0394| >= 10%."
+    }
+  ]
+}

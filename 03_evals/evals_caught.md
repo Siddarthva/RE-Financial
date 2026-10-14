@@ -1,0 +1,77 @@
+# Bugs caught by evals and reconciliation
+
+Log of defects found by checking engine output against source cells or by tests. Each entry has a regression test.
+
+## 2026-10-12 — `src/abc_workbook_adapter.py` reconciliation against `ABC Inc - Financial Statements.xlsx`
+
+**How it was found:** read-only cell-by-cell reconciliation of adapter output against the workbook. Checked Jan 2025, Jun 2025, and Jun 2026 (246 checks), then all 18 months (1,476 checks): revenue streams, total revenue, COGS, gross profit, all 70 OPEX detail categories, sum of categories vs Total Operating Expenses, and net income. **All values matched before and after the fixes.** The bugs below are in derived output and in logic that this workbook's layout happens not to trigger.
+
+| # | Bug | Effect | Fix | Regression test |
+|---|---|---|---|---|
+| 1 | **Sign:** `generate_commentary` computed MoM % as `change / prior`. With a negative prior value, the % had the opposite sign to the $ change. | Shipped output said `Net income … change +8,343.52 (-2.5%)` for Jun 2026 (C107 −330,756.08 vs D107 −339,099.60), even though the loss shrank. | Divide by `abs(prior)` (the rule in the monthly-financial-analysis skill). Output now reads `(+2.5%)`. | `test_bug1_mom_pct_sign_uses_absolute_prior_for_negative_base` |
+| 2 | **Hidden global:** `build_expense_category_trends` re-read the workbook through a module global `INPUT_PATH` that only `analyze_wide_workbook` set. | Any direct call (tests, notebooks, other pipelines) raised `NameError: name 'INPUT_PATH' is not defined`. | The parser records each row's section in `account_month.attrs["sections"]`. Category trends use that map and no longer re-read the file or use a global. | `test_bug2_expense_trends_do_not_depend_on_module_global` |
+| 3 | **Row mapping:** the OPEX section's stop condition looked for `Total Operating Expenses` in the Account column (B). The source puts it in column A (A103), so the stop never fired. | Any non-excluded account row after Total OPEX (e.g. "Other Income") would be counted as an operating expense. This workbook was saved only because `Operating Income`/`Net Income` are on the exclude list. | Section boundaries are tracked in the parser from the section header row to its `Total <section>` row, whichever column the label is in. | `test_bug3_rows_after_total_operating_expenses_are_not_opex` |
+| 4 | **TTM continuity:** `build_monthly_summary` `*_ttm` columns were plain 12-row rolling sums with no calendar check. | A workbook with a missing month would report a TTM figure that is not twelve consecutive months. This workbook (Jan 2025–Jun 2026, no gaps) was unaffected. | Mask TTM unless the 11 preceding month steps are each exactly one calendar month, matching `financial_analysis.normalize_monthly`. | `test_bug4_summary_ttm_requires_consecutive_calendar_months` |
+
+**Source-workbook regression checks added** (`SourceWorkbookReconciliationTests`, read-only, skipped if the workbook is absent):
+- months parse as Jan 2025–Jun 2026, ascending, no gaps (the source columns run newest first);
+- OPEX categories sum to Total Operating Expenses in every month (guards against subtotal double-counting: `Total S & M Payroll`, `Total Marketing`);
+- subtotal and header rows never appear as categories;
+- spot cells C14, C107, C31 (negative Bad Debts sign preserved).
+
+**Verification after fix:** 16/16 unit tests and 8/8 golden evals pass. Reconciliation is still 1,476/1,476. TTM revenue for Dec 2025 (2,145,316.28 = SUM I14:T14) and Jun 2026 (2,303,975.51 = SUM C14:N14) match independent sums of the source cells. The source workbook's SHA-256 is unchanged.
+
+## 2026-10-12 — ABC golden cases G09–G13 and commentary grader
+
+| # | Bug | Effect | Fix | Regression test |
+|---|---|---|---|---|
+| 5 | **Sign:** `build_expense_category_trends` `mom_pct` used signed `pct_change()`. Found by G12. | Income Tax Benefit Jan 2026 (I101 −1,244,429.84 → H101 0) showed `mom_change` +1,244,429.84 with `mom_pct` **−100%**. | Divide `mom_change` by `abs(prior)`; null when the prior is 0. | `test_bug5_category_mom_pct_sign_uses_absolute_prior`, G12 |
+| 6 | **Skill guidance gap:** section 9 asked only for top *expense* movements. Found by the commentary grader. | Skill run 1 left out Usage Fees (C11−D11 = −11,142.74), the 3rd-largest line movement in Jun 2026. | Section 9 now asks for the top 3 movements across revenue, COGS and OPEX lines. Run 2 passes 3/3. | `grade_commentary.py --run-skill` |
+| 7 | **Engine commentary coverage:** `generate_commentary()` names only totals. Found by the commentary grader. | 0/3 top movements named. | **Not fixed** — open item. | `grade_commentary.py` (default mode) |
+
+Data findings recorded in G10 (not bugs): Income Tax Benefit (row 101) is booked inside Operating Expenses. That is why Dec 2025 OPEX is negative (I103 −402,142.09) and net income is positive. Treat it as a mapping question for the reviewer.
+
+## 2026-10-12 — Mutation testing (`03_evals/mutation_test.py`)
+
+The first run caught 9 of 10 mutants. **Gap:** shifting every month forward by one in `financial_analysis.normalize_monthly` survived. Every synthetic test checked only relative values (diffs, rolling sums, margins), and none asserted that a value stays attached to its own month. **Added** golden case G14 (month labels kept intact through normalization). The re-run caught 10 of 10.
+
+Thin coverage worth knowing (caught, but by a single eval): adapter gross-margin denominator (G13 only); `financial_analysis` category drop (G06 and `test_category_mom`, both single-category inputs).
+
+## 2026-10-12 — Per-client config and isolation
+
+| # | Bug | Effect | Fix | Regression test |
+|---|---|---|---|---|
+| 8 | **Isolation bypass via path spelling** (new sandbox, caught by its own test before release) | Windows short 8.3 names (`SIDDAR~1`) and long names compared unequal. A tampered ABC config pointing at `../xyz/xyz_financials.xlsx` was **read**; the run failed later only on a sheet-name mismatch. | Compare `realpath`-normalised paths, which also resolves symlinks. | `test_config_pointing_at_other_client_data_is_rejected`, `test_short_and_long_path_spellings_cannot_bypass_the_guard` (both confirmed failing with the old normalisation) |
+| 9 | **Shared temp dir** | openpyxl stages files in the system temp folder, which every client's run shares. The sandbox blocked it. | Each run gets a private temp dir at `outputs/<client>/.tmp`, removed afterwards. | `test_each_run_writes_only_its_own_output_folder` |
+
+**Known, not fixed (out of scope — `src/financial_analysis.py`):** `category_summary` `expense_mom_pct` has no zero-denominator guard and can return `inf`.
+
+## 2026-10-13 — re-check of `src/abc_workbook_adapter.py` against the workbook
+
+**How it was checked:** read-only. Recomputed Income (rows 8–13), COGS (17–23), GP, OPEX (29–46, 48–58, 61–70, 72–102, so the subtotal rows 59/71 are skipped) and NI from detail cells for all 18 columns (C=Jun 2026 … T=Jan 2025). Compared each value with the cached total cell and with adapter output. Also checked BS row 63 Current Year Earnings in each of the 18 months against calendar-YTD adapter NI.
+
+**Result: no new bugs.** There were 0 mismatches in 90 total checks, and the 70 OPEX detail categories summed to Total Operating Expenses every month. All 18 Current Year Earnings checks tied, including D63 −1,987,916.44 = Jan–Jun 2026 NI. The traps are handled: the newest-first columns are re-sorted, the empty block-header rows are skipped, and Interest Income and Income Tax Benefit are kept in OPEX as negatives (Dec 2025 OPEX is −402,142.09). The negative Mar 2026 revenue lines F9 −1,608.09 and F12 −550.00 are summed as they are. No code changes, so no new regression tests.
+
+## 2026-10-13 — eval harness
+
+| # | Bug | Effect | Fix | Regression check |
+|---|---|---|---|---|
+| 10 | **Mutation copy incomplete:** `03_evals/mutation_test.py` copied `src/ tests/ 03_evals/ clients/` but not `evidence/`. `tests/test_evidence_redaction.py` imports `01_connection/evidence/quickbooks/redact_and_verify.py`. | The runner's unmodified-copy baseline failed (`test_evidence_redaction`), so it refused to run any mutants. | Copy `evidence/` as well. | `mutation_test.py` baseline green; 10/10 mutants caught |
+| 11 | **G11 too weak:** the runner checked only that Nov 2025 TTM was null. | A TTM leaking into Jan–Oct 2025, or into a non-revenue metric, would have passed. | The runner now requires every month before the first valid one to be null for all five TTM metrics. G11's expected values are unchanged. | G11 |
+
+## 2026-10-13 — final run
+
+| # | Bug | Effect | Fix | Regression check |
+|---|---|---|---|---|
+| 12 | **Mutation copy missing `scripts/`:** `tests/test_qbo_load.py` imports `01_connection/load_workbook_to_sandbox.py`, but `mutation_test.py` did not copy `scripts/`. Same class as #10. | First clean run: the mutation runner refused to start (`Baseline is not green … test_qbo_load`, exit 2). | Copy `scripts/` too. | Mutation run in `03_evals/FINAL_RUN.md` |
+| 13 | **Realistic-looking fake realm ID in a test fixture:** `tests/test_evidence_redaction.py` used a 16-digit value shaped like a sandbox realm ID. | It could not be told apart from a real ID by a reader or a scanner. | Replaced with `1234567890123456`; the fixture is declared a fake fixture to `scripts/scan_secrets.py`. | `tests/test_scan_secrets.py`, `tests/test_evidence_redaction.py` |
+| 14 | **Sandbox failed on a fresh checkout:** `client_sandbox` created `outputs/<client>/.tmp` after it started blocking writes, so with no `outputs/` folder yet it blocked its own `mkdir`. | `run_client.py` and the whole mutation baseline failed anywhere `outputs/` did not already exist (a reviewer's first run). Hidden here because `outputs/` already existed. | Create the folder before the sandbox activates. | `test_run_works_when_outputs_folder_does_not_exist_yet` |
+
+## 2026-10-13 — the grader caught stale/contradictory commentary
+
+**How it was found:** `03_evals/FINAL_RUN.md` recorded `grade_commentary.py` FAIL on two of three inputs. The grader was not changed; the commentary was.
+
+| # | Bug | Effect | Fix | Regression check |
+|---|---|---|---|---|
+| 15 | **Engine commentary incomplete:** `generate_commentary(monthly)` only saw monthly totals, so it could not name line items or cash. | Engine text failed: top movements 0/3, cash risk not covered (Jun 2026 cash 713,481.26 and runway never stated). | `generate_commentary(monthly, account_month, cash)` now names the top 3 latest-month movements by absolute $ change (same ranking as the review packet) and states cash plus 3-month runway (3.4 months, 209,656.62/month burn; the G17 method via `cash_position`). `run_client.py` and the grader's engine path pass these inputs; grading rules unchanged. | `test_engine_commentary_passes_grader_on_real_workbook` |
+| 16 | **Skill contradicted the engine:** `monthly-financial-analysis/SKILL.md` §7 said runway "cannot be calculated without fabricating data", while `cash_position()` and golden G17 compute it from Balance Sheet cash. | Saved skill output (`outputs/skill_commentary.md`) repeated that runway can't be calculated; numbers 43/43 and top movements 3/3 but cash risk not covered, so FAIL. | §7 rewritten: cash and runway come from Balance Sheet cash (3-month window, G17); only CFO/CFI/CFF remain unavailable. Skill output regenerated with `grade_commentary.py --run-skill`. | Same test asserts SKILL.md no longer says runway cannot be calculated; `--run-skill` now PASS. |

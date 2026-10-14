@@ -7,11 +7,11 @@ These rules apply to every task in this repo. They override convenience.
 - If a task seems to need a secret, stop and ask instead of opening the file.
 
 ## Source workbook is read-only
-- Never modify the original workbook (`ai_solutions_builder_free/ABC Inc - Financial Statements.xlsx`).
+- Never modify the original workbook (`data/ABC Inc - Financial Statements.xlsx`).
 - Write all generated files to `/outputs` (project-root `outputs/`), never alongside or over the source.
 
 ## Evals
-- Never change expected values in evals (e.g. `ai_solutions_builder_free/evals/`) just to make them pass.
+- Never change expected values in evals (e.g. `03_evals/`) just to make them pass.
 - If an expected value looks wrong, show the source-cell evidence (sheet, cell, value/formula) and ask me before changing anything.
 
 ##Token rules: don't print full files or raw data; show diffs and summary tables only. Read only the files named in the task. Don't re-run passing tests unless code changed. End every task with: Changed / Verified / Unverified (max 5 lines each).

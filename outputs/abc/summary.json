@@ -1,7 +1,7 @@
 {
   "client": "abc",
   "display_name": "ABC Inc",
-  "source": "../../ABC Inc - Financial Statements.xlsx",
+  "source": "../../data/ABC Inc - Financial Statements.xlsx",
   "months": 18,
   "period": "Jan 2025 - Jun 2026",
   "fiscal_year_start_month": 1,
