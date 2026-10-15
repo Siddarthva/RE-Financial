@@ -4,6 +4,11 @@
 
 This repository connects Claude to a QuickBooks Online sandbox through a read-only MCP server. It turns an 18-month financial workbook into a reviewed monthly trend analysis through a Claude skill, and it proves the result with a layered evaluation suite. The design rule throughout: **Python computes every number, Claude writes and reviews the words, and a human makes the final call.**
 
+**In brief.** Claude connects to a QuickBooks sandbox through Intuit's official MCP server, read-only; a skill analyses the supplied ABC workbook; evals prove it.
+- **Deliverables:** (1) [`01_connection/connection_decision.md`](01_connection/connection_decision.md) · (2) [`.claude/skills/monthly-financial-analysis/SKILL.md`](.claude/skills/monthly-financial-analysis/SKILL.md) · (3) [`03_evals/GRADING.md`](03_evals/GRADING.md) · (4) [`04_architecture/architecture.md`](04_architecture/architecture.md)
+- **Results (full regress, 2026-10-15):** unit tests 185 · golden cases 33/33 · mutants 19/19 caught · faults 38/38 handled.
+- **Not done:** the analysis reads the workbook, not live QuickBooks data (the sandbox holds only Intuit's sample company, and the workbook loader was never applied); team hosting is a design, not a deployment. See [section 17](#17-whats-not-done-and-known-limits).
+
 Everything except the live QuickBooks connection runs offline on the supplied workbook. **You don't need a QuickBooks account, an API key or Claude to verify the core results.**
 
 ---
@@ -39,7 +44,7 @@ Everything except the live QuickBooks connection runs offline on the supplied wo
 | **Skill** | `monthly-financial-analysis`: revenue, margins, opex by category, MoM, TTM, cash and runway, flagged movements, numbered commentary |
 | **Review** | A read-only `finance-reviewer` subagent plus a deterministic commentary grader, then a human sign-off that locks the period |
 | **Evals** | Unit tests, 33 golden cases, a commentary grader, 19 mutation tests, a 38-fault robustness suite, UI number checks |
-| **Multi-client** | Each client is a `config.yaml`; a synthetic second client (`xyz`) runs with no code changes |
+| **Multi-client** | Each client is a `config.yaml`; synthetic clients (`xyz`, `lmn`) run with no code changes |
 | **Safety** | Read-only workbook (hash-checked), hooks that block secret files, a secret scan before packaging, per-client sandboxing |
 
 ---
@@ -64,7 +69,7 @@ The brief asks for four deliverables. Each has its own folder.
 
 ## 3. Latest results
 
-From the clean-state runs on **2026-10-14**. Full records: [`03_evals/FINAL_RUN.md`](03_evals/FINAL_RUN.md) and [`04_architecture/verification_matrix.md`](04_architecture/verification_matrix.md).
+From the full regress run on **2026-10-15** (tag `v3.0-submission`). Full records: [`03_evals/FINAL_RUN.md`](03_evals/FINAL_RUN.md) and [`04_architecture/verification_matrix.md`](04_architecture/verification_matrix.md).
 
 | Check | Command | Result |
 |---|---|---|
@@ -129,7 +134,7 @@ Then open **[`02_skill/sample_outputs/`](02_skill/sample_outputs/)** to see what
 **Optional, slower checks:**
 
 ```powershell
-python 03_evals/mutation_test.py                  # ~6 min. Expect: 19/19 mutants caught
+python 03_evals/mutation_test.py                  # ~6-22 min. Expect: 19/19 mutants caught
 python 03_evals/robustness/fault_injection.py     # ~2 min. Expect: 38/38 faults handled
 python src/run_client.py xyz                      # a second, different company from config only
 streamlit run 05_review_workspace/app/Home.py     # optional UI; reads outputs/ only
@@ -220,7 +225,7 @@ Approval is refused unless the reviewer verdict is `approve`. Once approved, the
 | Option | Verdict | Reason |
 |---|---|---|
 | **Official Intuit MCP server (chosen)** | ✅ | Maintained by the API owner, covers the reports and entities needed, works natively with Claude Code, and its disable flags allow a verifiable read-only mode |
-| Native Claude connector | ❌ Rejected | Less control over scoping and over where credentials live; read-only enforcement isn't demonstrable in the same way |
+| Native Claude connector | Not chosen (unverified, not shown worse) | Could not establish how it scopes access or where credentials live, or demonstrate read-only enforcement the way the disable flags allow; see `01_connection/connection_decision.md` for the scores and what would change this |
 | Custom MCP on the QuickBooks API | ❌ Rejected | Rebuilds OAuth, token refresh and report parsing that already exist and are maintained, adding risk with no benefit for this scope |
 
 Full reasoning: [`connection_decision.md`](01_connection/connection_decision.md). Supply-chain notes (npm audit triage): [`dependency_risk.md`](01_connection/dependency_risk.md).
@@ -326,20 +331,19 @@ The rule "flag gross-margin drops over 5 pp" was added as a rehearsed on-the-spo
 | Layer | What it checks | Command |
 |---|---|---|
 | **Unit tests** | Engine functions, isolation, hooks, redaction, secret scan, Excel layout, UI numbers, robustness regressions | `python -m unittest discover -s tests` |
-| **Golden cases (22)** | A data state paired with the expected analysis output | `python 03_evals/run_golden_evals.py` |
+| **Golden cases (33)** | A data state paired with the expected analysis output | `python 03_evals/run_golden_evals.py` |
 | **Commentary grader** | Every number in the commentary matches the engine JSON; the top-3 movements are named; cash and runway are covered | `python 03_evals/grade_commentary.py` |
-| **Mutation test (13)** | Deliberately breaks the code and checks that some eval fails, which proves the evals can tell better from worse | `python 03_evals/mutation_test.py` |
-| **Fault injection (32)** | Deliberately breaks the *input workbook* and checks the pipeline stops, warns, or handles it correctly, never silently wrong | `python 03_evals/robustness/fault_injection.py` |
+| **Mutation test (19)** | Deliberately breaks the code and checks that some eval fails, which proves the evals can tell better from worse | `python 03_evals/mutation_test.py` |
+| **Fault injection (38)** | Deliberately breaks the *input workbook* and checks the pipeline stops, warns, or handles it correctly, never silently wrong | `python 03_evals/robustness/fault_injection.py` |
 | **UI number checks** | Every number shown in the UI exists in the engine JSON; no page imports calculation code | part of the unit tests |
 
 ### 9.2 Golden cases by source
 
 | Source | Count | IDs | Meaning |
 |---|---|---|---|
-| `workbook` | 4 | G01, G02, G03, G06 | Taken directly from the real ABC workbook |
-| `workbook+perturbation` | 5 | G04, G05, G07, G08, G14 | The real workbook with one cell changed to trigger one rule |
+| `workbook` | 12 | G01, G02, G03, G06, G26–G33 | Taken directly from the real ABC workbook |
+| `workbook+perturbation` | 12 | G04, G05, G07, G08, G14, G19–G25 | The real workbook with one cell changed to trigger one rule |
 | ABC cell-sourced | 9 | G09–G13, G15–G18 | Expected values derived by hand from named source cells |
-| Intake gate | 4 | G19–G22 | A perturbed workbook that the intake gate must refuse, with a message naming the cause |
 
 Highlights: the **Dec 2025 one-off** (net income +534,551.41, driven by a −1,244,429.84 income tax benefit and 334,660.53 of stock-based compensation), **Dec 2025 as the first valid TTM month**, the **Jan 2026 Platform Revenue drop**, **May 2026 Bad Debts**, the **Jun 2026 summary including cash and runway**, and the **Balance Sheet Current Year Earnings = YTD net income** cross-check.
 
@@ -478,7 +482,7 @@ Other flagged items: the **Dec 2025 one-off** (net income +534,551.41 in a loss-
 
 The full log, with fixes and regression tests: [`03_evals/evals_caught.md`](03_evals/evals_caught.md). The most important catches:
 
-1. **The skill path bypassed the intake gate.** Fault injection showed `/monthly-analysis` skipping the safety checks the pipeline ran. On broken workbooks it met the required behaviour on only **9 of 32** faults, and **8 produced wrong numbers with no warning**. After moving both paths onto one shared gate: **32 / 32**.
+1. **The skill path bypassed the intake gate.** Fault injection showed `/monthly-analysis` skipping the safety checks the pipeline ran. On broken workbooks it met the required behaviour on only **9 of the 32 faults then in the suite**, and **8 produced wrong numbers with no warning**. After moving both paths onto one shared gate: **32 / 32**.
 2. **The commentary contradicted the data.** The grader caught the skill saying "runway cannot be calculated" when the Balance Sheet made it computable.
 3. **The workbook's months run newest-first**, and subtotal rows sit among line items. Reconciliation caught both, and they are now covered by mutants and golden cases.
 4. **The connection test reported success on failure.** The script sent no `params`, the server rejected it, and the script exited 0. It's fixed, exits 1, and gives actionable messages.
@@ -515,7 +519,7 @@ The full log, with fixes and regression tests: [`03_evals/evals_caught.md`](03_e
 | "Workbook is locked" | It's open in Excel | Close it and re-run |
 | "… is approved and locked; not re-running" | The period was signed off | Intended. Approvals are final; reject before approving to allow a re-run |
 | The Streamlit pages are empty | Outputs haven't been generated yet | Run the pipeline and `grade_commentary.py` first |
-| The mutation test seems slow | It re-runs the suite for each of 19 mutants | Expect about 15 minutes |
+| The mutation test seems slow | It re-runs the suite for each of 19 mutants | Expect 6 to 22 minutes depending on the machine |
 
 ---
 
@@ -523,7 +527,7 @@ The full log, with fixes and regression tests: [`03_evals/evals_caught.md`](03_e
 
 - **Stretch goal not completed.** The loader and its 18-entry plan are built and tested against a fake, but no live write was made, and the skill reads the workbook, not QuickBooks. This was deliberate: a write needs a separately approved credential. Also, a QuickBooks P&L couldn't reproduce the workbook's 70 expense accounts anyway.
 - **Live connection needs your own setup.** A reviewer needs their own Intuit sandbox, the cloned MCP server and `npm run auth`. Without them, `--test` explains what is missing.
-- **Team hosting and ten-client isolation are designs.** Two clients exist; isolation is in-process, not an OS or credential boundary.
+- **Team hosting and ten-client isolation are designs.** Three clients exist (`abc`, `xyz`, `lmn`); isolation is in-process, not an OS or credential boundary.
 - **The MCP server is not in this repo.** It's Intuit's code, cloned beside it and untracked. Its npm audit findings are triaged in `dependency_risk.md`; none were fixed upstream.
 - **Different workbook shapes need code.** New clients need only a config, but the parser expects a wide sheet with one column per month.
 - **Commentary quality is only partly graded.** Numbers, coverage and the "no causes" rule are checked by code; usefulness is judged by the LLM reviewer and a human.
@@ -545,10 +549,9 @@ RE/
 ├── .claude/                   skills/, agents/finance-reviewer.md, commands/monthly-analysis.md, hooks/, settings.json
 ├── src/                       Deterministic engine, intake gate, client sandbox, review pack, Excel layout
 ├── tests/                     Unit tests (engine, isolation, hooks, redaction, scan, Excel, UI, robustness)
-├── clients/                   abc/config.yaml (supplied workbook), xyz/ (synthetic second company)
+├── clients/                   abc/config.yaml (supplied workbook), xyz/ (synthetic second company), lmn/ (third synthetic client)
 ├── data/                      ABC Inc - Financial Statements.xlsx (read-only, hash-checked)
 ├── scripts/                   run_pipeline.py, approve.py, export_eval_results.py, scan_secrets.py, package_submission.py
-├── config/                    qbo_write.env.example (placeholder for the sandbox loader's separate credential)
 ├── outputs/                   Generated files, one folder per client
 ├── CLAUDE.md                  Standing rules for Claude
 └── requirements.txt

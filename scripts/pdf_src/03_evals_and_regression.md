@@ -66,11 +66,11 @@ Each fault is applied to a copy of the ABC workbook and run through both entry p
 
 | Family | Faults | STOP | WARN | HANDLE | Examples |
 |---|---|---|---|---|---|
-| Structure | 11 | 6 | 1 | 4 | Prior month deleted; duplicated month; sheet renamed; merged headers |
-| Values | 9 | 4 | 3 | 2 | Text in a numeric cell; Excel `#DIV/0!`; x1000 outlier; zero revenue; infinity |
-| Labels | 7 | 2 | 3 | 2 | Renamed account; look-alike character; deleted section total |
-| Coverage | 5 | 4 | 1 | 0 | Only 11 months; formulas without saved values; corrupt or locked file |
-| **Total** | **32** | **16** | **8** | **8** | |
+| Structure | 12 | 6 | 2 | 4 | Prior month deleted; duplicated month; sheet renamed; merged headers |
+| Values | 12 | 4 | 6 | 2 | Text in a numeric cell; Excel `#DIV/0!`; x1000 outlier; zero revenue; infinity |
+| Labels | 8 | 2 | 4 | 2 | Renamed account; look-alike character; deleted section total |
+| Coverage | 6 | 4 | 2 | 0 | Only 11 months; formulas without saved values; corrupt or locked file |
+| **Total** | **38** | **16** | **14** | **8** | |
 
 **Result: {{fault_result}}.** Full table with the message shown for each fault is in the Verification and Robustness Report.
 

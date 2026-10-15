@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-14T07:55:09+00:00",
+  "generated_at": "2026-10-15T15:42:24+00:00",
   "golden": {
     "cases": [
       {
@@ -540,10 +540,240 @@
         "actual": "formulas saved without cached values: refused: Intake refused the workbook: Income Statement: 144 formula cells have no saved value (C14, D14, E14, F14, G14 (+139 more)). The file was saved without calculati",
         "tolerance": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string.",
         "perturbation": "The workbook re-saved by openpyxl with formulas kept: every formula cell (144 on the Income Statement, counted 2026-10-14) loses its cached value. Robustness fault F28."
+      },
+      {
+        "id": "G23",
+        "name": "Tie-out (intake STOP): Balance Sheet no longer balances in Mar 2026",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "month": "2026-06"
+        },
+        "expected": {
+          "refused": true,
+          "message_contains": [
+            "Balance Sheet balances",
+            "Balance Sheet!G37",
+            "2026-03: assets - liabilities & equity = 250.00"
+          ]
+        },
+        "actual": "Balance Sheet no longer balances in Mar 2026: refused: Intake checks failed (details in intake_2026-06.json): Balance Sheet balances (assets = liabilities + equity, every month) at Balance Sheet!G37 (Fix: find the m",
+        "tolerance": "The intake gate (close_artifacts.intake_gate) must refuse the perturbed copy with a message naming the check, the month and the cell. The source workbook is never modified.",
+        "perturbation": "+250.00 on Total Assets with Total Liabilities and Equity (G71 = 4,932,920.61) unchanged."
+      },
+      {
+        "id": "G24",
+        "name": "Tie-out (intake STOP): Current Year Earnings differs from YTD net income in Sep 2025",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "month": "2026-06"
+        },
+        "expected": {
+          "refused": true,
+          "message_contains": [
+            "Current Year Earnings = year-to-date net income",
+            "Balance Sheet!M63",
+            "2025-09: balance sheet -3,316,345.12 vs YTD net income -3,316,346.12"
+          ]
+        },
+        "actual": "Current Year Earnings differs from YTD net income in Sep 2025: refused: Intake checks failed (details in intake_2026-06.json): Current Year Earnings = year-to-date net income (every month) at Balance Sheet!M63 (Fix: check that the B",
+        "tolerance": "The intake gate (close_artifacts.intake_gate) must refuse the perturbed copy with a message naming the check, the month and the cell. The source workbook is never modified.",
+        "perturbation": "+1.00 on Current Year Earnings (M63). Current Year Earnings is part of equity, so Sep 2025 also stops balancing by 1.00; both checks fire and the message must contain the YTD one."
+      },
+      {
+        "id": "G25",
+        "name": "Tie-out (intake STOP): Current Year Earnings row label missing",
+        "source": "perturbed",
+        "passed": true,
+        "input": {
+          "month": "2026-06"
+        },
+        "expected": {
+          "refused": true,
+          "message_contains": [
+            "Balance Sheet rows present",
+            "Current Year Earnings"
+          ]
+        },
+        "actual": "Current Year Earnings row label missing: refused: Intake checks failed (details in intake_2026-06.json): Balance Sheet rows present at Balance Sheet (missing Current Year Earnings. Fix: restore the row label in",
+        "tolerance": "The intake gate (close_artifacts.intake_gate) must refuse the perturbed copy with a message naming the check, the month and the cell. The source workbook is never modified.",
+        "perturbation": "Renaming the label stops the equity tie-out being run silently; the gate must name the missing row."
+      },
+      {
+        "id": "G26",
+        "name": "Flux row for Events & Conferences (Jun 2026 vs May 2026)",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "month": "2026-06",
+          "account": "Events & Conferences",
+          "section": "operating expenses"
+        },
+        "expected": {
+          "reason_code": "LARGE_MOVE",
+          "current": 29294.58,
+          "prior": 11323.91,
+          "dollar_change": 17970.67,
+          "source_cell_current": "Income Statement!C65",
+          "source_cell_prior": "Income Statement!D65"
+        },
+        "actual": "LARGE_MOVE 29294.58 vs 11323.91 (+17,970.67) at Income Statement!C65",
+        "tolerance": "Values within half a cent; reason code and both source-cell refs exact. Used by the flux-explanations and client-questions skills.",
+        "perturbation": "Real data already trips the flux rule; no cell changed."
+      },
+      {
+        "id": "G27",
+        "name": "Flux row for Bad Debts (Jun 2026 vs May 2026)",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "month": "2026-06",
+          "account": "Bad Debts",
+          "section": "operating expenses"
+        },
+        "expected": {
+          "reason_code": "SIGN_FLIP",
+          "current": -1806.24,
+          "prior": 12935.29,
+          "dollar_change": -14741.53,
+          "source_cell_current": "Income Statement!C31",
+          "source_cell_prior": "Income Statement!D31"
+        },
+        "actual": "SIGN_FLIP -1806.24 vs 12935.29 (-14,741.53) at Income Statement!C31",
+        "tolerance": "Values within half a cent; reason code and both source-cell refs exact. Used by the flux-explanations and client-questions skills.",
+        "perturbation": "Real data already trips the flux rule; no cell changed."
+      },
+      {
+        "id": "G28",
+        "name": "Flux row for Sales Commission (Jun 2026 vs May 2026)",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "month": "2026-06",
+          "account": "Sales Commission",
+          "section": "cost of goods sold"
+        },
+        "expected": {
+          "reason_code": "LARGE_MOVE",
+          "current": 5926.88,
+          "prior": 13126.41,
+          "dollar_change": -7199.53,
+          "source_cell_current": "Income Statement!C23",
+          "source_cell_prior": "Income Statement!D23"
+        },
+        "actual": "LARGE_MOVE 5926.88 vs 13126.41 (-7,199.53) at Income Statement!C23",
+        "tolerance": "Values within half a cent; reason code and both source-cell refs exact. Used by the flux-explanations and client-questions skills.",
+        "perturbation": "Real data already trips the flux rule; no cell changed."
+      },
+      {
+        "id": "G29",
+        "name": "flux-explanations output for ABC 2026-06 passes its grader",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "client": "abc",
+          "month": "2026-06",
+          "file": "flux_explanations_{month}.md",
+          "grader": "flux"
+        },
+        "expected": {
+          "grader_passes": true
+        },
+        "actual": "grader passed",
+        "tolerance": "0 grader problems. Negative cases for each rule are in tests/test_grade_workflow_skills.py.",
+        "perturbation": "No change; grades the saved skill output against the real engine JSON."
+      },
+      {
+        "id": "G30",
+        "name": "client-questions output for ABC 2026-06 passes its grader",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "client": "abc",
+          "month": "2026-06",
+          "file": "client_questions_{month}.md",
+          "grader": "questions"
+        },
+        "expected": {
+          "grader_passes": true
+        },
+        "actual": "grader passed",
+        "tolerance": "0 grader problems. Negative cases for each rule are in tests/test_grade_workflow_skills.py.",
+        "perturbation": "No change; grades the saved skill output against the real engine JSON."
+      },
+      {
+        "id": "G31",
+        "name": "Year-over-year view for Jun 2026 vs Jun 2025 (revenue and gross margin)",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "month": "2026-06"
+        },
+        "expected": {
+          "prior_year_month": "2025-06",
+          "revenue": 195898.16,
+          "prior_revenue": 190555.65,
+          "yoy_change": 5342.51,
+          "yoy_pct": 0.028036,
+          "gross_margin": 0.701516,
+          "prior_gross_margin": 0.743225,
+          "yoy_change_pp": -4.170895
+        },
+        "actual": "revenue 195898.16 vs 190555.65 (+2.8036%); gross margin change -4.1709 pp",
+        "tolerance": "Money within half a cent; ratios within 1e-5; percentage points within 1e-4. Seasonality view required by the brief.",
+        "perturbation": "No change; real data has the prior-year month."
+      },
+      {
+        "id": "G32",
+        "name": "Net income excluding one-offs for Dec 2025 (two one-offs in the month)",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "month": "2025-12"
+        },
+        "expected": {
+          "net_income": 534551.41,
+          "one_off_effect_on_net_income": 909769.31,
+          "adjusted_net_income": -375217.9,
+          "items": [
+            "Income Tax Benefit",
+            "Stock-Based Compensation Expense"
+          ]
+        },
+        "actual": "net income 534,551.41, one-off effect +909,769.31, adjusted -375,217.90",
+        "tolerance": "Money within half a cent; the set of one-off accounts must match exactly.",
+        "perturbation": "No change; Dec 2025 holds two one-off operating-expense lines."
+      },
+      {
+        "id": "G33",
+        "name": "ABC 2026-06 commentary has all seven sections in order",
+        "source": "workbook",
+        "passed": true,
+        "input": {
+          "client": "abc",
+          "month": "2026-06",
+          "file": "commentary_{month}.md"
+        },
+        "expected": {
+          "sections": [
+            "Headline",
+            "Revenue",
+            "Margins",
+            "Opex",
+            "Cash & runway",
+            "One-offs",
+            "Questions"
+          ],
+          "passed": true
+        },
+        "actual": "found ['Headline', 'Revenue', 'Margins', 'Opex', 'Cash & runway', 'One-offs', 'Questions'], missing []",
+        "tolerance": "All seven found, none missing, order kept.",
+        "perturbation": "No change; grades the saved commentary. Missing and swapped headings are tested in tests/test_monthly_review.py."
       }
     ],
-    "total": 22,
-    "passed": 22
+    "total": 33,
+    "passed": 33
   },
   "mutation": {
     "rows": [
@@ -556,8 +786,7 @@
           "G03",
           "G07",
           "G14",
-          "test_mom_revenue_change",
-          "test_ttm_only_after_12_months"
+          "test_mom_revenue_change"
         ]
       },
       {
@@ -575,21 +804,14 @@
           "G17",
           "G18",
           "G21",
-          "test_abc_config_reproduces_existing_engine_numbers",
-          "test_abc_fiscal_ytd_matches_balance_sheet_current_year_earnings",
-          "test_approved_pack_has_blank_signoff_and_open_questions",
-          "test_balance_sheet_cash_and_runway",
-          "test_bug5_category_mom_pct_sign_uses_absolute_prior",
-          "test_current_year_earnings_ties_to_ytd_net_income",
-          "test_dec_2025_negative_opex_posts_as_a_credit",
-          "test_duplicate_month_raises_naming_both_cells",
-          "test_gross_margin_drop_flags",
-          "test_jun_2026_amounts_come_from_source_cells",
-          "test_line_that_does_not_foot_stops",
-          "test_margin_flags_skip_a_gap",
-          "test_packet_has_source_cell_values",
-          "test_spot_cells",
-          "test_xyz_one_off_audit_fee_detected"
+          "G23",
+          "G24",
+          "G26",
+          "G27",
+          "G28",
+          "G31",
+          "G32",
+          "test_bug5_category_mom_pct_sign_uses_absolute_prior"
         ]
       },
       {
@@ -602,9 +824,7 @@
           "G03",
           "G07",
           "G14",
-          "test_margin_calculation",
-          "test_mom_revenue_change",
-          "test_ttm_only_after_12_months"
+          "test_margin_calculation"
         ]
       },
       {
@@ -615,15 +835,8 @@
           "G11",
           "G13",
           "G18",
-          "test_abc_config_reproduces_existing_engine_numbers",
-          "test_clean_copy_passes",
-          "test_every_entry_balances_and_its_p_and_l_effect_is_workbook_net_income",
-          "test_jun_2026_amounts_come_from_source_cells",
-          "test_margin_flags_skip_a_gap",
-          "test_spot_cells",
-          "test_ttm_available_for_twelve_consecutive_months",
-          "ExcelLayoutTests (setUpClass)",
-          "MonthlyReviewTests (setUpClass)"
+          "G31",
+          "test_ttm_available_for_twelve_consecutive_months"
         ]
       },
       {
@@ -631,10 +844,7 @@
         "module": "abc_workbook_adapter.py",
         "caught": true,
         "caught_by": [
-          "test_abc_config_reproduces_existing_engine_numbers",
-          "test_category_rollups_sum_to_total_opex_every_month",
-          "test_opex_categories_sum_to_total_operating_expenses_every_month",
-          "test_subtotal_rows_excluded_from_categories"
+          "test_opex_categories_sum_to_total_operating_expenses_every_month"
         ]
       },
       {
@@ -660,25 +870,14 @@
           "G17",
           "G18",
           "G21",
-          "test_a_single_wrong_month_is_reported",
-          "test_abc_config_reproduces_existing_engine_numbers",
-          "test_abc_fiscal_ytd_matches_balance_sheet_current_year_earnings",
-          "test_balance_sheet_cash_and_runway",
-          "test_bug3_rows_after_total_operating_expenses_are_not_opex",
-          "test_bug5_category_mom_pct_sign_uses_absolute_prior",
-          "test_clean_copy_passes",
-          "test_current_year_earnings_ties_to_ytd_net_income",
-          "test_dec_2025_negative_opex_posts_as_a_credit",
-          "test_duplicate_month_raises_naming_both_cells",
-          "test_jun_2026_amounts_come_from_source_cells",
-          "test_line_that_does_not_foot_stops",
-          "test_margin_flags_skip_a_gap",
-          "test_months_parsed_ascending_without_gaps",
-          "test_spot_cells",
-          "test_xyz_layout_fiscal_year_and_ttm",
-          "test_xyz_one_off_audit_fee_detected",
-          "ExcelLayoutTests (setUpClass)",
-          "MonthlyReviewTests (setUpClass)"
+          "G23",
+          "G24",
+          "G26",
+          "G27",
+          "G28",
+          "G31",
+          "G32",
+          "test_bug3_rows_after_total_operating_expenses_are_not_opex"
         ]
       },
       {
@@ -695,11 +894,7 @@
         "module": "abc_workbook_adapter.py",
         "caught": true,
         "caught_by": [
-          "test_abc_config_reproduces_existing_engine_numbers",
-          "test_bug2_expense_trends_do_not_depend_on_module_global",
-          "test_bug3_rows_after_total_operating_expenses_are_not_opex",
-          "test_category_rollups_sum_to_total_opex_every_month",
-          "test_opex_categories_sum_to_total_operating_expenses_every_month"
+          "test_bug2_expense_trends_do_not_depend_on_module_global"
         ]
       },
       {
@@ -718,7 +913,6 @@
         "caught_by": [
           "G11",
           "G13",
-          "test_abc_config_reproduces_existing_engine_numbers",
           "test_ttm_available_for_twelve_consecutive_months"
         ]
       },
@@ -738,19 +932,72 @@
         "caught_by": [
           "G13",
           "G18",
-          "test_approved_pack_has_blank_signoff_and_open_questions",
-          "test_gross_margin_drop_flags",
-          "test_margin_flags_skip_a_gap"
+          "G31",
+          "test_approved_pack_has_blank_signoff_and_open_questions"
+        ]
+      },
+      {
+        "mutation": "Flux ignores the percentage threshold",
+        "module": "close_artifacts.py",
+        "caught": true,
+        "caught_by": [
+          "test_flux_needs_both_the_dollar_and_the_percent_threshold"
+        ]
+      },
+      {
+        "mutation": "Year-over-year compares with last month",
+        "module": "monthly_review.py",
+        "caught": true,
+        "caught_by": [
+          "G31",
+          "test_approved_pack_has_blank_signoff_and_open_questions"
+        ]
+      },
+      {
+        "mutation": "Adjusted net income sign reversed",
+        "module": "monthly_review.py",
+        "caught": true,
+        "caught_by": [
+          "G32",
+          "test_adjusted_net_income_removes_one_offs"
+        ]
+      },
+      {
+        "mutation": "Balance Sheet tie-out tolerance made huge",
+        "module": "close_artifacts.py",
+        "caught": true,
+        "caught_by": [
+          "G23",
+          "G24",
+          "test_current_year_earnings_mismatch_fails"
+        ]
+      },
+      {
+        "mutation": "Section footing check made blind",
+        "module": "close_artifacts.py",
+        "caught": true,
+        "caught_by": [
+          "G21",
+          "test_line_that_does_not_foot_stops"
+        ]
+      },
+      {
+        "mutation": "Prior-month column no longer required",
+        "module": "close_artifacts.py",
+        "caught": true,
+        "caught_by": [
+          "G19",
+          "test_missing_prior_month_stops"
         ]
       }
     ],
-    "total": 13,
-    "caught": 13,
+    "total": 19,
+    "caught": 19,
     "source": "outputs/mutation_report.md"
   },
   "unit": {
-    "total": 90,
-    "passed": 90,
+    "total": 185,
+    "passed": 185,
     "source": "03_evals/FINAL_RUN.md"
   }
 }

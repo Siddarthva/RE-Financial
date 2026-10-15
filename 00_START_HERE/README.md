@@ -2,6 +2,8 @@
 
 Submission for the RE Financial Services build exercise. Seven PDFs, generated from the repo's Markdown by one command.
 
+**In brief.** Claude connects to a QuickBooks sandbox read-only through Intuit's MCP server; a skill analyses the supplied ABC workbook; layered evals prove it. Deliverables: connection `01_connection/connection_decision.md`, skill `.claude/skills/monthly-financial-analysis/SKILL.md`, evals `03_evals/GRADING.md`, architecture `04_architecture/architecture.md` (PDF: `04_Architecture_OnePage.pdf`). Results: unit 185, golden 33/33, mutants 19/19, faults 38/38. **Not done:** the analysis reads the workbook, not live QuickBooks data; team hosting is a design only.
+
 ## Read in this order
 
 | # | PDF | Pages | What it is |
@@ -11,7 +13,7 @@ Submission for the RE Financial Services build exercise. Seven PDFs, generated f
 | 3 | `01_Connection_Architecture.pdf` | 4 | Component and credential diagrams, read-only enforcement, team hosting (proposed), evidence |
 | 4 | `02_Skill_and_Analysis_Workflow.pdf` | 4 | End-to-end flow, skill anatomy, client-config model, sample output |
 | 5 | `03_Evals_and_Regression.pdf` | 4 | Eval layers, golden cases, mutation and robustness results, regression procedure |
-| 6 | `06_Verification_and_Robustness_Report.pdf` | 8 | Brief-to-proof matrix and the 38-fault robustness report, with dates |
+| 6 | `06_Verification_and_Robustness_Report.pdf` | 9 | Brief-to-proof matrix and the 38-fault robustness report, with dates |
 | 7 | `05_Workflows_Appendix.pdf` | 20 | Seven workflow pages with diagrams (supplementary to the one-page note) |
 
 ## Rebuild

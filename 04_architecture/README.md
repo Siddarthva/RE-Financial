@@ -34,3 +34,5 @@ The one-page note is rendered to a PDF at [`00_START_HERE/04_Architecture_OnePag
 - **"Doc review only"** in the verification matrix means a document's content meets the line; no command can prove it.
 - **Known gap:** there is no "re-run as v2" after approval. See [workflow (c)](workflows/c_approve_reject_lock.md).
 - **Not checked by anyone:** G10–G18 cell by cell against the workbook.
+
+- [`final_review.md`](final_review.md) — independent cold review of the submission and what was fixed after it.

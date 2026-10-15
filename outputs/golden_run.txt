@@ -1,4 +1,4 @@
-Running 22 golden cases
+Running 33 golden cases
 PASS G01 — Month-over-month revenue change: change=9063.690000000002, pct=0.054083329603938246
 PASS G02 — Gross margin: gross_margin=0.7795149399567389
 PASS G03 — TTM requires twelve consecutive months: ttm_after_11=nan, ttm_after_12=2145316.28
@@ -21,5 +21,16 @@ PASS G19 — Intake STOP (structure): prior month column missing: refused: Intak
 PASS G20 — Intake STOP (values): text 'n/a' in an amount cell: refused: Intake checks failed (details in intake_2026-06.json): Every amount is a number at Income Statement!C11 (Usage Fees Jun 2026: text, not a number: 'n/a') | Total
 PASS G21 — Intake STOP (labels/footing): a line no longer foots to Total Income: refused: Intake checks failed (details in intake_2026-06.json): Total Income foots to its lines (every month) at Income Statement!F14 (2026-03: lines - total = 1,000.00)
 PASS G22 — Intake STOP (coverage): formulas saved without cached values: refused: Intake refused the workbook: Income Statement: 144 formula cells have no saved value (C14, D14, E14, F14, G14 (+139 more)). The file was saved without calculati
+PASS G23 — Tie-out (intake STOP): Balance Sheet no longer balances in Mar 2026: refused: Intake checks failed (details in intake_2026-06.json): Balance Sheet balances (assets = liabilities + equity, every month) at Balance Sheet!G37 (Fix: find the m
+PASS G24 — Tie-out (intake STOP): Current Year Earnings differs from YTD net income in Sep 2025: refused: Intake checks failed (details in intake_2026-06.json): Current Year Earnings = year-to-date net income (every month) at Balance Sheet!M63 (Fix: check that the B
+PASS G25 — Tie-out (intake STOP): Current Year Earnings row label missing: refused: Intake checks failed (details in intake_2026-06.json): Balance Sheet rows present at Balance Sheet (missing Current Year Earnings. Fix: restore the row label in
+PASS G26 — Flux row for Events & Conferences (Jun 2026 vs May 2026): LARGE_MOVE 29294.58 vs 11323.91 (+17,970.67) at Income Statement!C65
+PASS G27 — Flux row for Bad Debts (Jun 2026 vs May 2026): SIGN_FLIP -1806.24 vs 12935.29 (-14,741.53) at Income Statement!C31
+PASS G28 — Flux row for Sales Commission (Jun 2026 vs May 2026): LARGE_MOVE 5926.88 vs 13126.41 (-7,199.53) at Income Statement!C23
+PASS G29 — flux-explanations output for ABC 2026-06 passes its grader: grader passed
+PASS G30 — client-questions output for ABC 2026-06 passes its grader: grader passed
+PASS G31 — Year-over-year view for Jun 2026 vs Jun 2025 (revenue and gross margin): revenue 195898.16 vs 190555.65 (+2.8036%); gross margin change -4.1709 pp
+PASS G32 — Net income excluding one-offs for Dec 2025 (two one-offs in the month): net income 534,551.41, one-off effect +909,769.31, adjusted -375,217.90
+PASS G33 — ABC 2026-06 commentary has all seven sections in order: found ['Headline', 'Revenue', 'Margins', 'Opex', 'Cash & runway', 'One-offs', 'Questions'], missing []
 
-Score: 22/22 (100%)
+Score: 33/33 (100%)

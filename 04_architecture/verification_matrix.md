@@ -1,8 +1,8 @@
 # Verification matrix
 
-Two parts: the **current** results (final pre-submission run, 2026-10-14) and, below them, the dated **history** of the Phase 1 clean-state run, kept as a record. Counts in the history are Phase 1 counts and are superseded by this section.
+Two parts: the **current** results (final pre-submission run, 2026-10-15) and, below them, the dated **history** of the Phase 1 clean-state run, kept as a record. Counts in the history are Phase 1 counts and are superseded by this section.
 
-## Current results (final pre-submission run, 2026-10-14)
+## Current results (final pre-submission run, 2026-10-15)
 
 Run on the committed tree, in this order, one suite at a time.
 
