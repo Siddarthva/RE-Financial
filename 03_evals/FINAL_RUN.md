@@ -19,7 +19,7 @@ python scripts/scan_secrets.py . outputs
 
 ## Result: v3.0 WARN-path coverage, 2026-10-15
 
-Full `python scripts/regress.py` (not `--fast`), 14/14 checks held, run on the working tree before the commit that contains these changes. Source workbook SHA-256 `75da8d679a89...` unchanged.
+Full `python scripts/regress.py` (not `--fast`; `outputs/regress_results.json`: mode full, all_held true, 14/14 checks held), run on the working tree before the commit that contains these changes. Source workbook SHA-256 `75da8d679a89...` unchanged.
 
 | Check | Result | Counts |
 |---|---|---|
@@ -27,7 +27,10 @@ Full `python scripts/regress.py` (not `--fast`), 14/14 checks held, run on the w
 | Golden cases | **PASS** | 33/33 (workbook 12, workbook+perturbation 12, ABC cell-sourced 9) |
 | Mutation test | **PASS** | 19/19 caught, 0 survived |
 | Robustness (fault injection) | **PASS** | 38/38 pass (6 stricter than declared, 0 looser; 6 WARN-path variants added), source workbook hash unchanged |
-| Secret scan (git-tracked files) | **PASS** | 0 findings, 223 text files |
+| Commentary graders | **PASS** | engine PASS, reviewed commentary PASS, saved skill output PASS; flux-explanations PASS, client-questions PASS; the flawed control FAILS, as it must |
+| Trigger cases (structure) | **PASS** | 11 entries, 0 problems |
+| Internal links | **PASS** | 80 files, 172 links, 0 broken |
+| Secret scan (git-tracked files) | **PASS** | 0 findings, 223 text files (243 tracked paths) |
 
 Counts: 185 unit tests (one new: `test_owner_memo_survives_missing_gross_margin`); fault suite 38 = 32 originals + F02b, F13b, F16b, F17b, F21b, F27b; 0 SILENT-WRONG.
 
