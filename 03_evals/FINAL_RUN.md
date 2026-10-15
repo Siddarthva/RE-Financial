@@ -23,11 +23,13 @@ Full `python scripts/regress.py` (not `--fast`), 14/14 checks held, run on the w
 
 | Check | Result | Counts |
 |---|---|---|
-| Unit tests | **PASS** | 185 run, 185 OK (one new: `test_owner_memo_survives_missing_gross_margin`) |
-| Golden cases | **PASS** | 33/33 |
-| Mutation test | **PASS** | 19/19 caught, 0 survived (1043 s) |
-| Robustness (fault injection) | **PASS** | 38/38 (32 originals + 6 WARN-path variants F02b, F13b, F16b, F17b, F21b, F27b); 6 originals still STOP (stricter than declared, 0 looser); 0 SILENT-WRONG (341 s) |
-| Secret scan (git-tracked files) | **PASS** | 0 findings, 243 tracked files |
+| Unit tests | **PASS** | 185 run, 185 OK |
+| Golden cases | **PASS** | 33/33 (workbook 12, workbook+perturbation 12, ABC cell-sourced 9) |
+| Mutation test | **PASS** | 19/19 caught, 0 survived |
+| Robustness (fault injection) | **PASS** | 38/38 pass (6 stricter than declared, 0 looser; 6 WARN-path variants added), source workbook hash unchanged |
+| Secret scan (git-tracked files) | **PASS** | 0 findings, 223 text files |
+
+Counts: 185 unit tests (one new: `test_owner_memo_survives_missing_gross_margin`); fault suite 38 = 32 originals + F02b, F13b, F16b, F17b, F21b, F27b; 0 SILENT-WRONG.
 
 Along the way: the first variant run was 5/6. F17b (zero revenue) failed because the reviewer Excel and owner memo crashed on a missing gross margin; fixed in `src/owner_memo.py` and `src/monthly_review.py`, expectation unchanged. See `03_evals/evals_caught.md`.
 
