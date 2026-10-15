@@ -345,7 +345,7 @@ Highlights: the **Dec 2025 one-off** (net income +534,551.41, driven by a −1,2
 
 ### 9.3 Mutation test results
 
-13 mutants, including reversed month order, a flipped revenue sign, subtotals summed twice, a dropped opex line, an 11-month TTM, and the wrong margin denominator. **All 13 are caught.** The table, showing which test catches each one, is in `outputs/mutation_report.md`.
+19 mutants, including reversed month order, a flipped revenue sign, subtotals summed twice, a dropped opex line, an 11-month TTM, and the wrong margin denominator. **All 19 are caught.** The table, showing which test catches each one, is in `outputs/mutation_report.md`.
 
 ### 9.4 Robustness: does bad data ever produce a silent wrong answer?
 
