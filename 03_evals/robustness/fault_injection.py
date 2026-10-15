@@ -24,6 +24,7 @@ from; it is checked against the committed outputs/abc/review_packet_2026-06.json
 from __future__ import annotations
 
 import hashlib
+from datetime import datetime
 import io
 import json
 import re
@@ -106,6 +107,7 @@ class Fault:
     mutate: Callable | None = None   # (workbook, ctx) -> None; edits the values-only copy
     raw: Callable | None = None      # (path) -> None; writes the file itself (corrupt, formulas)
     lock: bool = False
+    touches: tuple | None = None     # variants only: the detail accounts the fault itself changes; all others must equal the baseline
 
 
 def _drop_month(label):
@@ -258,6 +260,35 @@ def _truncated(path: Path):
     path.write_bytes(SOURCE.read_bytes()[:4000])
 
 
+def _with_bs_tied(base_mutate):
+    """Variant of a fault: apply it, then restate the Balance Sheet so the tie-out still passes. Current Year Earnings
+    is reset to the (mutated) Income Statement's year-to-date net income for every month both sheets have (fiscal year
+    = calendar year, clients/abc/config.yaml), and Retained Earnings takes the opposite change, so Total Equity and
+    Total Liabilities and Equity are untouched and the sheet still balances. Only the BS tie-out is defeated; the data
+    problem the original fault introduces is the same."""
+    def f(wb, ctx):
+        base_mutate(wb, ctx)
+        ws, bs = wb[IS], wb[BS]
+        hr, ni_row = header_row(ws), row_of(ws, "Net Income")
+        ytd, running = {}, {}
+        for c in sorted((c for c in ws[hr] if c.column > 2 and c.value), key=lambda c: datetime.strptime(str(c.value), "%b %Y")):
+            d = datetime.strptime(str(c.value), "%b %Y")
+            running[d.year] = running.get(d.year, 0.0) + (ws.cell(ni_row, c.column).value or 0.0)
+            ytd[(d.year, d.month)] = running[d.year]
+        def bs_row(label):  # Balance Sheet labels sit in column C
+            return next(r for r in range(1, bs.max_row + 1) if str(bs.cell(r, 3).value).strip() == label)
+        cye, re_ = bs_row("Current Year Earnings"), bs_row("Retained Earnings")
+        for c in bs[header_row(bs)]:
+            if c.column <= 3 or not c.value:
+                continue
+            d = c.value if isinstance(c.value, datetime) else datetime.strptime(str(c.value), "%d %b %Y")
+            if (d.year, d.month) in ytd:
+                delta = ytd[(d.year, d.month)] - bs.cell(cye, c.column).value
+                bs.cell(cye, c.column).value += delta
+                bs.cell(re_, c.column).value -= delta
+    return f
+
+
 FAULTS = [
     # Structure
     Fault("F01", "Structure", "Missing month column: prior month (May 2026) deleted", "STOP", "no column for 2026-05", _drop_month("May 2026")),
@@ -297,6 +328,17 @@ FAULTS = [
     # .xlsx cannot store inf: openpyxl writes it and reads it back as an empty cell, so the line no longer foots.
     Fault("F32", "Values", "Float inf written into a numeric cell (Bonus, Jun 2026; lands as an empty cell)", "STOP",
           "Total Operating Expenses foots", _set("Bonus", "Jun 2026", float("inf"))),
+]
+
+# Variants of the six WARN faults that the Balance Sheet tie-out now refuses (the originals above run as STOP, "stricter").
+# Each restates the Balance Sheet so the tie-out passes; the declared WARN is then the behaviour required end to end:
+# the warning in summary.json, the review packet, the Data Quality sheet and the reviewer Excel's Open Questions, with
+# every number other than the fault's own effect equal to the baseline.
+_BY_ID = {f.fid: f for f in FAULTS}
+FAULTS += [
+    Fault(f"{o}b", _BY_ID[o].family, _BY_ID[o].name + " [Balance Sheet restated to tie out]", "WARN", _BY_ID[o].expect,
+          _with_bs_tied(_BY_ID[o].mutate), touches=touched)
+    for o, touched in (("F02", ()), ("F13", ("Bonus",)), ("F16", ("Usage Fees",)), ("F17", "INCOME"), ("F21", ()), ("F27", ()))
 ]
 
 
@@ -364,17 +406,39 @@ def run_case(base_wb, fault: Fault | None, ctx: dict) -> dict:
                 handle.seek(0)
                 msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, book.stat().st_size)
                 handle.close()
-        return {"cell": cell, "pipeline": collect(tmp / "out_pipeline" / CLIENT, procs["pipeline"], manifest=True),
-                "skill": collect(tmp / "out_skill" / CLIENT, procs["skill"], manifest=False)}
+        res = {"cell": cell, "pipeline": collect(tmp / "out_pipeline" / CLIENT, procs["pipeline"], manifest=True),
+               "skill": collect(tmp / "out_skill" / CLIENT, procs["skill"], manifest=False)}
+        if fault and fault.required == "WARN":  # end to end: build the reviewer Excel (sign-off pack) from each path's packet
+            for kind, out in (("pipeline", "out_pipeline"), ("skill", "out_skill")):
+                if res[kind]["status"] == "success":
+                    res[kind]["reviewer_oq"] = reviewer_open_questions(clients, tmp / out)
+        return res
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+def reviewer_open_questions(clients: str, outputs: Path) -> list:
+    """Build the reviewer Excel (monthly_review.build) over this run's packet, using the committed ABC commentary and
+    reviewer verdict as fixed inputs (only the packet differs), and return the Open Questions sheet's question column."""
+    code = ("import sys; sys.path.insert(0, 'src'); import monthly_review as m; "
+            f"m.build({CLIENT!r}, {MONTH!r}, 'outputs/abc/commentary_2026-06.md', 'outputs/abc/review_2026-06.json', {clients!r}, {str(outputs)!r})")
+    p = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300, cwd=ROOT)
+    xlsx = outputs / CLIENT / f"monthly_review_{MONTH}.xlsx"
+    if p.returncode or not xlsx.is_file():
+        return [f"<reviewer Excel not built: {p.stderr.strip()[-200:]}>"]
+    wbq = load_workbook(xlsx, read_only=True)
+    rows = [str(r[2]) for r in wbq["Open Questions"].iter_rows(min_row=2, values_only=True) if r and r[2]]
+    wbq.close()
+    return rows
 
 
 def collect(out: Path, proc, manifest: bool) -> dict:
     """Outcome of one entry point: success/failed, the message a user sees, the packet and the Data Quality sheet."""
     packet_path = out / f"review_packet_{MONTH}.json"
     packet = json.loads(packet_path.read_text(encoding="utf-8")) if packet_path.is_file() else None
-    dq, values = [], {}
+    dq, values, summary_warnings = [], {}, []
+    if (out / "summary.json").is_file():
+        summary_warnings = [str(w) for w in json.loads((out / "summary.json").read_text(encoding="utf-8")).get("warnings", [])]
     if (out / "analysis.xlsx").is_file():
         wbq = load_workbook(out / "analysis.xlsx", read_only=True)
         if "Data Quality" in wbq.sheetnames:
@@ -392,7 +456,7 @@ def collect(out: Path, proc, manifest: bool) -> dict:
         status = "success" if proc.returncode == 0 else "failed"
         lines = [l for l in proc.stderr.strip().splitlines() if l.strip()]
         errors = [lines[-1]] if proc.returncode and lines else []
-    return {"exit": proc.returncode, "status": status, "errors": errors, "packet": packet, "dq_sheet": dq, "values": values,
+    return {"exit": proc.returncode, "status": status, "errors": errors, "packet": packet, "dq_sheet": dq, "values": values, "summary_warnings": summary_warnings,
             "stderr_tail": proc.stderr.strip()[-300:]}
 
 
@@ -418,7 +482,22 @@ def same_values(got: dict, base: dict) -> bool:
     return all(_round(got[a]) == _round(base[a]) for a in base if a in got)
 
 
-def judge(fault: Fault, r: dict, cell: str | None, baseline: dict) -> dict:
+SUMMARY_ROWS = ("gross profit", "operating income", "net income")
+
+
+def numbers_otherwise_correct(fault: Fault, r: dict, baseline: dict, ctx: dict) -> bool:
+    """Variants: every detail-account amount (any month the run still has) equals the baseline except the accounts the
+    fault itself changes, and the Balance Sheet cash in the packet is unchanged (the restated rows are not cash)."""
+    touched = set(ctx["income_lines"] if fault.touches == "INCOME" else fault.touches)
+    for acct, months in r["values"].items():
+        if acct in touched or acct.lower().startswith("total ") or acct.lower() in SUMMARY_ROWS or acct not in baseline["values"]:
+            continue
+        if any(_round(v) != _round(baseline["values"][acct].get(m)) for m, v in months.items()):
+            return False
+    return _round(r["packet"].get("cash")) == _round(baseline["packet"].get("cash"))
+
+
+def judge(fault: Fault, r: dict, cell: str | None, baseline: dict, ctx: dict | None = None) -> dict:
     expect = fault.expect.replace("{cell}", cell or "?")
     if r["status"] != "success":
         msg = " | ".join(r["errors"]) or r["stderr_tail"] or f"exit {r['exit']}"
@@ -434,6 +513,9 @@ def judge(fault: Fault, r: dict, cell: str | None, baseline: dict) -> dict:
     if new_warnings:
         hit = next((w for w in new_warnings if expect and expect in w), None)
         ok = fault.required == "WARN" and hit is not None and any(expect in w for w in r["dq_sheet"])
+        if ok and fault.fid.endswith("b"):  # variants: also summary.json and the reviewer Excel (checked for every WARN run below)
+            ok = (any(expect in w for w in r["summary_warnings"]) and any(expect in q for q in r.get("reviewer_oq", []))
+                  and numbers_otherwise_correct(fault, r, baseline, ctx))
         return {"actual": "WARN", "pass": ok, "message": hit or new_warnings[0], "numbers_equal_baseline": same}
     if same:
         return {"actual": "HANDLE", "pass": fault.required == "HANDLE", "message": "Run succeeded; every review-packet number and every account amount equals the baseline."}
@@ -483,7 +565,7 @@ def main(argv=None) -> int:
         if r.get("skipped"):
             row = {"actual": "SKIPPED", "skill_actual": "SKIPPED", "pass": None, "message": r["skipped"], "skill_message": ""}
         else:
-            jp, js = judge(f, r["pipeline"], r["cell"], baseline), judge(f, r["skill"], r["cell"], baseline)
+            jp, js = judge(f, r["pipeline"], r["cell"], baseline, ctx), judge(f, r["skill"], r["cell"], baseline, ctx)
             row = {"actual": jp["actual"], "skill_actual": js["actual"], "pass": jp["pass"] and js["pass"],
                    "message": jp["message"], "skill_message": js["message"],
                    "stricter": bool(jp.get("stricter") and js.get("stricter"))}
@@ -520,6 +602,12 @@ def write_report(rows, before, after):
              "Passes because nothing wrong is accepted; the declarations were not edited. Before the tie-out existed (commit c8421e4) these ran as WARN. "
              "Rule: an expectation only moves toward stricter (HANDLE, WARN, STOP), never looser; no row moved looser. "
              f"Rows moved to STOP: {', '.join(r['id'] for r in rows if r.get('stricter')) or 'none'}. Per-fault reasons: `03_evals/evals_caught.md`.", "",
+             "**WARN-path variants (F02b, F13b, F16b, F17b, F21b, F27b):** the same six faults with the Balance Sheet restated so the tie-out "
+             "passes (Current Year Earnings reset to the mutated year-to-date net income, Retained Earnings takes the opposite change, so the "
+             "sheet still balances and cash is unchanged). Required, declared in code before running: WARN end to end, i.e. the warning is in "
+             "`summary.json`, the review packet, the analysis workbook's Data Quality sheet and the reviewer Excel's Open Questions (built by "
+             "`monthly_review.build` over that run's packet), and every detail-account amount other than the accounts the fault itself changes "
+             "equals the baseline, as does the packet's cash. The originals stay as STOP cases, so both the refusal and the warning path are covered.", "",
              "| ID | Family | Fault | Required | Pipeline | Skill path | Pass | Message shown (pipeline) |", "|---|---|---|---|---|---|---|---|"]
     for r in rows:
         mark = "✅ (stricter)" if r.get("stricter") else "✅" if r["pass"] else "—" if r["pass"] is None else "❌"

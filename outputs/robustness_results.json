@@ -384,6 +384,78 @@
       "message": "ValueError: Intake checks failed (details in intake_2026-06.json): Total Operating Expenses foots to its lines (every month) at Income Statement!C103 (2026-06: lines - total = -10,889.00)",
       "skill_message": "ValueError: Intake checks failed (details in intake_2026-06.json): Total Operating Expenses foots to its lines (every month) at Income Statement!C103 (2026-06: lines - total = -10,889.00)",
       "stricter": false
+    },
+    {
+      "id": "F02b",
+      "family": "Structure",
+      "fault": "Missing month column: Sep 2025 deleted mid-history [Balance Sheet restated to tie out]",
+      "required": "WARN",
+      "actual": "WARN",
+      "skill_actual": "WARN",
+      "pass": true,
+      "message": "Months missing from the source: Sep 2025. TTM is withheld for windows with gaps, and no month-over-month change is reported across a gap.",
+      "skill_message": "Months missing from the source: Sep 2025. TTM is withheld for windows with gaps, and no month-over-month change is reported across a gap.",
+      "stricter": false
+    },
+    {
+      "id": "F13b",
+      "family": "Values",
+      "fault": "Empty cell inside a series (Bonus, Feb 2026; totals treat it as zero) [Balance Sheet restated to tie out]",
+      "required": "WARN",
+      "actual": "WARN",
+      "skill_actual": "WARN",
+      "pass": true,
+      "message": "1 blank cell(s) inside rows that have values, treated as missing (not zero): Income Statement!G33 (Bonus, Feb 2026)",
+      "skill_message": "1 blank cell(s) inside rows that have values, treated as missing (not zero): Income Statement!G33 (Bonus, Feb 2026)",
+      "stricter": false
+    },
+    {
+      "id": "F16b",
+      "family": "Values",
+      "fault": "Extreme outlier x1000 (Usage Fees, Jun 2026, totals consistent) [Balance Sheet restated to tie out]",
+      "required": "WARN",
+      "actual": "WARN",
+      "skill_actual": "WARN",
+      "pass": true,
+      "message": "Possible outlier: Usage Fees in Jun 2026 is 166,781,500.00, over 100x its median month (140,396.16). Check Income Statement!C11.",
+      "skill_message": "Possible outlier: Usage Fees in Jun 2026 is 166,781,500.00, over 100x its median month (140,396.16). Check Income Statement!C11.",
+      "stricter": false
+    },
+    {
+      "id": "F17b",
+      "family": "Values",
+      "fault": "Zero total revenue in Jun 2026 (division by zero) [Balance Sheet restated to tie out]",
+      "required": "WARN",
+      "actual": "WARN",
+      "skill_actual": "WARN",
+      "pass": true,
+      "message": "Revenue is zero in Jun 2026; margins for that month are reported as not available.",
+      "skill_message": "Revenue is zero in Jun 2026; margins for that month are reported as not available.",
+      "stricter": false
+    },
+    {
+      "id": "F21b",
+      "family": "Labels",
+      "fault": "New unmapped account (Crypto Mining Costs, totals consistent) [Balance Sheet restated to tie out]",
+      "required": "WARN",
+      "actual": "WARN",
+      "skill_actual": "WARN",
+      "pass": true,
+      "message": "Unmapped OPEX account (reported under 'Unmapped'): Crypto Mining Costs",
+      "skill_message": "Unmapped OPEX account (reported under 'Unmapped'): Crypto Mining Costs",
+      "stricter": false
+    },
+    {
+      "id": "F27b",
+      "family": "Coverage",
+      "fault": "Only 11 months (Aug 2025 - Jun 2026) [Balance Sheet restated to tie out]",
+      "required": "WARN",
+      "actual": "WARN",
+      "skill_actual": "WARN",
+      "pass": true,
+      "message": "TTM not available: 11 months supplied, 12 consecutive required.",
+      "skill_message": "TTM not available: 11 months supplied, 12 consecutive required.",
+      "stricter": false
     }
   ]
 }

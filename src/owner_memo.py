@@ -58,7 +58,10 @@ def render(packet: dict, questions: list[str]) -> str:
     line = f"Revenue was {_usd(rev['value'])}, {_move(rev['mom_change'])} from {prior}"
     line += f" ({abs(rev['mom_pct']):.1%})." if rev.get("mom_pct") is not None else "."
     out.append(line)
-    out.append(f"After the direct costs of delivering your service, you kept {gm:.1%} of revenue (gross margin).")
+    if gm is None:  # no revenue in the month: a margin is undefined, and the data-quality warning says so
+        out.append("There was no revenue this month, so the gross margin cannot be calculated.")
+    else:
+        out.append(f"After the direct costs of delivering your service, you kept {gm:.1%} of revenue (gross margin).")
     out.append(f"The business {'made a profit' if ni >= 0 else 'made a loss'} of {_usd(ni)} for the month.")
     adj = packet.get("adjusted_net_income")
     if adj and adj["items"]:

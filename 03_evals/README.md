@@ -6,14 +6,14 @@
 
 | Layer | Command | What it proves | Latest (2026-10-14) |
 |---|---|---|---|
-| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 184 run, 184 OK |
+| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 185 run, 185 OK |
 | Golden cases | `python 03_evals/run_golden_evals.py` | Engine numbers and flags equal values derived by hand from source cells | 33 / 33 |
 | Commentary grader | `python 03_evals/grade_commentary.py` | Every number in the text matches the engine JSON; top-3 movements named; cash and runway covered | engine, reviewed and saved-skill text PASS; flawed control FAILs as intended |
 | Mutation test | `python 03_evals/mutation_test.py` | The tests and golden cases above fail when a known bug is injected | 19 / 19 mutants caught |
-| Robustness | `python 03_evals/robustness/fault_injection.py` | 32 corrupted workbooks each STOP, WARN or HANDLE as declared, on both entry points | 32 / 32; 0 silent wrong numbers |
+| Robustness | `python 03_evals/robustness/fault_injection.py` | 38 corrupted workbooks (32 + 6 WARN-path variants) each STOP, WARN or HANDLE as declared, on both entry points | 38 / 38; 0 silent wrong numbers |
 | UI number checks | `python -m unittest tests.test_ui_numbers` | Every number the review UI displays exists in an engine JSON file; no page imports calculation code | 15 tests OK |
 
-The 184 unit tests include the UI tests, the robustness tests and the workflow-failure tests ([`tests/test_robustness.py`](../tests/test_robustness.py)). Run records: [`FINAL_RUN.md`](FINAL_RUN.md). Scoring rules in full: [`GRADING.md`](GRADING.md).
+The 185 unit tests include the UI tests, the robustness tests and the workflow-failure tests ([`tests/test_robustness.py`](../tests/test_robustness.py)). Run records: [`FINAL_RUN.md`](FINAL_RUN.md). Scoring rules in full: [`GRADING.md`](GRADING.md).
 
 ## Golden cases by source
 
@@ -57,13 +57,13 @@ A change is blocked by any of: a golden case that passed now fails; any unit tes
 Run in this order from the repo root (PowerShell, except the secret scan, which is Git Bash). Skip mutation and robustness only if you changed nothing under `src/`, `scripts/` or `clients/`.
 
 ```powershell
-python -m unittest discover -s tests                                                          # expect OK (184)
+python -m unittest discover -s tests                                                          # expect OK (185)
 python 03_evals/run_golden_evals.py                                                           # expect Score: 33/33
 python 03_evals/grade_commentary.py                                                           # engine text: PASS
 python 03_evals/grade_commentary.py --commentary outputs/abc/commentary_2026-06.md            # reviewed text: PASS
 python 03_evals/grade_commentary.py --commentary outputs/skill_commentary.md                  # saved skill output: PASS
 python 03_evals/mutation_test.py                                                              # expect 19/19 caught, ~15 min
-python 03_evals/robustness/fault_injection.py                                                 # expect 32/32, ~3 min
+python 03_evals/robustness/fault_injection.py                                                 # expect 38/38, ~4 min
 python scripts/check_links.py                                                                 # expect 0 broken links
 (Get-FileHash "data/ABC Inc - Financial Statements.xlsx").Hash                                # expect 75DA8D679A89551F…
 ```
@@ -78,7 +78,7 @@ Defects 1–16, plus the robustness and workflow fixes of Phases 1–3, with fix
 
 | # | Story | Found by | Link |
 |---|---|---|---|
-| 1 | The `/monthly-analysis` path skipped the intake gate: a workbook whose subtotal did not foot (+1,000 on one line) ran to success with wrong numbers. The suite scored 9/32 with 8 SILENT-WRONG before the fix, 32/32 after. | Fault injection | [`BEFORE_FIX.md`](robustness/BEFORE_FIX.md), [`ROBUSTNESS_REPORT.md`](robustness/ROBUSTNESS_REPORT.md) |
+| 1 | The `/monthly-analysis` path skipped the intake gate: a workbook whose subtotal did not foot (+1,000 on one line) ran to success with wrong numbers. The suite scored 9/32 with 8 SILENT-WRONG before the fix, 32/32 after (38/38 with the six WARN-path variants added later). | Fault injection | [`BEFORE_FIX.md`](robustness/BEFORE_FIX.md), [`ROBUSTNESS_REPORT.md`](robustness/ROBUSTNESS_REPORT.md) |
 | 2 | Shifting every month forward by one survived the first mutation run (9 of 10 caught): every test checked relative values only. Golden case G14 was added to pin values to their months. | Mutation test | [`evals_caught.md`](evals_caught.md) |
 | 3 | The grader failed the engine's own commentary (0/3 movements, no cash) and the saved skill text, which still said runway "cannot be calculated" while the engine computed it. The grader was left alone; the text was fixed. | Commentary grader | [`FINAL_RUN.md`](FINAL_RUN.md), [`evals_caught.md`](evals_caught.md) |
 | 4 | MoM % had the wrong sign when the prior value was negative, so a shrinking loss printed as a negative change (`+8,343.52 (-2.5%)`). Fixed by dividing by `abs(prior)`; null when the prior is 0. | Source-cell reconciliation, G12 | [`evals_caught.md`](evals_caught.md) |

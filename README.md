@@ -38,7 +38,7 @@ Everything except the live QuickBooks connection runs offline on the supplied wo
 | **Connection** | Intuit's official QuickBooks Online MCP server over stdio, with write, update and delete tools disabled at registration |
 | **Skill** | `monthly-financial-analysis`: revenue, margins, opex by category, MoM, TTM, cash and runway, flagged movements, numbered commentary |
 | **Review** | A read-only `finance-reviewer` subagent plus a deterministic commentary grader, then a human sign-off that locks the period |
-| **Evals** | Unit tests, 33 golden cases, a commentary grader, 19 mutation tests, a 32-fault robustness suite, UI number checks |
+| **Evals** | Unit tests, 33 golden cases, a commentary grader, 19 mutation tests, a 38-fault robustness suite, UI number checks |
 | **Multi-client** | Each client is a `config.yaml`; a synthetic second client (`xyz`) runs with no code changes |
 | **Safety** | Read-only workbook (hash-checked), hooks that block secret files, a secret scan before packaging, per-client sandboxing |
 
@@ -68,11 +68,11 @@ From the clean-state runs on **2026-10-14**. Full records: [`03_evals/FINAL_RUN.
 
 | Check | Command | Result |
 |---|---|---|
-| Unit tests (incl. UI number checks and robustness regressions) | `python -m unittest discover -s tests` | **184 / 184 pass** |
+| Unit tests (incl. UI number checks and robustness regressions) | `python -m unittest discover -s tests` | **185 / 185 pass** |
 | Golden cases | `python 03_evals/run_golden_evals.py` | **33 / 33 pass** |
 | Mutation test | `python 03_evals/mutation_test.py` | **19 / 19 mutants caught**, 0 survived |
 | Commentary grader | `python 03_evals/grade_commentary.py` | **PASS** on engine text, reviewed text and saved skill output; **FAIL** on the deliberately flawed control, as intended |
-| Fault injection (broken workbooks) | `python 03_evals/robustness/fault_injection.py` | **32 / 32 faults handled correctly** on both entry points |
+| Fault injection (broken workbooks) | `python 03_evals/robustness/fault_injection.py` | **38 / 38 faults handled correctly** on both entry points |
 | Client runs | `python src/run_client.py abc` / `xyz` | Both succeed; `xyz` reports 1 expected warning |
 | Live QuickBooks (read-only) | `python 01_connection/qbo_test_connection.py abc --test` | **Pass**: CompanyInfo, monthly P&L Jan–Jun 2026, Balance Sheet at 30 Jun 2026; no write tool registered |
 | Secret scan (tracked files) | `python scripts/scan_secrets.py <paths>` | **0 findings** |
@@ -130,7 +130,7 @@ Then open **[`02_skill/sample_outputs/`](02_skill/sample_outputs/)** to see what
 
 ```powershell
 python 03_evals/mutation_test.py                  # ~6 min. Expect: 19/19 mutants caught
-python 03_evals/robustness/fault_injection.py     # ~2 min. Expect: 32/32 faults handled
+python 03_evals/robustness/fault_injection.py     # ~2 min. Expect: 38/38 faults handled
 python src/run_client.py xyz                      # a second, different company from config only
 streamlit run 05_review_workspace/app/Home.py     # optional UI; reads outputs/ only
 ```
@@ -349,7 +349,7 @@ Highlights: the **Dec 2025 one-off** (net income +534,551.41, driven by a −1,2
 
 ### 9.4 Robustness: does bad data ever produce a silent wrong answer?
 
-32 faults across four families. Each has its **required behaviour defined before it runs**: STOP (refuse with a message naming the cell or sheet), WARN (continue with a data-quality warning), or HANDLE (normalise correctly).
+38 faults across four families (32 corrupted workbooks, plus 6 WARN-path variants F02b, F13b, F16b, F17b, F21b, F27b: the same faults with the Balance Sheet restated so the tie-out passes, which must reach WARN end to end). Each has its **required behaviour defined before it runs**: STOP (refuse with a message naming the cell or sheet), WARN (continue with a data-quality warning), or HANDLE (normalise correctly).
 
 | Family | Examples |
 |---|---|
@@ -358,7 +358,7 @@ Highlights: the **Dec 2025 one-off** (net income +534,551.41, driven by a −1,2
 | Labels | Renamed account, new unmapped account, look-alike unicode, missing subtotal row, a subtotal that doesn't foot |
 | Coverage | Only 11 months (TTM unavailable), formulas with no cached values, a corrupt or non-xlsx file, a locked file |
 
-**Result: 32 / 32 on both entry points** (the pipeline and the skill's prepare step). Full report: [`03_evals/robustness/ROBUSTNESS_REPORT.md`](03_evals/robustness/ROBUSTNESS_REPORT.md).
+**Result: 38 / 38 on both entry points** (the pipeline and the skill's prepare step). Full report: [`03_evals/robustness/ROBUSTNESS_REPORT.md`](03_evals/robustness/ROBUSTNESS_REPORT.md).
 
 ### 9.5 How a regression is detected
 

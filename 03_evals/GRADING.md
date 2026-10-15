@@ -7,7 +7,7 @@ There are four graders. Each is pass/fail and must be green before a change is c
 | Golden cases | `python 03_evals\run_golden_evals.py` | Numbers and flags produced by the engine (`src/`) |
 | Commentary | `python 03_evals\grade_commentary.py [--commentary FILE \| --run-skill]` | Every number in written commentary, coverage of the top movements, and the cash risk |
 | Mutation | `python 03_evals\mutation_test.py` | That the two graders above actually catch known bug classes |
-| Robustness | `python 03_evals\robustness\fault_injection.py` | 32 corrupted copies of the workbook: each must STOP, WARN or be HANDLED as declared, on both entry points (`run_pipeline.py` and the `/monthly-analysis` prepare step); never a successful run with wrong numbers and no warning |
+| Robustness | `python 03_evals\robustness\fault_injection.py` | 38 corrupted copies of the workbook: each must STOP, WARN or be HANDLED as declared, on both entry points (`run_pipeline.py` and the `/monthly-analysis` prepare step); never a successful run with wrong numbers and no warning |
 
 Unit tests (`python -m unittest discover -s tests`) guard individual bugs; see `03_evals/evals_caught.md`.
 
@@ -105,7 +105,7 @@ The report goes to `outputs/mutation_report.md`.
 
 ## 5. Robustness (fault injection)
 
-`03_evals/robustness/fault_injection.py` writes a corrupted COPY of the workbook into a temp folder for each of 32 faults: structure, values, labels and coverage. It never touches `data/` or `outputs/<client>/`, and it checks the source SHA-256 before and after. It then runs both entry points that produce numbers on that copy: `scripts/run_pipeline.py --clients-root/--outputs-root` and `monthly_review.prepare`. The required behaviour is declared per fault before it runs:
+`03_evals/robustness/fault_injection.py` writes a corrupted COPY of the workbook into a temp folder for each of 38 faults (32 plus 6 WARN-path variants whose Balance Sheet is restated to tie out; the originals stay as STOP cases): structure, values, labels and coverage. It never touches `data/` or `outputs/<client>/`, and it checks the source SHA-256 before and after. It then runs both entry points that produce numbers on that copy: `scripts/run_pipeline.py --clients-root/--outputs-root` and `monthly_review.prepare`. The required behaviour is declared per fault before it runs:
 
 - **STOP:** intake refuses with a message naming the cell, sheet or cause, and no review packet is written.
 - **WARN:** the run continues, and the warning appears in the review packet (Open Questions in the sign-off pack) and in the analysis workbook's Data Quality sheet.
@@ -152,4 +152,4 @@ Any of the following is a regression and blocks the change:
 
 Live consistency: three headless `claude -p` runs of `/monthly-analysis abc 2026-06` all pass this grader with different wording and the same graded facts; see [`live_consistency_2026-10-15.md`](live_consistency_2026-10-15.md).
 
-The latest full run, with commands, counts and the failures along the way, is in `03_evals/FINAL_RUN.md` (unit tests 184/184, golden 33/33, mutation 19/19, robustness 32/32 as of 2026-10-15).
+The latest full run, with commands, counts and the failures along the way, is in `03_evals/FINAL_RUN.md` (unit tests 185/185, golden 33/33, mutation 19/19, robustness 38/38 as of 2026-10-15).

@@ -6,7 +6,7 @@
 Workbook → intake gate (stops, names the cell) → Python engine → review packet JSON → Claude drafts from the packet only → number grader + `finance-reviewer` agent → Excel pack → human approval locks the month.
 
 ## Files
-`clients/<id>/` config and workbook · `src/` engine · `scripts/` pipeline, approve, `regress.py` · `.claude/` skills, hooks · `03_evals/` 33 golden cases, 19 mutants, 32 faults · `outputs/<id>/` generated files · `01_connection/` QuickBooks MCP.
+`clients/<id>/` config and workbook · `src/` engine · `scripts/` pipeline, approve, `regress.py` · `.claude/` skills, hooks · `03_evals/` 33 golden cases, 19 mutants, 38 faults · `outputs/<id>/` generated files · `01_connection/` QuickBooks MCP.
 
 ## Skills
 9 skills, 2 commands, 1 read-only reviewer agent. New skills follow [`authoring_kit/`](../02_skill/authoring_kit/CHECKLIST.md) and stay Draft until golden, trigger and grader cases exist.

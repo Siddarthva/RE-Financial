@@ -17,6 +17,20 @@ python src/run_client.py xyz
 python scripts/scan_secrets.py . outputs
 ```
 
+## Result: v3.0 WARN-path coverage, 2026-10-15
+
+Full `python scripts/regress.py` (not `--fast`), 14/14 checks held, run on the working tree before the commit that contains these changes. Source workbook SHA-256 `75da8d679a89...` unchanged.
+
+| Check | Result | Counts |
+|---|---|---|
+| Unit tests | **PASS** | 185 run, 185 OK (one new: `test_owner_memo_survives_missing_gross_margin`) |
+| Golden cases | **PASS** | 33/33 |
+| Mutation test | **PASS** | 19/19 caught, 0 survived (1043 s) |
+| Robustness (fault injection) | **PASS** | 38/38 (32 originals + 6 WARN-path variants F02b, F13b, F16b, F17b, F21b, F27b); 6 originals still STOP (stricter than declared, 0 looser); 0 SILENT-WRONG (341 s) |
+| Secret scan (git-tracked files) | **PASS** | 0 findings, 243 tracked files |
+
+Along the way: the first variant run was 5/6. F17b (zero revenue) failed because the reviewer Excel and owner memo crashed on a missing gross margin; fixed in `src/owner_memo.py` and `src/monthly_review.py`, expectation unchanged. See `03_evals/evals_caught.md`.
+
 ## Result: v2.1 verification pass, 2026-10-15
 
 Run before the commit that contains these changes (working tree, not a clean checkout). Unit, golden, commentary, links and secret scan from `python scripts/regress.py` (fast layers re-run after the last code change); mutation and fault injection from their own scripts after the last change to each. A full `regress.py` run earlier the same day reported mutation 18/19: one new mutant ("flux ignores the percentage threshold") survived because no test covered the percent threshold, and the harness could not read failures of tests that have a docstring. Both are fixed (new test `test_flux_needs_both_the_dollar_and_the_percent_threshold`; `mutation_test.py` reads the FAIL/ERROR summary lines and copies `.claude/` so hook tests run in the mutant copy).

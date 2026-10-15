@@ -57,7 +57,7 @@ flowchart LR
 ## Tested in
 - `tests/test_workflow_failures.py`: `Pipeline.*` covers traversal, bad month, unknown client and the sandbox id check.
 - `tests/test_robustness.py`: the intake gate.
-- `03_evals/robustness/fault_injection.py`: 32 faults.
+- `03_evals/robustness/fault_injection.py`: 38 faults.
 - `tests/test_client_isolation.py`.
 - `tests/test_ui_numbers.py`, which reads pipeline outputs.
 - Golden G19–G22.

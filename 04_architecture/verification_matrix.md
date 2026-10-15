@@ -8,10 +8,10 @@ Run on the committed tree, in this order, one suite at a time.
 
 | Command | Exit | Result |
 |---|---|---|
-| `python -m unittest discover -s tests` | 0 | **184 run, OK** |
+| `python -m unittest discover -s tests` | 0 | **185 run, OK** |
 | `python 03_evals/run_golden_evals.py` | 0 | **33/33** |
 | `python 03_evals/mutation_test.py` | 0 | **19/19 mutants caught**, 0 survived |
-| `python 03_evals/robustness/fault_injection.py` | 0 | **32/32 faults behaved as required**; source workbook hash unchanged |
+| `python 03_evals/robustness/fault_injection.py` | 0 | **38/38 faults behaved as required**; source workbook hash unchanged |
 | `git ls-files -z \| xargs -0 python scripts/scan_secrets.py` | 0 | 175 text files scanned, 0 findings |
 | `python scripts/check_links.py` | 0 | 0 broken links (count in the final run record) |
 
@@ -30,7 +30,7 @@ Not re-run in this pass: the grader on the three commentary texts, the pipeline 
 | 2.2 | MoM and TTM | `src/financial_analysis.py`; golden TTM cases | 33/33 | Done |
 | 2.3 | Commentary flagging movements | `grade_commentary.py` on engine, reviewed and skill text | 3 PASS; flawed control FAIL | Done |
 | 2.4 | For a human reviewer to finish | `src/monthly_review.py build …` → `monthly_review_2026-06.xlsx` | Rebuilt, APPROVED; same cell values as `02_skill/sample_outputs/` | Done |
-| 2.5 | Maintainable, extensible | `02_skill/README.md`, `tests/` | 184 tests OK | Done |
+| 2.5 | Maintainable, extensible | `02_skill/README.md`, `tests/` | 185 tests OK | Done |
 | 2.6 | Another company without a rewrite | `run_client.py xyz`, `run_pipeline.py xyz 2026-05`, `tests/test_client_isolation.py` | Both exit 0 | Partial (wide-sheet layout only) |
 | 2.S | Stretch: load workbook into sandbox, run end to end | `load_workbook_to_sandbox.py --dry-run`; `--compare` vs today's live P&L | Dry run OK. Live P&L has **no** `Workbook Load` accounts (income 0.00 Jan–Apr 2026); `--compare` exits 1 | Not done |
 | 3.1 | ≥5 golden cases | `run_golden_evals.py` | 33/33 | Done |

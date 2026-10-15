@@ -1,7 +1,7 @@
 """Regression tests for the defects found by 03_evals/robustness/fault_injection.py (Phase 2, 2026-10-14).
 
 Each test builds a perturbed values-only COPY of the ABC workbook in a temp folder; the source is only read.
-The full fault suite (32 faults, both entry points) is `python 03_evals/robustness/fault_injection.py`.
+The full fault suite (38 faults incl. the six F..b variants, both entry points) is `python 03_evals/robustness/fault_injection.py`.
 """
 import io
 import shutil
@@ -173,6 +173,20 @@ class GapsAndWarnings(unittest.TestCase):
         text = " ".join(run_client.cell_warnings(am))
         self.assertIn("Possible outlier: Usage Fees in Jun 2026", text)
         self.assertIn("non-ASCII", text)
+
+
+class ZeroRevenueReviewerPack(unittest.TestCase):
+    """F17b: zero revenue makes gross margin None; the owner memo and the reviewer Excel cover used to crash on it."""
+
+    def test_owner_memo_survives_missing_gross_margin(self):
+        import copy
+        import json
+        import owner_memo
+        packet = json.loads((ROOT / "outputs" / "abc" / "review_packet_2026-06.json").read_text(encoding="utf-8"))
+        packet = copy.deepcopy(packet)
+        packet["months"][packet["latest_month"]]["gross_profit"]["margin"] = None
+        text = owner_memo.render(packet, [])
+        self.assertIn("gross margin cannot be calculated", text)
 
 
 if __name__ == "__main__":

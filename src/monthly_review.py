@@ -350,7 +350,7 @@ def build(client, month_text, commentary_path, review_path, clients_root=run_cli
             ("Revenue", _usd(cur["revenue"]["value"])),
             ("Revenue vs same month last year", f"{yoy['revenue']['yoy_pct']:+.1%} vs {yoy['prior_year_month']}"
              if yoy.get("available") and yoy["revenue"]["yoy_pct"] is not None else "not available"),
-            ("Gross margin", f"{cur['gross_profit']['margin']:.1%}"),
+            ("Gross margin", f"{cur['gross_profit']['margin']:.1%}" if cur["gross_profit"]["margin"] is not None else "not available"),
             ("Net income", _usd(cur["net_income"]["value"])),
             ("Net income excluding one-offs", _usd(adj["adjusted_net_income"]) if adj else "not available"),
             ("Cash", _usd(cash["value"]) if cash else "not available"),

@@ -6,9 +6,11 @@ Source workbook SHA-256 before `75da8d679a89551f…`, after `75da8d679a89551f…
 
 Required behaviour, fixed before running: **STOP** = intake refuses with a message naming the cell, sheet or cause, and no review packet is written; **WARN** = run continues and the warning is in the review packet (Open Questions in the sign-off pack) and in the analysis workbook's Data Quality sheet; **HANDLE** = run continues, no new warning, every review-packet number and every account amount in the analysis workbook (`Account Values` sheet) equals the baseline. **SILENT-WRONG** (success, different numbers, no warning) must never occur.
 
-**Result: 32/32 pass; SILENT-WRONG: 0.**
+**Result: 38/38 pass; SILENT-WRONG: 0.**
 
 **Stricter than declared:** a fault declared WARN that the Balance Sheet tie-out refuses (STOP) before the warning could happen. Passes because nothing wrong is accepted; the declarations were not edited. Before the tie-out existed (commit c8421e4) these ran as WARN. Rule: an expectation only moves toward stricter (HANDLE, WARN, STOP), never looser; no row moved looser. Rows moved to STOP: F02, F13, F16, F17, F21, F27. Per-fault reasons: `03_evals/evals_caught.md`.
+
+**WARN-path variants (F02b, F13b, F16b, F17b, F21b, F27b):** the same six faults with the Balance Sheet restated so the tie-out passes (Current Year Earnings reset to the mutated year-to-date net income, Retained Earnings takes the opposite change, so the sheet still balances and cash is unchanged). Required, declared in code before running: WARN end to end, i.e. the warning is in `summary.json`, the review packet, the analysis workbook's Data Quality sheet and the reviewer Excel's Open Questions (built by `monthly_review.build` over that run's packet), and every detail-account amount other than the accounts the fault itself changes equals the baseline, as does the packet's cash. The originals stay as STOP cases, so both the refusal and the warning path are covered.
 
 | ID | Family | Fault | Required | Pipeline | Skill path | Pass | Message shown (pipeline) |
 |---|---|---|---|---|---|---|---|
@@ -44,3 +46,9 @@ Required behaviour, fixed before running: **STOP** = intake refuses with a messa
 | F30 | Coverage | Truncated .xlsx (zip header, cut off) | STOP | STOP | STOP | ✅ | ValueError: Intake refused the workbook: Cannot open book.xlsx as an .xlsx workbook (BadZipFile). Re-export it from the source system. |
 | F31 | Coverage | File open and locked by another program | STOP | STOP | STOP | ✅ | ValueError: Intake refused the workbook: Workbook is open or locked by another program: <temp>\clients\abc\book.xlsx. Close it (for example in Excel) and re-run. |
 | F32 | Values | Float inf written into a numeric cell (Bonus, Jun 2026; lands as an empty cell) | STOP | STOP | STOP | ✅ | ValueError: Intake checks failed (details in intake_2026-06.json): Total Operating Expenses foots to its lines (every month) at Income Statement!C103 (2026-06: lines - total = -10,889.00) |
+| F02b | Structure | Missing month column: Sep 2025 deleted mid-history [Balance Sheet restated to tie out] | WARN | WARN | WARN | ✅ | Months missing from the source: Sep 2025. TTM is withheld for windows with gaps, and no month-over-month change is reported across a gap. |
+| F13b | Values | Empty cell inside a series (Bonus, Feb 2026; totals treat it as zero) [Balance Sheet restated to tie out] | WARN | WARN | WARN | ✅ | 1 blank cell(s) inside rows that have values, treated as missing (not zero): Income Statement!G33 (Bonus, Feb 2026) |
+| F16b | Values | Extreme outlier x1000 (Usage Fees, Jun 2026, totals consistent) [Balance Sheet restated to tie out] | WARN | WARN | WARN | ✅ | Possible outlier: Usage Fees in Jun 2026 is 166,781,500.00, over 100x its median month (140,396.16). Check Income Statement!C11. |
+| F17b | Values | Zero total revenue in Jun 2026 (division by zero) [Balance Sheet restated to tie out] | WARN | WARN | WARN | ✅ | Revenue is zero in Jun 2026; margins for that month are reported as not available. |
+| F21b | Labels | New unmapped account (Crypto Mining Costs, totals consistent) [Balance Sheet restated to tie out] | WARN | WARN | WARN | ✅ | Unmapped OPEX account (reported under 'Unmapped'): Crypto Mining Costs |
+| F27b | Coverage | Only 11 months (Aug 2025 - Jun 2026) [Balance Sheet restated to tie out] | WARN | WARN | WARN | ✅ | TTM not available: 11 months supplied, 12 consecutive required. |

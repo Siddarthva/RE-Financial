@@ -41,7 +41,7 @@ CHECKS = [
     ("trigger", "trigger cases (structure)", PY + ["03_evals/run_trigger_evals.py"], "pass", r"(\d+ entries, \d+ problems)", False),
     ("guards", "internal links", PY + ["scripts/check_links.py"], "pass", r"(\d+ files, \d+ links, \d+ broken)", False),
     ("mutation", "mutation test (19 injected bugs)", PY + ["03_evals/mutation_test.py"], "pass", r"(\d+/\d+) mutants caught", True),
-    ("faults", "fault injection (32 corrupted workbooks)", PY + ["03_evals/robustness/fault_injection.py"], "pass", r"(\d+/\d+) faults behaved", True),
+    ("faults", "fault injection (38 corrupted workbooks)", PY + ["03_evals/robustness/fault_injection.py"], "pass", r"(\d+/\d+) faults behaved", True),
 ]
 
 

@@ -1,19 +1,16 @@
 {
-  "started": "2026-10-15T00:04:18+00:00",
-  "git_head": "00a551c",
-  "mode": "fast",
+  "started": "2026-10-15T02:27:12+00:00",
+  "git_head": "84eeb8f",
+  "mode": "full",
   "all_held": true,
-  "skipped": [
-    "mutation test (19 injected bugs)",
-    "fault injection (32 corrupted workbooks)"
-  ],
+  "skipped": [],
   "results": [
     {
       "layer": "unit",
       "check": "unit tests",
       "ok": true,
-      "detail": "184",
-      "seconds": 58.4,
+      "detail": "185",
+      "seconds": 198.8,
       "tail": ""
     },
     {
@@ -21,7 +18,7 @@
       "check": "golden cases",
       "ok": true,
       "detail": "33/33",
-      "seconds": 4.8,
+      "seconds": 15.4,
       "tail": ""
     },
     {
@@ -29,7 +26,7 @@
       "check": "engine commentary",
       "ok": true,
       "detail": "PASS",
-      "seconds": 1.5,
+      "seconds": 3.6,
       "tail": ""
     },
     {
@@ -37,7 +34,7 @@
       "check": "reviewed commentary (abc 2026-06)",
       "ok": true,
       "detail": "PASS",
-      "seconds": 1.5,
+      "seconds": 3.8,
       "tail": ""
     },
     {
@@ -45,7 +42,7 @@
       "check": "saved skill output",
       "ok": true,
       "detail": "PASS",
-      "seconds": 1.5,
+      "seconds": 3.7,
       "tail": ""
     },
     {
@@ -53,7 +50,7 @@
       "check": "FLAWED CONTROL must fail",
       "ok": true,
       "detail": "FAIL (failed, as it must)",
-      "seconds": 1.4,
+      "seconds": 3.1,
       "tail": ""
     },
     {
@@ -61,7 +58,7 @@
       "check": "flux-explanations grader",
       "ok": true,
       "detail": "PASS",
-      "seconds": 0.1,
+      "seconds": 0.2,
       "tail": ""
     },
     {
@@ -69,7 +66,7 @@
       "check": "client-questions grader",
       "ok": true,
       "detail": "PASS",
-      "seconds": 0.1,
+      "seconds": 0.2,
       "tail": ""
     },
     {
@@ -77,23 +74,39 @@
       "check": "trigger cases (structure)",
       "ok": true,
       "detail": "11 entries, 0 problems",
-      "seconds": 0.1,
+      "seconds": 0.2,
       "tail": ""
     },
     {
       "layer": "guards",
       "check": "internal links",
       "ok": true,
-      "detail": "66 files, 165 links, 0 broken",
-      "seconds": 0.2,
+      "detail": "80 files, 172 links, 0 broken",
+      "seconds": 0.7,
+      "tail": ""
+    },
+    {
+      "layer": "mutation",
+      "check": "mutation test (19 injected bugs)",
+      "ok": true,
+      "detail": "19/19",
+      "seconds": 1042.8,
+      "tail": ""
+    },
+    {
+      "layer": "faults",
+      "check": "fault injection (38 corrupted workbooks)",
+      "ok": true,
+      "detail": "38/38",
+      "seconds": 341.2,
       "tail": ""
     },
     {
       "layer": "guards",
       "check": "secret scan",
       "ok": true,
-      "detail": "199 tracked files, 0 findings",
-      "seconds": 0.5,
+      "detail": "243 tracked files, 0 findings",
+      "seconds": 1.0,
       "tail": ""
     },
     {

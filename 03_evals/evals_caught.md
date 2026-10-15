@@ -146,4 +146,18 @@ The Balance Sheet tie-out (Current Year Earnings = year-to-date net income) was 
 | F21 New account Crypto Mining Costs | WARN | STOP | Same: added cost changes net income, Balance Sheet did not |
 | F27 Only 11 months supplied | WARN | STOP | Year-to-date net income no longer reconciles |
 
-Cost, stated plainly: for these six the declared warning text (outlier, zero revenue, unmapped account, TTM withheld, gap) is no longer reached by the whole-run test, because the refusal comes first. Those warnings stay covered by the unit and golden tests, not by this suite.
+Cost, stated plainly: for these six the declared warning text (outlier, zero revenue, unmapped account, TTM withheld, gap) is no longer reached by the whole-run test, because the refusal comes first. That gap is closed by the F..b variants in the section below. Those warnings stay covered by the unit and golden tests, not by this suite.
+
+## WARN-path coverage gap closed: six variants (2026-10-15, v3.0)
+The six WARN declarations above only ever ran as STOP, so no run reached their warning path. Each now has a variant (F02b, F13b, F16b, F17b, F21b, F27b) that applies the same fault and restates the Balance Sheet (Current Year Earnings reset to the mutated year-to-date net income, Retained Earnings takes the opposite change; Total Equity, Total Liabilities and Equity and cash are untouched), so the tie-out passes. The originals are unchanged and still run as STOP (stricter than declared). Required behaviour, declared in `fault_injection.py` before the run: WARN on both entry points, with the expected text in `summary.json`, the review packet, the Data Quality sheet and the reviewer Excel's Open Questions (built by `monthly_review.build`), every detail-account amount other than the accounts the fault changes equal to the baseline, and cash equal to the baseline.
+
+| Variant | Warning required | Result |
+|---|---|---|
+| F02b Sep 2025 column deleted | `Months missing from the source: Sep 2025` | WARN, pass |
+| F13b Blank Bonus cell, Feb 2026 | `blank cell(s)` | WARN, pass |
+| F16b Usage Fees x1000, Jun 2026 | `Possible outlier: Usage Fees` | WARN, pass |
+| F17b Zero revenue, Jun 2026 | `Revenue is zero in Jun 2026` | WARN, pass after the fix below (first run: **FAIL**) |
+| F21b New account Crypto Mining Costs | `Unmapped OPEX account ...: Crypto Mining Costs` | WARN, pass |
+| F27b Only 11 months supplied | `TTM not available` | WARN, pass |
+
+**Defect found by F17b:** with zero revenue the gross margin is None, and the reviewer pack crashed (`TypeError`) in two places, `owner_memo.render` ("you kept {gm:.1%} of revenue") and the Cover sheet in `monthly_review.build`. The run itself and its warning were fine, so the earlier STOP/WARN checks could not see it; only building the reviewer Excel did. Both now say the margin is not available. Regression guard: `test_owner_memo_survives_missing_gross_margin`. The expectation was not changed; the code was.

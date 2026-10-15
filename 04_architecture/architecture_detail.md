@@ -67,6 +67,6 @@ QuickBooks MCP runs with write, update and delete disabled (71 tools, none a wri
 | 2 | Model-layer isolation | Highest consequence: a leak across clients. The engine is separated; the model's tools are not | Container and one Claude session per client; deny rules for other clients' paths | Proposed |
 | 3 | Reviewer capacity | Ten packs and one sign-off each in a few days | Severity ranking; batch triage; measure minutes per pack | Partly Implemented |
 | 4 | Account mapping | Needs judgement per client; code cannot detect a wrong but valid category | Reviewer approval; diff mappings month to month | Manual |
-| 5 | Layout assumption | One wide sheet with a column per month. Other shapes are refused at intake, not guessed | New adapter per layout; the intake gate and 32 faults stop silent mislabelling | Refusal Implemented; adapters Not done |
+| 5 | Layout assumption | One wide sheet with a column per month. Other shapes are refused at intake, not guessed | New adapter per layout; the intake gate and 38 faults stop silent mislabelling | Refusal Implemented; adapters Not done |
 | 6 | Reviewer variance | LLM verdicts vary run to run (`03_evals/live_consistency_2026-10-15.md`: same facts, different wording, 3 of 3 runs passed) | Grader floor on numbers; human signs | Implemented |
 | 7 | One machine | No backup, concurrency control or off-box audit trail | Shared host, versioned outputs | Proposed |
