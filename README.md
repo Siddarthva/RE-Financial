@@ -38,7 +38,7 @@ Everything except the live QuickBooks connection runs offline on the supplied wo
 | **Connection** | Intuit's official QuickBooks Online MCP server over stdio, with write, update and delete tools disabled at registration |
 | **Skill** | `monthly-financial-analysis`: revenue, margins, opex by category, MoM, TTM, cash and runway, flagged movements, numbered commentary |
 | **Review** | A read-only `finance-reviewer` subagent plus a deterministic commentary grader, then a human sign-off that locks the period |
-| **Evals** | Unit tests, 22 golden cases, a commentary grader, 13 mutation tests, a 32-fault robustness suite, UI number checks |
+| **Evals** | Unit tests, 33 golden cases, a commentary grader, 19 mutation tests, a 32-fault robustness suite, UI number checks |
 | **Multi-client** | Each client is a `config.yaml`; a synthetic second client (`xyz`) runs with no code changes |
 | **Safety** | Read-only workbook (hash-checked), hooks that block secret files, a secret scan before packaging, per-client sandboxing |
 
@@ -68,9 +68,9 @@ From the clean-state runs on **2026-10-14**. Full records: [`03_evals/FINAL_RUN.
 
 | Check | Command | Result |
 |---|---|---|
-| Unit tests (incl. UI number checks and robustness regressions) | `python -m unittest discover -s tests` | **129 / 129 pass** |
-| Golden cases | `python 03_evals/run_golden_evals.py` | **22 / 22 pass** |
-| Mutation test | `python 03_evals/mutation_test.py` | **13 / 13 mutants caught**, 0 survived |
+| Unit tests (incl. UI number checks and robustness regressions) | `python -m unittest discover -s tests` | **184 / 184 pass** |
+| Golden cases | `python 03_evals/run_golden_evals.py` | **33 / 33 pass** |
+| Mutation test | `python 03_evals/mutation_test.py` | **19 / 19 mutants caught**, 0 survived |
 | Commentary grader | `python 03_evals/grade_commentary.py` | **PASS** on engine text, reviewed text and saved skill output; **FAIL** on the deliberately flawed control, as intended |
 | Fault injection (broken workbooks) | `python 03_evals/robustness/fault_injection.py` | **32 / 32 faults handled correctly** on both entry points |
 | Client runs | `python src/run_client.py abc` / `xyz` | Both succeed; `xyz` reports 1 expected warning |
@@ -114,7 +114,7 @@ pip install -r requirements.txt
 # 2. Run the unit tests (~1 min). Expect: OK
 python -m unittest discover -s tests
 
-# 3. Run the golden cases. Expect: Score: 22/22
+# 3. Run the golden cases. Expect: Score: 33/33
 python 03_evals/run_golden_evals.py
 
 # 4. Run the close pipeline for ABC, June 2026 (intake gate + calculate + flux)
@@ -129,7 +129,7 @@ Then open **[`02_skill/sample_outputs/`](02_skill/sample_outputs/)** to see what
 **Optional, slower checks:**
 
 ```powershell
-python 03_evals/mutation_test.py                  # ~6 min. Expect: 13/13 mutants caught
+python 03_evals/mutation_test.py                  # ~6 min. Expect: 19/19 mutants caught
 python 03_evals/robustness/fault_injection.py     # ~2 min. Expect: 32/32 faults handled
 python src/run_client.py xyz                      # a second, different company from config only
 streamlit run 05_review_workspace/app/Home.py     # optional UI; reads outputs/ only
@@ -515,7 +515,7 @@ The full log, with fixes and regression tests: [`03_evals/evals_caught.md`](03_e
 | "Workbook is locked" | It's open in Excel | Close it and re-run |
 | "… is approved and locked; not re-running" | The period was signed off | Intended. Approvals are final; reject before approving to allow a re-run |
 | The Streamlit pages are empty | Outputs haven't been generated yet | Run the pipeline and `grade_commentary.py` first |
-| The mutation test seems slow | It re-runs the suite for each of 13 mutants | Expect about 6 minutes |
+| The mutation test seems slow | It re-runs the suite for each of 19 mutants | Expect about 15 minutes |
 
 ---
 

@@ -110,6 +110,49 @@ class Approval(Base):  # workflow (c)
         code, out = self.run_approve("abc", "2026-06", "--reviewer", "R", "--reason", "x", "--reject")
         self.assertClean(code, out, 3, "approved and locked")
 
+    def approval_folder(self, statuses, verdict="approve"):
+        import openpyxl
+        d = self.tmp / "abc"
+        d.mkdir()
+        (d / "review_packet_2026-06.json").write_text("{}", encoding="utf-8")
+        (d / "review_2026-06.json").write_text(json.dumps({"verdict": verdict}), encoding="utf-8")
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Open Questions"
+        ws.append(["#", "Source", "Question", "Why it matters", "Owner", "Answer", "Status"])
+        for i, st in enumerate(statuses, 1):
+            ws.append([i, "Reviewer", f"Question {i}?", "", "", "", st])
+        wb.save(d / "monthly_review_2026-06.xlsx")
+        return d
+
+    def test_blank_question_status_blocks_approval(self):
+        d = self.approval_folder(["Answered", None, "Open"])
+        code, out = self.run_approve("abc", "2026-06", "--reviewer", "R", "--reason", "x")
+        self.assertClean(code, out, 6, "1 open question(s) have a blank status (question #2)")
+        self.assertFalse((d / "approval_2026-06.json").exists())
+        self.assertFalse((d / "audit_log.jsonl").exists())
+
+    def test_whitespace_status_counts_as_blank(self):
+        self.approval_folder(["   "])
+        code, out = self.run_approve("abc", "2026-06", "--reviewer", "R", "--reason", "x")
+        self.assertClean(code, out, 6, "blank status")
+
+    def test_filled_statuses_allow_approval_and_rejection_ignores_the_check(self):
+        d = self.approval_folder(["Open", "Answered"])
+        code, out = self.run_approve("abc", "2026-06", "--reviewer", "R", "--reason", "x")
+        self.assertEqual((code, json.loads((d / "approval_2026-06.json").read_text(encoding="utf-8"))["status"]), (0, "approved"))
+
+    def test_rejection_does_not_need_statuses(self):
+        d = self.approval_folder([None])
+        code, out = self.run_approve("abc", "2026-06", "--reviewer", "R", "--reason", "x", "--reject")
+        self.assertEqual((code, json.loads((d / "approval_2026-06.json").read_text(encoding="utf-8"))["status"]), (0, "rejected"))
+
+    def test_approval_without_a_pack_is_refused(self):
+        d = self.approval_folder(["Open"])
+        (d / "monthly_review_2026-06.xlsx").unlink()
+        code, out = self.run_approve("abc", "2026-06", "--reviewer", "R", "--reason", "x")
+        self.assertClean(code, out, 6, "no sign-off pack")
+
 
 class Connection(Base):  # workflow (d)
     def test_invalid_client_and_missing_server(self):

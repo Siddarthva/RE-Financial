@@ -61,6 +61,9 @@ def load_config(client: str, clients_root: Path = CLIENTS_ROOT) -> dict:
     start = cfg["fiscal_year"].get("start_month")
     if not isinstance(start, int) or not 1 <= start <= 12:
         raise ValueError(f"{path}: fiscal_year.start_month must be an integer 1-12")
+    drop = (cfg.get("thresholds") or {}).get("gross_margin_drop_pp")
+    if drop is not None and (isinstance(drop, bool) or not isinstance(drop, (int, float)) or drop < 0):
+        raise ValueError(f"{path}: thresholds.gross_margin_drop_pp must be a non-negative number of percentage points")
     cfg["workbook_path"] = (path.parent / cfg["workbook"]).resolve()
     return cfg
 

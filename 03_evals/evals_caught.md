@@ -133,3 +133,17 @@ Thin coverage worth knowing (caught, but by a single eval): adapter gross-margin
 - **Cause:** `test_prepare_errors_are_one_line` ran `monthly_review.py prepare nope 2026-06` (and two `abc` failures) with no output root, so they used the real `outputs/`. `client_sandbox` creates `outputs/<client>/.tmp` before the unknown-client check and removed only `.tmp`, leaving `outputs/<client>/`. A mistyped client name by a real user would have left the same folder.
 - **Fix:** `monthly_review.py prepare/build` take `--outputs-root` (default unchanged); the test passes a temp root and asserts both that the real `outputs/` listing is unchanged and that the temp root is empty after the failures. `client_sandbox` removes the empty client folder on exit. `test_build_names_the_missing_or_broken_input` now recreates its own `out/abc` folder rather than relying on the leftover one.
 - **Check:** full unit suite run twice after deleting `outputs/nope/`: 129 OK both times, folder did not reappear. Golden 22/22.
+
+## Fault-injection judge: six expectations ended stricter, none looser (2026-10-15)
+The Balance Sheet tie-out (Current Year Earnings = year-to-date net income) was added after the fault declarations were fixed. Six faults declared WARN now hit that refusal first, so the run STOPs. `judge()` in `03_evals/robustness/fault_injection.py` accepts this only when the declared level is WARN, the run was refused (no packet, non-zero exit) and the message names the tie-out. The declarations themselves were not edited; the report marks these rows "stricter". Rule held: an expectation only moves WARN to STOP, never looser (HANDLE and STOP rows are judged exactly as before).
+
+| Fault | Declared | Now | Why the tie-out stops it |
+|---|---|---|---|
+| F02 Sep 2025 column deleted | WARN | STOP | Year-to-date net income no longer reconciles to Current Year Earnings once a month is missing |
+| F13 Blank Bonus cell, Feb 2026 | WARN | STOP | The blank changes net income; the Balance Sheet figure did not move |
+| F16 Usage Fees x1000, Jun 2026 | WARN | STOP | Income Statement net income changed; Balance Sheet Current Year Earnings did not |
+| F17 Zero revenue, Jun 2026 | WARN | STOP | Same: net income changed, Balance Sheet did not |
+| F21 New account Crypto Mining Costs | WARN | STOP | Same: added cost changes net income, Balance Sheet did not |
+| F27 Only 11 months supplied | WARN | STOP | Year-to-date net income no longer reconciles |
+
+Cost, stated plainly: for these six the declared warning text (outlier, zero revenue, unmapped account, TTM withheld, gap) is no longer reached by the whole-run test, because the refusal comes first. Those warnings stay covered by the unit and golden tests, not by this suite.

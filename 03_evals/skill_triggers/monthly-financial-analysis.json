@@ -1,0 +1,22 @@
+{
+  "name": "monthly-financial-analysis",
+  "kind": "skill",
+  "cases": [
+    {
+      "prompt": "Analyze the ABC Inc monthly financial statements workbook and give me revenue, margins and MoM changes.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Give me TTM revenue and opex category trends from the monthly workbook.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Write executive commentary on the latest month of the ABC workbook.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Tie out the balance sheet equation for the June trial balance.",
+      "should_trigger": false
+    }
+  ]
+}

@@ -98,6 +98,24 @@
       "passed": true,
       "cell_ref": "Income Statement",
       "detail": ""
+    },
+    {
+      "check": "Balance Sheet rows present",
+      "passed": true,
+      "cell_ref": "Balance Sheet",
+      "detail": "Total Assets, Total Liabilities and Equity, Current Year Earnings"
+    },
+    {
+      "check": "Balance Sheet balances (assets = liabilities + equity, every month)",
+      "passed": true,
+      "cell_ref": "Balance Sheet",
+      "detail": ""
+    },
+    {
+      "check": "Current Year Earnings = year-to-date net income (every month)",
+      "passed": true,
+      "cell_ref": "Balance Sheet",
+      "detail": ""
     }
   ],
   "status": "pass"

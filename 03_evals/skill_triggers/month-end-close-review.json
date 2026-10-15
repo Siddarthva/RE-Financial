@@ -1,0 +1,22 @@
+{
+  "name": "month-end-close-review",
+  "kind": "skill",
+  "cases": [
+    {
+      "prompt": "Review the month-end close: checklist status, reconciliations and exceptions.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Prepare the reviewer sign-off pack from the GL export and trial balance.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Where are we on the June close? Which reconciliations are open?",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Prepare the 10-Q traceability matrix.",
+      "should_trigger": false
+    }
+  ]
+}

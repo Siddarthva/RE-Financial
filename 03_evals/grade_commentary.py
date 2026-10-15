@@ -36,11 +36,13 @@ SKILL_PROMPT = (
 
 def build_computed():
     """Engine output as JSON for the ABC workbook's latest month (shared builder: src/monthly_review.py)."""
-    from monthly_review import build_computed as build  # imported here: monthly_review imports this module
+    import monthly_review as mr  # imported here: monthly_review imports this module
+    import run_client
     am = abc.parse_wide_income_statement(WORKBOOK)
     monthly = abc.build_monthly_summary(am).set_index("month")
     cash = abc.cash_position(abc.parse_wide_income_statement(WORKBOOK, abc.ABC_BS_LAYOUT))
-    return build(am, monthly, monthly.index[-1], cash)
+    packet = mr.build_computed(am, monthly, monthly.index[-1], cash, categories=mr.rollup_categories(am, run_client.load_config("abc")))
+    return mr.add_one_offs(packet, am)
 
 
 def fact_pools(computed):
@@ -51,15 +53,18 @@ def fact_pools(computed):
             for k, v in node.items():
                 walk(v, k)
         elif isinstance(node, (int, float)) and not isinstance(node, bool):
-            if key in {"mom_pct", "margin", "ttm_margin", "share_of_opex"}:
+            if key in {"mom_pct", "margin", "ttm_margin", "share_of_opex", "yoy_pct", "prior_margin"}:
                 percents.append(abs(node) * 100)
-            elif key == "margin_change_pp":
+            elif key in {"margin_change_pp", "yoy_change_pp"}:
                 points.append(abs(node))
             else:
                 amounts.append(abs(node))
     walk(computed["months"])
     walk(computed["line_items"])
     walk(computed.get("cash", {}))
+    walk(computed.get("yoy", {}))
+    walk(computed.get("adjusted_net_income", {}))
+    walk({o["account"]: o["amount"] for o in computed.get("one_offs", [])})
     return {"amount": amounts, "percent": percents, "pp": points}
 
 
@@ -78,6 +83,28 @@ def check_cash_risk(text, numbers, cash):
     runway_stated = "runway" in text.casefold() and any(abs(f - r) <= tol + 1e-9 for f, tol in figures for r in runways)
     return {"covered": cash_stated and runway_stated, "cash_stated": cash_stated, "runway_stated": runway_stated,
             "cash": cash["value"], "runway_months": cash["runway_months"]}
+
+
+# Commentary section order (see the monthly-financial-analysis skill, section 9). A heading counts when its text
+# contains the section's key words; "and" and "&" are interchangeable.
+SECTIONS = [("Headline", "headline"), ("Revenue", "revenue"), ("Margins", "margin"), ("Opex", "opex|operating expenses"),
+            ("Cash & runway", "cash"), ("One-offs", "one-off|one off"), ("Questions", "question")]
+
+
+def check_sections(text, sections=SECTIONS):
+    """Markdown headings (## ...) must include every section, in order. Returns found/missing/order for the report."""
+    heads = [h.strip().casefold().replace(" and ", " & ") for h in re.findall(r"^\s*#{1,6}\s+(.+?)\s*$", text, re.M)]
+    found, last, in_order = [], -1, True
+    for name, pattern in sections:
+        idx = next((i for i, h in enumerate(heads) if re.search(pattern, h)), None)
+        if idx is None:
+            continue
+        found.append(name)
+        in_order = in_order and idx > last
+        last = idx
+    missing = [n for n, _ in sections if n not in found]
+    return {"required": [n for n, _ in sections], "found": found, "missing": missing, "in_order": in_order,
+            "passed": not missing and in_order}
 
 
 MONTHS = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?"
@@ -117,7 +144,7 @@ def extract_numbers(text):
         yield m.group(0).strip(), value, kind, tol
 
 
-def grade(text, computed):
+def grade(text, computed, require_sections=False):
     pools = fact_pools(computed)
     numbers = []
     for token, value, kind, tol in extract_numbers(text):
@@ -129,10 +156,33 @@ def grade(text, computed):
         names = {item["account"].casefold(), item["account"].split(":")[-1].strip().casefold()}
         movements.append({**item, "mentioned": any(n in low for n in names)})
     cash_risk = check_cash_risk(text, numbers, computed.get("cash"))
+    sections = check_sections(text)
     passed = (all(n["matched"] for n in numbers) and all(m["mentioned"] for m in movements) and bool(numbers)
-              and cash_risk["covered"])
-    return {"passed": passed, "numbers_checked": len(numbers), "numbers_matched": sum(n["matched"] for n in numbers),
+              and cash_risk["covered"] and (sections["passed"] or not require_sections))
+    return {"passed": passed, "sections": sections, "numbers_checked": len(numbers), "numbers_matched": sum(n["matched"] for n in numbers),
             "numbers": numbers, "top_movements": movements, "cash_risk": cash_risk}
+
+
+# Owner memo: plain language, cash and runway first. Same number check as the commentary, no top-3 rule.
+MEMO_SECTIONS = [("Cash & runway", "cash"), ("How the month went", "month"), ("Questions for you", "question")]
+JARGON = re.compile(r"\b(MoM|YoY|TTM|EBITDA|COGS|opex|flux|pp|basis points?|YTD)\b", re.I)
+
+
+def grade_memo(text, computed):
+    """Memo passes when every number matches the packet, cash and runway are stated, the three sections appear in
+    order with cash first, and no accounting shorthand is used."""
+    pools = fact_pools(computed)
+    numbers = []
+    for token, value, kind, tol in extract_numbers(text):
+        match = next((f for f in pools[kind] if abs(f - value) <= tol), None)
+        numbers.append({"token": token, "kind": kind, "value": value, "matched": match is not None})
+    cash_risk = check_cash_risk(text, [{**n, "tol": 0.5} for n in numbers], computed.get("cash"))
+    sections = check_sections(text, MEMO_SECTIONS)
+    jargon = sorted({m.group(0) for m in JARGON.finditer(text)})
+    passed = (all(n["matched"] for n in numbers) and bool(numbers) and cash_risk["covered"] and sections["passed"] and not jargon)
+    return {"passed": passed, "numbers_checked": len(numbers), "numbers_matched": sum(n["matched"] for n in numbers),
+            "unmatched": [n["token"] for n in numbers if not n["matched"]], "cash_risk": cash_risk,
+            "sections": sections, "jargon": jargon}
 
 
 def run_skill():
@@ -182,6 +232,10 @@ def main():
     print(f"  {'OK  ' if cr['cash_stated'] else 'MISS'} cash balance stated ({cr.get('cash', 0):,.2f})")
     print(f"  {'OK  ' if cr['runway_stated'] else 'MISS'} runway stated (months: {cr.get('runway_months')})")
     print(f"Cash risk covered: {'yes' if cr['covered'] else 'no'}")
+    sec = report["sections"]
+    print(f"Sections present (order Headline, Revenue, Margins, Opex, Cash & runway, One-offs, Questions): "
+          f"{'yes' if sec['passed'] else 'no - missing ' + ', '.join(sec['missing']) + ('' if sec['in_order'] else ' / out of order')}"
+          " (informational for this report; required in the sign-off pack)")
     print(f"\nRESULT: {'PASS' if report['passed'] else 'FAIL'}")
     return 0 if report["passed"] else 1
 

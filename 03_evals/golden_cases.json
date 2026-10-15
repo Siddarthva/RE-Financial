@@ -774,5 +774,347 @@
       "purpose": "The workbook re-saved by openpyxl with formulas kept: every formula cell (144 on the Income Statement, counted 2026-10-14) loses its cached value. Robustness fault F28."
     },
     "grading": "The intake gate (close_artifacts.intake_gate, used by scripts/run_pipeline.py and monthly_review.prepare) refuses the copy and its message contains every expected string."
+  },
+  {
+    "id": "G23",
+    "name": "Tie-out (intake STOP): Balance Sheet no longer balances in Mar 2026",
+    "type": "intake_gate",
+    "source": "workbook+perturbation",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Balance Sheet",
+    "input": {
+      "month": "2026-06"
+    },
+    "expected": {
+      "refused": true,
+      "message_contains": [
+        "Balance Sheet balances",
+        "Balance Sheet!G37",
+        "2026-03: assets - liabilities & equity = 250.00"
+      ]
+    },
+    "perturbation": {
+      "cells_changed": [
+        {
+          "sheet": "Balance Sheet",
+          "cell": "G37",
+          "label": "Total Assets, Mar 2026",
+          "original": 4932920.61,
+          "new": 4933170.61
+        }
+      ],
+      "purpose": "+250.00 on Total Assets with Total Liabilities and Equity (G71 = 4,932,920.61) unchanged."
+    },
+    "source_evidence": "Real data: Balance Sheet G37 = 4,932,920.61 and G71 = 4,932,920.61 (difference 0.00) for Mar 2026.",
+    "derivation": "Hand-computed from cached source-cell values, not from the engine.",
+    "grading": "The intake gate (close_artifacts.intake_gate) must refuse the perturbed copy with a message naming the check, the month and the cell. The source workbook is never modified."
+  },
+  {
+    "id": "G24",
+    "name": "Tie-out (intake STOP): Current Year Earnings differs from YTD net income in Sep 2025",
+    "type": "intake_gate",
+    "source": "workbook+perturbation",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Balance Sheet",
+    "input": {
+      "month": "2026-06"
+    },
+    "expected": {
+      "refused": true,
+      "message_contains": [
+        "Current Year Earnings = year-to-date net income",
+        "Balance Sheet!M63",
+        "2025-09: balance sheet -3,316,345.12 vs YTD net income -3,316,346.12"
+      ]
+    },
+    "perturbation": {
+      "cells_changed": [
+        {
+          "sheet": "Balance Sheet",
+          "cell": "M63",
+          "label": "Current Year Earnings, Sep 2025",
+          "original": -3316346.12,
+          "new": -3316345.12
+        }
+      ],
+      "purpose": "+1.00 on Current Year Earnings (M63). Current Year Earnings is part of equity, so Sep 2025 also stops balancing by 1.00; both checks fire and the message must contain the YTD one."
+    },
+    "source_evidence": "Real data: Income Statement Net Income Jan-Mar 2026 (H107, G107, F107) = -344,312.38 + -376,578.43 + -275,994.10 = -996,884.91 = Balance Sheet G63. Same rule for Sep 2025: M63 = -3,316,346.12.",
+    "derivation": "Hand-computed from cached source-cell values, not from the engine.",
+    "grading": "The intake gate (close_artifacts.intake_gate) must refuse the perturbed copy with a message naming the check, the month and the cell. The source workbook is never modified."
+  },
+  {
+    "id": "G25",
+    "name": "Tie-out (intake STOP): Current Year Earnings row label missing",
+    "type": "intake_gate",
+    "source": "workbook+perturbation",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Balance Sheet",
+    "input": {
+      "month": "2026-06"
+    },
+    "expected": {
+      "refused": true,
+      "message_contains": [
+        "Balance Sheet rows present",
+        "Current Year Earnings"
+      ]
+    },
+    "perturbation": {
+      "cells_changed": [
+        {
+          "sheet": "Balance Sheet",
+          "cell": "C63",
+          "label": "Current Year Earnings row label",
+          "original": "Current Year Earnings",
+          "new": "Earnings"
+        }
+      ],
+      "purpose": "Renaming the label stops the equity tie-out being run silently; the gate must name the missing row."
+    },
+    "source_evidence": "Real data: Balance Sheet C63 = 'Current Year Earnings'.",
+    "derivation": "Hand-computed from cached source-cell values, not from the engine.",
+    "grading": "The intake gate (close_artifacts.intake_gate) must refuse the perturbed copy with a message naming the check, the month and the cell. The source workbook is never modified."
+  },
+  {
+    "id": "G26",
+    "name": "Flux row for Events & Conferences (Jun 2026 vs May 2026)",
+    "type": "flux_item",
+    "source": "workbook",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Income Statement",
+    "layout": "columns run newest first: C=Jun 2026, D=May 2026",
+    "input": {
+      "month": "2026-06",
+      "account": "Events & Conferences",
+      "section": "operating expenses"
+    },
+    "source_cells": {
+      "C65": 29294.58,
+      "D65": 11323.91
+    },
+    "expected": {
+      "reason_code": "LARGE_MOVE",
+      "current": 29294.58,
+      "prior": 11323.91,
+      "dollar_change": 17970.67,
+      "source_cell_current": "Income Statement!C65",
+      "source_cell_prior": "Income Statement!D65"
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "Real data already trips the flux rule; no cell changed."
+    },
+    "derivation": "Current, prior and change read by hand from the two cached source cells; reason code from the rule (|$| >= 5,000 and |%| >= 10%, or sign flip >= 1,000).",
+    "grading": "Values within half a cent; reason code and both source-cell refs exact. Used by the flux-explanations and client-questions skills.",
+    "evidence": "C65 29,294.58 - D65 11,323.91 = 17,970.67 (+158.7%)"
+  },
+  {
+    "id": "G27",
+    "name": "Flux row for Bad Debts (Jun 2026 vs May 2026)",
+    "type": "flux_item",
+    "source": "workbook",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Income Statement",
+    "layout": "columns run newest first: C=Jun 2026, D=May 2026",
+    "input": {
+      "month": "2026-06",
+      "account": "Bad Debts",
+      "section": "operating expenses"
+    },
+    "source_cells": {
+      "C31": -1806.24,
+      "D31": 12935.29
+    },
+    "expected": {
+      "reason_code": "SIGN_FLIP",
+      "current": -1806.24,
+      "prior": 12935.29,
+      "dollar_change": -14741.53,
+      "source_cell_current": "Income Statement!C31",
+      "source_cell_prior": "Income Statement!D31"
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "Real data already trips the flux rule; no cell changed."
+    },
+    "derivation": "Current, prior and change read by hand from the two cached source cells; reason code from the rule (|$| >= 5,000 and |%| >= 10%, or sign flip >= 1,000).",
+    "grading": "Values within half a cent; reason code and both source-cell refs exact. Used by the flux-explanations and client-questions skills.",
+    "evidence": "C31 -1,806.24 vs D31 12,935.29: sign changed, |change| 14,741.53 >= 1,000"
+  },
+  {
+    "id": "G28",
+    "name": "Flux row for Sales Commission (Jun 2026 vs May 2026)",
+    "type": "flux_item",
+    "source": "workbook",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Income Statement",
+    "layout": "columns run newest first: C=Jun 2026, D=May 2026",
+    "input": {
+      "month": "2026-06",
+      "account": "Sales Commission",
+      "section": "cost of goods sold"
+    },
+    "source_cells": {
+      "C23": 5926.88,
+      "D23": 13126.41
+    },
+    "expected": {
+      "reason_code": "LARGE_MOVE",
+      "current": 5926.88,
+      "prior": 13126.41,
+      "dollar_change": -7199.53,
+      "source_cell_current": "Income Statement!C23",
+      "source_cell_prior": "Income Statement!D23"
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "Real data already trips the flux rule; no cell changed."
+    },
+    "derivation": "Current, prior and change read by hand from the two cached source cells; reason code from the rule (|$| >= 5,000 and |%| >= 10%, or sign flip >= 1,000).",
+    "grading": "Values within half a cent; reason code and both source-cell refs exact. Used by the flux-explanations and client-questions skills.",
+    "evidence": "C23 5,926.88 - D23 13,126.41 = -7,199.53 (-54.8%)"
+  },
+  {
+    "id": "G29",
+    "name": "flux-explanations output for ABC 2026-06 passes its grader",
+    "type": "skill_text",
+    "source": "workbook",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "input": {
+      "client": "abc",
+      "month": "2026-06",
+      "file": "flux_explanations_{month}.md",
+      "grader": "flux"
+    },
+    "expected": {
+      "grader_passes": true
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; grades the saved skill output against the real engine JSON."
+    },
+    "derivation": "The grader recomputes nothing: it checks the text against flux/review/packet JSON written by the engine.",
+    "grading": "0 grader problems. Negative cases for each rule are in tests/test_grade_workflow_skills.py."
+  },
+  {
+    "id": "G30",
+    "name": "client-questions output for ABC 2026-06 passes its grader",
+    "type": "skill_text",
+    "source": "workbook",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "input": {
+      "client": "abc",
+      "month": "2026-06",
+      "file": "client_questions_{month}.md",
+      "grader": "questions"
+    },
+    "expected": {
+      "grader_passes": true
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; grades the saved skill output against the real engine JSON."
+    },
+    "derivation": "The grader recomputes nothing: it checks the text against flux/review/packet JSON written by the engine.",
+    "grading": "0 grader problems. Negative cases for each rule are in tests/test_grade_workflow_skills.py."
+  },
+  {
+    "id": "G31",
+    "name": "Year-over-year view for Jun 2026 vs Jun 2025 (revenue and gross margin)",
+    "type": "yoy_view",
+    "source": "workbook",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Income Statement",
+    "layout": "columns run newest first: C=Jun 2026, O=Jun 2025",
+    "input": {
+      "month": "2026-06"
+    },
+    "source_cells": {
+      "C14": 195898.16,
+      "O14": 190555.65,
+      "C26": 137425.72,
+      "O26": 141625.74
+    },
+    "expected": {
+      "prior_year_month": "2025-06",
+      "revenue": 195898.16,
+      "prior_revenue": 190555.65,
+      "yoy_change": 5342.51,
+      "yoy_pct": 0.028036,
+      "gross_margin": 0.701516,
+      "prior_gross_margin": 0.743225,
+      "yoy_change_pp": -4.170895
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; real data has the prior-year month."
+    },
+    "derivation": "yoy_change = C14 - O14 = 5,342.51; yoy_pct = 5,342.51 / 190,555.65; gross margins = C26/C14 and O26/O14; change in pp = (0.701516 - 0.743225) x 100.",
+    "grading": "Money within half a cent; ratios within 1e-5; percentage points within 1e-4. Seasonality view required by the brief.",
+    "evidence": "C14 195,898.16 vs O14 190,555.65 (+2.80%); gross margin 70.15% vs 74.32% (-4.17 pp)"
+  },
+  {
+    "id": "G32",
+    "name": "Net income excluding one-offs for Dec 2025 (two one-offs in the month)",
+    "type": "adjusted_net_income",
+    "source": "workbook",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sheet": "Income Statement",
+    "layout": "columns run newest first: I=Dec 2025",
+    "input": {
+      "month": "2025-12"
+    },
+    "source_cells": {
+      "I99": 334660.53,
+      "I101": -1244429.84,
+      "I107": 534551.41
+    },
+    "expected": {
+      "net_income": 534551.41,
+      "one_off_effect_on_net_income": 909769.31,
+      "adjusted_net_income": -375217.9,
+      "items": [
+        "Income Tax Benefit",
+        "Stock-Based Compensation Expense"
+      ]
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; Dec 2025 holds two one-off operating-expense lines."
+    },
+    "derivation": "Costs lower net income, so removing them adds back: -(-1,244,429.84) - 334,660.53 = +909,769.31. Adjusted = 534,551.41 - 909,769.31 = -375,217.90.",
+    "grading": "Money within half a cent; the set of one-off accounts must match exactly.",
+    "evidence": "I101 -1,244,429.84 (income tax benefit), I99 334,660.53 (stock-based compensation), I107 534,551.41"
+  },
+  {
+    "id": "G33",
+    "name": "ABC 2026-06 commentary has all seven sections in order",
+    "type": "commentary_sections",
+    "source": "workbook",
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "input": {
+      "client": "abc",
+      "month": "2026-06",
+      "file": "commentary_{month}.md"
+    },
+    "expected": {
+      "sections": [
+        "Headline",
+        "Revenue",
+        "Margins",
+        "Opex",
+        "Cash & runway",
+        "One-offs",
+        "Questions"
+      ],
+      "passed": true
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; grades the saved commentary. Missing and swapped headings are tested in tests/test_monthly_review.py."
+    },
+    "derivation": "The grader looks for a heading for each section in the fixed order; it computes no numbers.",
+    "grading": "All seven found, none missing, order kept."
   }
 ]

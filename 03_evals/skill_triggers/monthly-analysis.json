@@ -1,0 +1,22 @@
+{
+  "name": "monthly-analysis",
+  "kind": "command",
+  "cases": [
+    {
+      "prompt": "/monthly-analysis abc 2026-06",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Run the monthly analysis for abc 2026-06 and build the Excel sign-off pack.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Produce the reviewed monthly Excel pack for client abc, month 2026-06.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Run the full six-stage close review for abc 2026-06.",
+      "should_trigger": false
+    }
+  ]
+}

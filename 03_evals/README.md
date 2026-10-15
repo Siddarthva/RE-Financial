@@ -6,18 +6,18 @@
 
 | Layer | Command | What it proves | Latest (2026-10-14) |
 |---|---|---|---|
-| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 129 run, 129 OK |
-| Golden cases | `python 03_evals/run_golden_evals.py` | Engine numbers and flags equal values derived by hand from source cells | 22 / 22 |
+| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 184 run, 184 OK |
+| Golden cases | `python 03_evals/run_golden_evals.py` | Engine numbers and flags equal values derived by hand from source cells | 33 / 33 |
 | Commentary grader | `python 03_evals/grade_commentary.py` | Every number in the text matches the engine JSON; top-3 movements named; cash and runway covered | engine, reviewed and saved-skill text PASS; flawed control FAILs as intended |
-| Mutation test | `python 03_evals/mutation_test.py` | The tests and golden cases above fail when a known bug is injected | 13 / 13 mutants caught (7 bug classes) |
+| Mutation test | `python 03_evals/mutation_test.py` | The tests and golden cases above fail when a known bug is injected | 19 / 19 mutants caught |
 | Robustness | `python 03_evals/robustness/fault_injection.py` | 32 corrupted workbooks each STOP, WARN or HANDLE as declared, on both entry points | 32 / 32; 0 silent wrong numbers |
 | UI number checks | `python -m unittest tests.test_ui_numbers` | Every number the review UI displays exists in an engine JSON file; no page imports calculation code | 15 tests OK |
 
-The 129 unit tests include the 15 UI tests, 14 robustness tests and 12 workflow-failure tests ([`tests/test_robustness.py`](../tests/test_robustness.py)). Run records: [`FINAL_RUN.md`](FINAL_RUN.md). Scoring rules in full: [`GRADING.md`](GRADING.md).
+The 184 unit tests include the UI tests, the robustness tests and the workflow-failure tests ([`tests/test_robustness.py`](../tests/test_robustness.py)). Run records: [`FINAL_RUN.md`](FINAL_RUN.md). Scoring rules in full: [`GRADING.md`](GRADING.md).
 
 ## Golden cases by source
 
-[`golden_cases.json`](golden_cases.json) has 22 cases in three `source` groups. "Real workbook" means the ABC workbook read in memory, never modified.
+[`golden_cases.json`](golden_cases.json) has 33 cases in three `source` groups. "Real workbook" means the ABC workbook read in memory, never modified.
 
 | `source` | Count | IDs | What the group is |
 |---|---|---|---|
@@ -57,12 +57,12 @@ A change is blocked by any of: a golden case that passed now fails; any unit tes
 Run in this order from the repo root (PowerShell, except the secret scan, which is Git Bash). Skip mutation and robustness only if you changed nothing under `src/`, `scripts/` or `clients/`.
 
 ```powershell
-python -m unittest discover -s tests                                                          # expect OK (129)
-python 03_evals/run_golden_evals.py                                                           # expect Score: 22/22
+python -m unittest discover -s tests                                                          # expect OK (184)
+python 03_evals/run_golden_evals.py                                                           # expect Score: 33/33
 python 03_evals/grade_commentary.py                                                           # engine text: PASS
 python 03_evals/grade_commentary.py --commentary outputs/abc/commentary_2026-06.md            # reviewed text: PASS
 python 03_evals/grade_commentary.py --commentary outputs/skill_commentary.md                  # saved skill output: PASS
-python 03_evals/mutation_test.py                                                              # expect 13/13 caught, ~6 min
+python 03_evals/mutation_test.py                                                              # expect 19/19 caught, ~15 min
 python 03_evals/robustness/fault_injection.py                                                 # expect 32/32, ~3 min
 python scripts/check_links.py                                                                 # expect 0 broken links
 (Get-FileHash "data/ABC Inc - Financial Statements.xlsx").Hash                                # expect 75DA8D679A89551F…

@@ -1,0 +1,22 @@
+{
+  "name": "client-questions",
+  "kind": "skill",
+  "cases": [
+    {
+      "prompt": "Turn the open questions and flagged items for ABC June into a client request list.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "What documents do we need from the client to clear the June flux items? Make a PBC list with priorities.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Build the client-ready question list for this close, with why it matters and priority.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Draft the preparer explanation column for the flux table.",
+      "should_trigger": false
+    }
+  ]
+}

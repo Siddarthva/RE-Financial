@@ -1470,6 +1470,54 @@
       "share_of_opex": 0.002577
     }
   },
+  "yoy": {
+    "available": true,
+    "month": "2026-06",
+    "prior_year_month": "2025-06",
+    "revenue": {
+      "value": 195898.16,
+      "prior_value": 190555.65,
+      "yoy_change": 5342.51,
+      "yoy_pct": 0.028036
+    },
+    "margins": {
+      "gross_margin": {
+        "margin": 0.701516,
+        "prior_margin": 0.743225,
+        "yoy_change_pp": -4.170895
+      },
+      "operating_margin": {
+        "margin": -1.688408,
+        "prior_margin": -1.869513,
+        "yoy_change_pp": 18.110446
+      },
+      "net_margin": {
+        "margin": -1.688408,
+        "prior_margin": -1.869513,
+        "yoy_change_pp": 18.110446
+      }
+    },
+    "opex_categories": {
+      "Payroll & Benefits": {
+        "value": 331397.16,
+        "prior_value": 356774.3,
+        "yoy_change": -25377.14,
+        "yoy_pct": -0.071129
+      },
+      "Sales & Marketing": {
+        "value": 74527.55,
+        "prior_value": 80777.29,
+        "yoy_change": -6249.74,
+        "yoy_pct": -0.07737
+      },
+      "Technology": {
+        "value": 34089.48,
+        "prior_value": 18256.59,
+        "yoy_change": 15832.89,
+        "yoy_pct": 0.867242
+      }
+    }
+  },
   "top_movements": [
     {
       "account": "Events & Conferences",
@@ -1554,5 +1602,12 @@
       "amount": 10000.0
     }
   ],
-  "warnings": []
+  "warnings": [],
+  "adjusted_net_income": {
+    "month": "2026-06",
+    "net_income": -330756.08,
+    "one_off_effect_on_net_income": 0.0,
+    "adjusted_net_income": -330756.08,
+    "items": {}
+  }
 }

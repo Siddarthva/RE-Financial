@@ -32,18 +32,18 @@ A model asked to do arithmetic can be fluent and wrong. Here the model never see
 | Way | Command | Gives you |
 |---|---|---|
 | In Claude Code (full flow) | `/monthly-analysis abc 2026-06` | Commentary, reviewer verdict, `outputs/abc/monthly_review_2026-06.xlsx` |
-| Pipeline, no model | `python scripts/run_pipeline.py abc 2026-06` | Intake gate, calculation, flux, packet, manifest in `outputs/abc/` |
+| Pipeline, no model | `python scripts/run_pipeline.py abc 2026-06` | Intake gate, calculation, flux, packet, manifest in `outputs/abc/`. The month is the reporting month; TTM needs 12 consecutive months ending there. Optional `--clients-root DIR` and `--outputs-root DIR` point at other folders (tests and experiments use them so `outputs/` is untouched) |
 | Engine only | `python src/run_client.py abc` | `analysis.xlsx`, `summary.json`, `commentary.md` |
 
 Then approve with `python scripts/approve.py abc 2026-06 --reviewer NAME --reason TEXT`. There is no `/close-review` command; the close review is the `month-end-close-review` skill, loaded when asked.
 
 ## Add a client in 3 steps
 
-Worked example: `xyz`, a synthetic client whose layout differs from ABC. Its config differs in sheet name (`P&L`), header label (`Line Item`), month format (`%b-%y`, oldest first), section names (`Revenue`, `Cost of Sales`, `Expenses`), total names (`Net Profit`) and fiscal year (April start). No engine code changed.
+Every field is explained, with what breaks if it is wrong, in [`CONFIG_REFERENCE.md`](CONFIG_REFERENCE.md). Worked examples: `xyz` and `lmn` (13 months, July fiscal year, `Particulars` / `Statement of Profit`); `xyz`, a synthetic client whose layout differs from ABC. Its config differs in sheet name (`P&L`), header label (`Line Item`), month format (`%b-%y`, oldest first), section names (`Revenue`, `Cost of Sales`, `Expenses`), total names (`Net Profit`) and fiscal year (April start). No engine code changed.
 
 1. **Config.** Copy [`clients/xyz/config.yaml`](../clients/xyz/config.yaml) to `clients/<id>/config.yaml`. Set the workbook path, sheet names, header label, month format, section and total labels, account → category map and `fiscal_year.start_month`.
-2. **Workbook.** Put the client's workbook where the config says. Never edit a source workbook.
-3. **Run.** `python src/run_client.py <id>`, then `/monthly-analysis <id> <YYYY-MM>`. Read `warnings` in `outputs/<id>/summary.json` first: unmapped accounts, missing categories and rollup mismatches are reported there, and a missing category is "not available", never zero.
+2. **Workbook.** Put the client's workbook where the config says. Never edit a source workbook. Its shape must match the grid in [`CONFIG_REFERENCE.md`](CONFIG_REFERENCE.md#workbook-shape-the-config-describes); `clients/xyz/generate_dataset.py` and `clients/lmn/generate_dataset.py` are copyable templates.
+3. **Run.** `python scripts/run_pipeline.py <id> <YYYY-MM>` (the intake gate names any label it cannot find, with the sheet and rows searched), then `/monthly-analysis <id> <YYYY-MM>`. Read `warnings` in `outputs/<id>/summary.json` first: unmapped accounts, missing categories and rollup mismatches are reported there, and a missing category is "not available", never zero.
 
 Proof: `python scripts/run_pipeline.py xyz 2026-05` exits 0 (14 months, 1 warning: no Sales & Marketing accounts), and [`tests/test_client_isolation.py`](../tests/test_client_isolation.py) checks that a run cannot read another client's folder. Limit: the parser expects a wide sheet with one column per month. A different layout needs code.
 

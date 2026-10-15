@@ -1,0 +1,22 @@
+{
+  "name": "fpa-budget-variance",
+  "kind": "skill",
+  "cases": [
+    {
+      "prompt": "Compare actuals with the budget we supplied and show favourable and unfavourable variances.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Build a variance table of June versus June last year with the top drivers.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Actual vs forecast for Q2: which lines moved most?",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Summarise the month for the business owner and tell them what to focus on.",
+      "should_trigger": false
+    }
+  ]
+}

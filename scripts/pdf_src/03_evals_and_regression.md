@@ -28,8 +28,8 @@ flowchart TB
 
 | Source | Count | IDs | What the group is |
 |---|---|---|---|
-| `workbook` | {{g_wb}} | G01, G02, G03, G06 | Real data already triggers the rule; no cell changed |
-| `workbook+perturbation` | {{g_pert}} | G04, G05, G07, G08, G14, G19–G22 | One or two cells changed to trigger a rule; G19–G22 require the intake gate to refuse a perturbed copy |
+| `workbook` | {{g_wb}} | G01, G02, G03, G06, G26–G33 | Real data already triggers the rule; no cell changed |
+| `workbook+perturbation` | {{g_pert}} | G04, G05, G07, G08, G14, G19–G25 | One or two cells changed to trigger a rule; G19–G22 require the intake gate to refuse a perturbed copy |
 | ABC cell-sourced | {{g_cell}} | G09–G13, G15–G18 | Expected values computed by hand from cached source cells, not by the engine |
 
 | Case | Pins |
@@ -58,7 +58,7 @@ The runner refuses to start unless the unmodified copy is green. A mutant is an 
 | TTM over 11 months | both | yes, yes |
 | Wrong margin denominator | both | yes, yes |
 
-**Total: {{mut_result}}** (7 bug classes). The wrong-denominator mutant is caught by G02, G13, G18 and two unit tests.
+**Total: {{mut_result}}** (the 7 original bug classes are tabled above; 6 more mutants for flux, year-over-year, adjusted net income and the intake gate were added 2026-10-15; the full list is `outputs/mutation_report.md`). The wrong-denominator mutant is caught by G02, G13, G18 and two unit tests.
 
 ## Robustness matrix summary
 

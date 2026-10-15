@@ -3,22 +3,34 @@
   "changes": [],
   "statement_notes": [
     {"statement": 1, "status": "ok", "note": ""},
-    {"statement": 2, "status": "ok", "note": ""},
-    {"statement": 3, "status": "ok", "note": ""},
-    {"statement": 4, "status": "ok", "note": "Net margin -168.84% and the 6.09pp fall are correct. The loss shrank while revenue fell, so the margin worsened."},
+    {"statement": 2, "status": "ok", "note": "Loss shrank (mom_change 8343.52), margin fell 6.09pp because revenue fell; both directions correct."},
+    {"statement": 3, "status": "ok", "note": "All three top_movements named; Bad Debts 12,935.29 to -1,806.24 matches."},
+    {"statement": 4, "status": "ok", "note": ""},
     {"statement": 5, "status": "ok", "note": ""},
-    {"statement": 6, "status": "ok", "note": "Bad Debts moved from 12,935.29 to -1,806.24, which is a negative or reversing line. It is named correctly."},
+    {"statement": 6, "status": "ok", "note": ""},
     {"statement": 7, "status": "ok", "note": ""},
-    {"statement": 8, "status": "ok", "note": ""},
+    {"statement": 8, "status": "ok", "note": "Matches months.2026-06.net_income.ttm = -3089779.59."},
     {"statement": 9, "status": "ok", "note": ""},
-    {"statement": 10, "status": "ok", "note": "runway_months.3m = 3.403094 and burn.3m = 209,656.62, with primary_window = 3m."},
-    {"statement": 11, "status": "ok", "note": "warnings is empty."},
-    {"statement": 12, "status": "ok", "note": "No entry in one_offs has month 2026-06. The only 2026 item is SKU Profiling in 2026-04."}
+    {"statement": 10, "status": "ok", "note": ""},
+    {"statement": 11, "status": "ok", "note": ""},
+    {"statement": 12, "status": "ok", "note": ""},
+    {"statement": 13, "status": "ok", "note": ""},
+    {"statement": 14, "status": "ok", "note": "Matches cash.runway_months.3m = 3.403094 and cash.burn.3m = 209656.62 (primary window)."},
+    {"statement": 15, "status": "ok", "note": "No one-off in 2026-06; adjusted_net_income equals net income."},
+    {"statement": 16, "status": "ok", "note": "warnings is empty."},
+    {"statement": 17, "status": "ok", "note": "Question only; yoy Technology change 15832.89 matches."},
+    {"statement": 18, "status": "ok", "note": "Events & Conferences value 29294.58 matches."}
   ],
+  "scores": {
+    "numbers": {"ok": 17, "of": 17},
+    "coverage": {"ok": 12, "of": 12},
+    "causes": {"ok": 18, "of": 18},
+    "tone": {"ok": 18, "of": 18}
+  },
   "open_questions": [
-    {"question": "What explains the Bad Debts credit of -1,806.24 in June, against 12,935.29 in May? Is it a recovery or reversal of a prior provision?", "why": "It is the second-largest movement and cuts operating expenses by 14.7k. If it is non-recurring, underlying operating expenses are higher than reported."},
-    {"question": "What is the nature of the Events & Conferences increase, from 11,323.91 to 29,294.58? Is it one-off or recurring?", "why": "It is the largest movement and, at 6.3% of operating expenses, the main offset to the other cost reductions."},
-    {"question": "Why did Partnership Income and Professional Services fall to zero, and why did Usage Fees fall 6.3%?", "why": "These three lines account for the whole 12.5k revenue decline (-476.73, -833.33 and -11,142.74). Whether they continue matters for runway."},
-    {"question": "Is the drop in Partnerships Commission (10,800 to 1,800) and Sales Commission (13,126.41 to 5,926.88) a timing difference?", "why": "These lines drive much of the cost reduction and may reverse next month."}
+    {"question": "What explains the Bad Debts swing from 12,935.29 to -1,806.24 (a recovery or reversal)?", "why": "A 14,741.53 credit reduced June operating expenses and improved net income."},
+    {"question": "Why did cash fall 215,543.33 (-23.2%) in June, and are further drawdowns or funding planned?", "why": "Runway is 3.40 months on the 3-month burn (3.31 on 1-month, 2.29 on 6-month), so the balance is the key sensitivity."},
+    {"question": "Is the Technology increase (+86.72% vs 2025-06) a new recurring cost?", "why": "It adds 15,832.89 year on year to the run-rate."},
+    {"question": "Is the December 2025 Income Tax Benefit (-1,244,429.84) and stock-based compensation (334,660.53) to be treated as one-offs when reading TTM net income of -3,089,779.59?", "why": "Both sit inside the TTM window and distort it."}
   ]
 }

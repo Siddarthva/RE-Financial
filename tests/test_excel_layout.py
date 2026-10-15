@@ -76,7 +76,7 @@ class ExcelLayoutTests(unittest.TestCase):
 
     def test_tables_have_filters(self):
         for ws in self.sheets():
-            if ws.title != "Summary":
+            if ws.title not in ("Cover", "Summary"):  # key-value sheets, no table
                 self.assertEqual(ws.auto_filter.ref, ws.dimensions)
 
     def test_number_and_date_formats(self):

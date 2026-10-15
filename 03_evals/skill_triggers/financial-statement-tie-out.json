@@ -1,0 +1,22 @@
+{
+  "name": "financial-statement-tie-out",
+  "kind": "skill",
+  "cases": [
+    {
+      "prompt": "Tie out the ABC workbook for June 2026 and tell me if anything does not foot.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Does the balance sheet balance in every month, and does Current Year Earnings agree to net income?",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Intake refused the file with a Balance Sheet error. Explain it in plain language and tell me how to fix it.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Compare June actuals with the budget and list the biggest variances.",
+      "should_trigger": false
+    }
+  ]
+}

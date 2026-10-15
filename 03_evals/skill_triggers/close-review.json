@@ -1,0 +1,22 @@
+{
+  "name": "close-review",
+  "kind": "command",
+  "cases": [
+    {
+      "prompt": "/close-review abc 2026-06",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Run the full close review for ABC for 2026-06, all stages, stop at the first failed gate.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Run the close workflow end to end for client abc, month 2026-06, and show the stage table.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Just run the monthly analysis for abc 2026-06 and build the Excel pack.",
+      "should_trigger": false
+    }
+  ]
+}

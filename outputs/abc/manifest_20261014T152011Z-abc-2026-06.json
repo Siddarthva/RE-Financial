@@ -1,0 +1,196 @@
+{
+  "run_id": "20261014T152011Z-abc-2026-06",
+  "client": "abc",
+  "period": "2026-06",
+  "started_at": "2026-10-14T15:20:11+00:00",
+  "finished_at": "2026-10-14T15:20:19+00:00",
+  "source": {
+    "workbook": "ABC Inc - Financial Statements.xlsx",
+    "sha256": "75da8d679a89551f9e46b3563b7cfc724d9aaeabe0444b0214d455a0b335a0ea"
+  },
+  "skill_version": "monthly-financial-analysis@06a22b559d4a",
+  "git_sha": "6410527",
+  "status": "success",
+  "stages": [
+    {
+      "name": "Intake",
+      "status": "done",
+      "duration_s": 0.786
+    },
+    {
+      "name": "Calculate",
+      "status": "done",
+      "duration_s": 7.048
+    },
+    {
+      "name": "Grade commentary",
+      "status": "done",
+      "duration_s": 0.047
+    }
+  ],
+  "diff_vs_previous": {
+    "previous_run_id": "20261014T075551Z-abc-2026-06",
+    "changed": [
+      {
+        "path": "adjusted_net_income.adjusted_net_income",
+        "old": null,
+        "new": -330756.08
+      },
+      {
+        "path": "adjusted_net_income.month",
+        "old": null,
+        "new": "2026-06"
+      },
+      {
+        "path": "adjusted_net_income.net_income",
+        "old": null,
+        "new": -330756.08
+      },
+      {
+        "path": "adjusted_net_income.one_off_effect_on_net_income",
+        "old": null,
+        "new": 0.0
+      },
+      {
+        "path": "yoy.available",
+        "old": null,
+        "new": true
+      },
+      {
+        "path": "yoy.margins.gross_margin.margin",
+        "old": null,
+        "new": 0.701516
+      },
+      {
+        "path": "yoy.margins.gross_margin.prior_margin",
+        "old": null,
+        "new": 0.743225
+      },
+      {
+        "path": "yoy.margins.gross_margin.yoy_change_pp",
+        "old": null,
+        "new": -4.170895
+      },
+      {
+        "path": "yoy.margins.net_margin.margin",
+        "old": null,
+        "new": -1.688408
+      },
+      {
+        "path": "yoy.margins.net_margin.prior_margin",
+        "old": null,
+        "new": -1.869513
+      },
+      {
+        "path": "yoy.margins.net_margin.yoy_change_pp",
+        "old": null,
+        "new": 18.110446
+      },
+      {
+        "path": "yoy.margins.operating_margin.margin",
+        "old": null,
+        "new": -1.688408
+      },
+      {
+        "path": "yoy.margins.operating_margin.prior_margin",
+        "old": null,
+        "new": -1.869513
+      },
+      {
+        "path": "yoy.margins.operating_margin.yoy_change_pp",
+        "old": null,
+        "new": 18.110446
+      },
+      {
+        "path": "yoy.month",
+        "old": null,
+        "new": "2026-06"
+      },
+      {
+        "path": "yoy.opex_categories.Payroll & Benefits.prior_value",
+        "old": null,
+        "new": 356774.3
+      },
+      {
+        "path": "yoy.opex_categories.Payroll & Benefits.value",
+        "old": null,
+        "new": 331397.16
+      },
+      {
+        "path": "yoy.opex_categories.Payroll & Benefits.yoy_change",
+        "old": null,
+        "new": -25377.14
+      },
+      {
+        "path": "yoy.opex_categories.Payroll & Benefits.yoy_pct",
+        "old": null,
+        "new": -0.071129
+      },
+      {
+        "path": "yoy.opex_categories.Sales & Marketing.prior_value",
+        "old": null,
+        "new": 80777.29
+      },
+      {
+        "path": "yoy.opex_categories.Sales & Marketing.value",
+        "old": null,
+        "new": 74527.55
+      },
+      {
+        "path": "yoy.opex_categories.Sales & Marketing.yoy_change",
+        "old": null,
+        "new": -6249.74
+      },
+      {
+        "path": "yoy.opex_categories.Sales & Marketing.yoy_pct",
+        "old": null,
+        "new": -0.07737
+      },
+      {
+        "path": "yoy.opex_categories.Technology.prior_value",
+        "old": null,
+        "new": 18256.59
+      },
+      {
+        "path": "yoy.opex_categories.Technology.value",
+        "old": null,
+        "new": 34089.48
+      },
+      {
+        "path": "yoy.opex_categories.Technology.yoy_change",
+        "old": null,
+        "new": 15832.89
+      },
+      {
+        "path": "yoy.opex_categories.Technology.yoy_pct",
+        "old": null,
+        "new": 0.867242
+      },
+      {
+        "path": "yoy.prior_year_month",
+        "old": null,
+        "new": "2025-06"
+      },
+      {
+        "path": "yoy.revenue.prior_value",
+        "old": null,
+        "new": 190555.65
+      },
+      {
+        "path": "yoy.revenue.value",
+        "old": null,
+        "new": 195898.16
+      },
+      {
+        "path": "yoy.revenue.yoy_change",
+        "old": null,
+        "new": 5342.51
+      },
+      {
+        "path": "yoy.revenue.yoy_pct",
+        "old": null,
+        "new": 0.028036
+      }
+    ]
+  }
+}

@@ -4,7 +4,8 @@
 
 Writes outputs/<client>/approval_<period>.json and appends to outputs/<client>/audit_log.jsonl.
 Rules: reviewer name and reason are required; approving needs the finance-reviewer verdict to be
-"approve"; once a period is approved it is locked and no further decision is accepted.
+"approve" and every question on the sign-off pack's Open Questions sheet to have a status (Open, Answered,
+Closed ... anything but blank); once a period is approved it is locked and no further decision is accepted.
 """
 from __future__ import annotations
 
@@ -24,6 +25,27 @@ PERIOD = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 def fail(msg: str, code: int = 1) -> int:
     print(f"ERROR: {msg}")
     return code
+
+
+def blank_status_questions(pack: Path) -> list[str]:
+    """Numbers of the Open Questions rows whose Status cell is blank. Raises ValueError if the pack cannot be read."""
+    from openpyxl import load_workbook
+    try:
+        wb = load_workbook(pack, read_only=True, data_only=True)
+    except Exception as exc:
+        raise ValueError(f"cannot open the sign-off pack {pack.name} ({type(exc).__name__})") from None
+    try:
+        if "Open Questions" not in wb.sheetnames:
+            return []  # drop_empty removes the sheet only when it holds nothing at all
+        rows = list(wb["Open Questions"].iter_rows(values_only=True))
+    finally:
+        wb.close()
+    head = [str(h).strip() if h is not None else "" for h in rows[0]] if rows else []
+    if "Status" not in head or "Question" not in head:
+        raise ValueError(f"{pack.name}: the Open Questions sheet has no Status or Question column")
+    s, q = head.index("Status"), head.index("Question")
+    return [str(r[0] if r[0] not in (None, "") else i) for i, r in enumerate(rows[1:], 1)
+            if q < len(r) and r[q] not in (None, "", "None") and (s >= len(r) or r[s] is None or not str(r[s]).strip())]
 
 
 def main() -> int:
@@ -53,6 +75,17 @@ def main() -> int:
     status = "rejected" if a.reject else "approved"
     if status == "approved" and verdict != "approve":
         return fail(f"cannot approve: finance-reviewer verdict is {verdict!r}, not 'approve'", 4)
+    if status == "approved":
+        pack = d / f"monthly_review_{a.period}.xlsx"
+        if not pack.is_file():
+            return fail(f"cannot approve: no sign-off pack for {a.client} {a.period} ({pack.name}); build it first", 6)
+        try:
+            blank = blank_status_questions(pack)
+        except ValueError as exc:
+            return fail(f"cannot approve: {exc}", 6)
+        if blank:
+            return fail(f"cannot approve: {len(blank)} open question(s) have a blank status (question #{', #'.join(blank)}) in "
+                        f"{pack.name}. Set each Status (for example Open, Answered or Closed) and run again.", 6)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     record = {"client": a.client, "period": a.period, "status": status, "reviewer": reviewer, "reason": reason,
               "decided_at": now, "review_verdict": verdict,

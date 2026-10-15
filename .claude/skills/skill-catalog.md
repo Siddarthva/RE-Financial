@@ -8,7 +8,7 @@ Status rule (see `02_skill/authoring_kit/`): **Validated** needs a SKILL.md from
 
 | Skill | Workflow stage | Status | Version | Evals | Trigger cases |
 |---|---|---|---|---|---|
-| `monthly-financial-analysis` | Calculate / draft | Draft | 1.0 | Golden 22 (G01-G22), commentary grader, mutation 13/13, fault injection 32/32 | 0 |
+| `monthly-financial-analysis` | Calculate / draft | Draft | 1.1 | Golden 33 (G01-G33), commentary + section grader, memo grader, mutation (see FINAL_RUN), fault injection 26/32 (see FINAL_RUN) | 0 |
 | `financial-statement-tie-out` | Intake | Draft | 1.0 | None skill-specific (engine checks covered by unit tests) | 0 |
 | `month-end-close-review` | Reviewer / package | Draft | 1.0 | None | 0 |
 | `fpa-budget-variance` | Calculate / flux | Draft | 1.0 | None | 0 |

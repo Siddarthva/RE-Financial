@@ -1,0 +1,315 @@
+{
+  "run_at": "2026-10-14T22:51:38+00:00",
+  "passed": 44,
+  "total": 44,
+  "results": [
+    {
+      "entry": "client-questions",
+      "prompt": "Turn the open questions and flagged items for ABC June into a client request list.",
+      "should_trigger": true,
+      "answer": "client-questions",
+      "pass": true
+    },
+    {
+      "entry": "client-questions",
+      "prompt": "What documents do we need from the client to clear the June flux items? Make a PBC list with priorities.",
+      "should_trigger": true,
+      "answer": "client-questions",
+      "pass": true
+    },
+    {
+      "entry": "client-questions",
+      "prompt": "Build the client-ready question list for this close, with why it matters and priority.",
+      "should_trigger": true,
+      "answer": "client-questions",
+      "pass": true
+    },
+    {
+      "entry": "client-questions",
+      "prompt": "Draft the preparer explanation column for the flux table.",
+      "should_trigger": false,
+      "answer": "flux-explanations",
+      "pass": true
+    },
+    {
+      "entry": "close-review",
+      "prompt": "/close-review abc 2026-06",
+      "should_trigger": true,
+      "answer": "close-review",
+      "pass": true
+    },
+    {
+      "entry": "close-review",
+      "prompt": "Run the full close review for ABC for 2026-06, all stages, stop at the first failed gate.",
+      "should_trigger": true,
+      "answer": "close-review",
+      "pass": true
+    },
+    {
+      "entry": "close-review",
+      "prompt": "Run the close workflow end to end for client abc, month 2026-06, and show the stage table.",
+      "should_trigger": true,
+      "answer": "close-review",
+      "pass": true
+    },
+    {
+      "entry": "close-review",
+      "prompt": "Just run the monthly analysis for abc 2026-06 and build the Excel pack.",
+      "should_trigger": false,
+      "answer": "monthly-analysis",
+      "pass": true
+    },
+    {
+      "entry": "company-context",
+      "prompt": "What services does RE Financial Services offer?",
+      "should_trigger": true,
+      "answer": "company-context",
+      "pass": true
+    },
+    {
+      "entry": "company-context",
+      "prompt": "Before we start a new client task, which workflow and skill should we use?",
+      "should_trigger": true,
+      "answer": "company-context",
+      "pass": true
+    },
+    {
+      "entry": "company-context",
+      "prompt": "Does the firm do fractional CFO work and SEC reporting?",
+      "should_trigger": true,
+      "answer": "company-context",
+      "pass": true
+    },
+    {
+      "entry": "company-context",
+      "prompt": "Explain what a flux analysis is.",
+      "should_trigger": false,
+      "answer": "NONE",
+      "pass": true
+    },
+    {
+      "entry": "financial-statement-tie-out",
+      "prompt": "Tie out the ABC workbook for June 2026 and tell me if anything does not foot.",
+      "should_trigger": true,
+      "answer": "financial-statement-tie-out",
+      "pass": true
+    },
+    {
+      "entry": "financial-statement-tie-out",
+      "prompt": "Does the balance sheet balance in every month, and does Current Year Earnings agree to net income?",
+      "should_trigger": true,
+      "answer": "financial-statement-tie-out",
+      "pass": true
+    },
+    {
+      "entry": "financial-statement-tie-out",
+      "prompt": "Intake refused the file with a Balance Sheet error. Explain it in plain language and tell me how to fix it.",
+      "should_trigger": true,
+      "answer": "financial-statement-tie-out",
+      "pass": true
+    },
+    {
+      "entry": "financial-statement-tie-out",
+      "prompt": "Compare June actuals with the budget and list the biggest variances.",
+      "should_trigger": false,
+      "answer": "fpa-budget-variance",
+      "pass": true
+    },
+    {
+      "entry": "flux-explanations",
+      "prompt": "Draft the preparer explanations for the flagged items in the June 2026 flux for ABC.",
+      "should_trigger": true,
+      "answer": "flux-explanations",
+      "pass": true
+    },
+    {
+      "entry": "flux-explanations",
+      "prompt": "Fill in the Preparer explanation column of the flux table, evidence only, no causes.",
+      "should_trigger": true,
+      "answer": "flux-explanations",
+      "pass": true
+    },
+    {
+      "entry": "flux-explanations",
+      "prompt": "For each flagged flux item write the amount, prior, change, source cell and one question for the client.",
+      "should_trigger": true,
+      "answer": "flux-explanations",
+      "pass": true
+    },
+    {
+      "entry": "flux-explanations",
+      "prompt": "Write the executive commentary for ABC June 2026.",
+      "should_trigger": false,
+      "answer": "monthly-financial-analysis",
+      "pass": true
+    },
+    {
+      "entry": "fpa-budget-variance",
+      "prompt": "Compare actuals with the budget we supplied and show favourable and unfavourable variances.",
+      "should_trigger": true,
+      "answer": "fpa-budget-variance",
+      "pass": true
+    },
+    {
+      "entry": "fpa-budget-variance",
+      "prompt": "Build a variance table of June versus June last year with the top drivers.",
+      "should_trigger": true,
+      "answer": "fpa-budget-variance",
+      "pass": true
+    },
+    {
+      "entry": "fpa-budget-variance",
+      "prompt": "Actual vs forecast for Q2: which lines moved most?",
+      "should_trigger": true,
+      "answer": "fpa-budget-variance",
+      "pass": true
+    },
+    {
+      "entry": "fpa-budget-variance",
+      "prompt": "Summarise the month for the business owner and tell them what to focus on.",
+      "should_trigger": false,
+      "answer": "fractional-cfo-insights",
+      "pass": true
+    },
+    {
+      "entry": "fractional-cfo-insights",
+      "prompt": "Give the owner a CFO-style decision brief with a KPI snapshot and runway.",
+      "should_trigger": true,
+      "answer": "fractional-cfo-insights",
+      "pass": true
+    },
+    {
+      "entry": "fractional-cfo-insights",
+      "prompt": "What should I focus on this month? I own the company and have the validated statements.",
+      "should_trigger": true,
+      "answer": "fractional-cfo-insights",
+      "pass": true
+    },
+    {
+      "entry": "fractional-cfo-insights",
+      "prompt": "Prepare a runway view and key risks for the founder.",
+      "should_trigger": true,
+      "answer": "fractional-cfo-insights",
+      "pass": true
+    },
+    {
+      "entry": "fractional-cfo-insights",
+      "prompt": "Reconcile the trial balance and list the exceptions.",
+      "should_trigger": false,
+      "answer": "month-end-close-review",
+      "pass": true
+    },
+    {
+      "entry": "month-end-close-review",
+      "prompt": "Review the month-end close: checklist status, reconciliations and exceptions.",
+      "should_trigger": true,
+      "answer": "month-end-close-review",
+      "pass": true
+    },
+    {
+      "entry": "month-end-close-review",
+      "prompt": "Prepare the reviewer sign-off pack from the GL export and trial balance.",
+      "should_trigger": true,
+      "answer": "month-end-close-review",
+      "pass": true
+    },
+    {
+      "entry": "month-end-close-review",
+      "prompt": "Where are we on the June close? Which reconciliations are open?",
+      "should_trigger": true,
+      "answer": "month-end-close-review",
+      "pass": true
+    },
+    {
+      "entry": "month-end-close-review",
+      "prompt": "Prepare the 10-Q traceability matrix.",
+      "should_trigger": false,
+      "answer": "sec-reporting-support",
+      "pass": true
+    },
+    {
+      "entry": "monthly-analysis",
+      "prompt": "/monthly-analysis abc 2026-06",
+      "should_trigger": true,
+      "answer": "monthly-analysis",
+      "pass": true
+    },
+    {
+      "entry": "monthly-analysis",
+      "prompt": "Run the monthly analysis for abc 2026-06 and build the Excel sign-off pack.",
+      "should_trigger": true,
+      "answer": "monthly-analysis",
+      "pass": true
+    },
+    {
+      "entry": "monthly-analysis",
+      "prompt": "Produce the reviewed monthly Excel pack for client abc, month 2026-06.",
+      "should_trigger": true,
+      "answer": "monthly-analysis",
+      "pass": true
+    },
+    {
+      "entry": "monthly-analysis",
+      "prompt": "Run the full six-stage close review for abc 2026-06.",
+      "should_trigger": false,
+      "answer": "close-review",
+      "pass": true
+    },
+    {
+      "entry": "monthly-financial-analysis",
+      "prompt": "Analyze the ABC Inc monthly financial statements workbook and give me revenue, margins and MoM changes.",
+      "should_trigger": true,
+      "answer": "monthly-financial-analysis",
+      "pass": true
+    },
+    {
+      "entry": "monthly-financial-analysis",
+      "prompt": "Give me TTM revenue and opex category trends from the monthly workbook.",
+      "should_trigger": true,
+      "answer": "monthly-financial-analysis",
+      "pass": true
+    },
+    {
+      "entry": "monthly-financial-analysis",
+      "prompt": "Write executive commentary on the latest month of the ABC workbook.",
+      "should_trigger": true,
+      "answer": "monthly-financial-analysis",
+      "pass": true
+    },
+    {
+      "entry": "monthly-financial-analysis",
+      "prompt": "Tie out the balance sheet equation for the June trial balance.",
+      "should_trigger": false,
+      "answer": "financial-statement-tie-out",
+      "pass": true
+    },
+    {
+      "entry": "sec-reporting-support",
+      "prompt": "Prepare support for the 10-Q: a traceability matrix and tie-outs.",
+      "should_trigger": true,
+      "answer": "sec-reporting-support",
+      "pass": true
+    },
+    {
+      "entry": "sec-reporting-support",
+      "prompt": "Draft an MD&A-style variance narrative for qualified review.",
+      "should_trigger": true,
+      "answer": "sec-reporting-support",
+      "pass": true
+    },
+    {
+      "entry": "sec-reporting-support",
+      "prompt": "Build the 10-K tie-out workpaper from the statements.",
+      "should_trigger": true,
+      "answer": "sec-reporting-support",
+      "pass": true
+    },
+    {
+      "entry": "sec-reporting-support",
+      "prompt": "Monthly revenue trend for the ABC workbook.",
+      "should_trigger": false,
+      "answer": "monthly-financial-analysis",
+      "pass": true
+    }
+  ]
+}

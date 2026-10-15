@@ -1,0 +1,22 @@
+{
+  "name": "fractional-cfo-insights",
+  "kind": "skill",
+  "cases": [
+    {
+      "prompt": "Give the owner a CFO-style decision brief with a KPI snapshot and runway.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "What should I focus on this month? I own the company and have the validated statements.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Prepare a runway view and key risks for the founder.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Reconcile the trial balance and list the exceptions.",
+      "should_trigger": false
+    }
+  ]
+}

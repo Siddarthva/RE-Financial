@@ -1,0 +1,44 @@
+# LMN Traders - synthetic test client (fictional). Regenerate data: python clients/lmn/generate_dataset.py
+client: lmn
+display_name: LMN Traders (synthetic)
+workbook: lmn_financials.xlsx
+
+sheets:
+  income_statement: Statement of Profit
+
+layout:
+  header_label: Particulars
+  month_format: "%B %Y"
+
+sections:
+  income:             {header: Sales,        total: Total Sales}
+  cost of goods sold: {header: Direct Costs, total: Total Direct Costs}
+  operating expenses: {header: Overheads,    total: Total Overheads}
+
+totals:
+  revenue: Total Sales
+  cost_of_goods_sold: Total Direct Costs
+  gross_profit: Gross Result
+  operating_expenses: Total Overheads
+  operating_income: Operating Result
+  net_income: Net Result
+
+subtotal_rows: []
+
+fiscal_year:
+  start_month: 7
+
+categories:
+  - Payroll & Benefits
+  - Occupancy
+  - Sales & Marketing
+  - Professional Services
+  - Insurance
+
+account_to_category:
+  Staff Costs: Payroll & Benefits
+  Shop Rent: Occupancy
+  Electricity: Occupancy
+  Advertising: Sales & Marketing
+  Accounting Fees: Professional Services
+  Vehicle Running: Occupancy

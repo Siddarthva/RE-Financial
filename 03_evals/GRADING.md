@@ -13,7 +13,7 @@ Unit tests (`python -m unittest discover -s tests`) guard individual bugs; see `
 
 ## 1. Numbers (golden cases)
 
-`03_evals/golden_cases.json` has 22 cases in three `source` groups: `workbook` 4 (G01, G02, G03, G06), `workbook+perturbation` 9 (G04, G05, G07, G08, G14, G19–G22) and ABC cell-sourced 9 (G09–G13, G15–G18). They fall into three kinds:
+`03_evals/golden_cases.json` has 33 cases in three `source` groups: `workbook` 12 (G01, G02, G03, G06, G26–G33), `workbook+perturbation` 12 (G04, G05, G07, G08, G14, G19–G25) and ABC cell-sourced 9 (G09–G13, G15–G18). They fall into three kinds:
 
 - **G01–G08 and G14, real workbook (in memory, never modified):** the same engine rules as before (MoM, margin, TTM eligibility, validation errors, month labels kept intact), now fed from cached Income Statement cells. Each case records `source`, `perturbation.cells_changed` (sheet, cell, label, original, new) and a one-line `perturbation.purpose`. The runner refuses a case whose recorded original differs from the workbook. Expected values were computed in plain Python from the source cells, not from the engine.
   - `workbook+perturbation` (G04, G05, G07, G08, G14): one or two cells changed to trigger the rule. Where a changed cell is a formula (G07, T14), its cached value is overridden directly.
@@ -146,10 +146,10 @@ Any of the following is a regression and blocks the change:
 
 - Golden cases: **17/17 PASS** (G15–G17 added; G11 now checks every earlier month is null).
 - Unit tests: **75/75 PASS** (clean re-run 2026-10-13).
-- Mutation testing: **13/13 caught** (reverse month order ×2 and sum subtotals twice added). Thin spots: the double-counted subtotals are caught only by unit tests, not by a golden case, and the adapter's wrong margin denominator only by G13. `evidence/` is now copied into the throwaway project, so the runner's baseline is green again.
+- Mutation testing: **19/19 caught** (13/13 at the time of this entry; 6 added 2026-10-15) (reverse month order ×2 and sum subtotals twice added). Thin spots: the double-counted subtotals are caught only by unit tests, not by a golden case, and the adapter's wrong margin denominator only by G13. `evidence/` is now copied into the throwaway project, so the runner's baseline is green again.
 - Reference commentary `outputs/reference_commentary_jun2026.md` (positive control): 13/13 numbers, 3/3 movements, cash risk covered → **PASS**.
 - Engine `generate_commentary()`, reviewed text and saved skill output (`outputs/skill_commentary.md`): all **PASS** as of the 2026-10-13 clean re-run (28/28, 27/27 and 36/36 numbers; 3/3 movements; cash risk covered). The earlier FAILs for the engine text and the saved skill output are kept in `03_evals/FINAL_RUN.md`. The skill output was graded as saved, not regenerated live.
 
 Live consistency: three headless `claude -p` runs of `/monthly-analysis abc 2026-06` all pass this grader with different wording and the same graded facts; see [`live_consistency_2026-10-15.md`](live_consistency_2026-10-15.md).
 
-The latest full run, with commands, counts and the failures along the way, is in `03_evals/FINAL_RUN.md` (unit tests 129/129, golden 22/22, mutation 13/13, robustness 32/32 as of 2026-10-14).
+The latest full run, with commands, counts and the failures along the way, is in `03_evals/FINAL_RUN.md` (unit tests 184/184, golden 33/33, mutation 19/19, robustness 32/32 as of 2026-10-15).

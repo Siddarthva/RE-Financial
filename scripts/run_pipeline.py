@@ -128,10 +128,8 @@ def main(argv=None) -> int:
                 raise ValueError(refused)
 
     def calculate():
+        # prepare writes the packet, the intake report and the flux table (with the client's materiality threshold).
         monthly_review.prepare(client, month, clients_root, outputs_root)
-        packet = json.loads(packet_path.read_text(encoding="utf-8"))
-        with client_sandbox(client, clients_root, outputs_root):
-            (out_dir / f"flux_{month}.json").write_text(json.dumps(ca.build_flux(packet, ctx["loc"]), indent=2), encoding="utf-8")
 
     def grade_commentary():
         # Re-grade an existing commentary draft against the fresh packet, using the existing grader.
@@ -144,7 +142,7 @@ def main(argv=None) -> int:
         spec.loader.exec_module(gc)
         text = text_path.read_text(encoding="utf-8")
         packet = json.loads(packet_path.read_text(encoding="utf-8"))
-        report = gc.grade(text, packet)
+        report = gc.grade(text, packet, require_sections=True)
         lines = [l.strip() for l in text.splitlines() if l.strip()]
         (out_dir / f"commentary_{month}.json").write_text(
             json.dumps({"period": month, "lines": lines, "grade": report}, indent=2, default=str), encoding="utf-8")

@@ -10,6 +10,22 @@ description: Use when the user asks to analyze, audit, or report on a monthly fi
 - **Run:** `python src/run_client.py <client>` (e.g. `abc`). Output goes to `outputs/<client>/`. Read `summary.json` → `warnings` first.
 - **New client:** copy `clients/abc/config.yaml` to `clients/<new>/config.yaml` and edit the workbook path, sheet and label names, account mapping and fiscal-year start. No code changes.
 
+## When to trigger
+- **Yes:** "analyze the ABC workbook for June", "run the monthly analysis for xyz", "give me revenue, margins, opex by category, MoM and TTM", "write the commentary for 2026-05", "what moved most this month".
+- **No (use another skill):** comparing against a budget or forecast (`fpa-budget-variance`); "does the balance sheet balance / tie out" (`financial-statement-tie-out`); running the whole close, checklist or sign-off pack (`month-end-close-review`, `/close-review`); a decision brief for an owner (`fractional-cfo-insights`); SEC filings (`sec-reporting-support`).
+- Trigger cases live in `03_evals/skill_triggers/monthly-financial-analysis.json` and are run by `03_evals/run_trigger_evals.py`.
+
+## Inputs contract
+| Input | Where | Required | If missing or wrong |
+|---|---|---|---|
+| Client id | argument, lowercase `[a-z0-9_-]` | yes | stop; do not guess a client |
+| Month `YYYY-MM` | argument (for the packet and commentary) | yes for commentary | stop; the intake gate names the months the workbook has |
+| `clients/<id>/config.yaml` | repo | yes | stop; every field is explained in `02_skill/CONFIG_REFERENCE.md` |
+| Source workbook | path in the config; read-only | yes | intake gate refuses it with a named cell, row or sheet |
+| Review packet | `outputs/<id>/review_packet_<month>.json` | for commentary | run `python scripts/run_pipeline.py <id> <month>` first |
+
+The model's only data input for writing is the review packet. It never opens the workbook.
+
 ## Objective
 Produce a consistent, review-ready monthly trend analysis for a human finance reviewer. This skill defines workflow and interpretation rules; deterministic Python code is the source of truth for every number. Run only the sections the request needs; a full monthly review runs them all in order.
 
@@ -79,12 +95,51 @@ Produce a consistent, review-ready monthly trend analysis for a human finance re
 - Never label items as fraud, error, or mismanagement; the reviewer determines root cause.
 
 ## 9. Executive commentary
-- Header: entity, period range, scope, source file.
-- 3–4 bullet summary of validated figures; revenue, margin (pp), and OPEX movements; cash balance and runway (section 7); data limitations (no cash-flow statement, TTM availability, undefined %); at most 3–5 questions for management.
+- **Fixed section order** (the grader checks every heading is present and in this order): `## Headline` · `## Revenue` · `## Margins` · `## Opex` · `## Cash & runway` · `## One-offs` · `## Questions`. Under each heading write numbered statements (`1.`, `2.` ... continuing across sections, one statement per line). A section with nothing to report says so in one statement ("The packet reports no one-off items in 2026-06.").
+- Header: entity, period range, scope, source file (the `#` title line, not a section).
+- Headline: 3–4 statements of validated figures. Revenue: MoM, TTM and the same-month-last-year comparison from the packet's `yoy` block (state "not available" if `yoy.available` is false). Margins: gross, operating and net margin with pp change, and `yoy.margins`. Opex: MoM and the `yoy.opex_categories`. Cash & runway: section 7. One-offs: each `one_offs` item in the month and `adjusted_net_income` (net income excluding the month's one-offs, computed by the engine; state both figures). Questions: at most 3–5 for management, as questions about the data, never a cause.
+- Also state data limitations (no cash-flow statement, TTM availability, undefined %).
 - Name the top 3 line-item movements of the latest month by absolute MoM $ change, ranked across all detail rows (revenue streams, COGS lines, and OPEX categories), not just expenses.
 - Grading: `python 03_evals/grade_commentary.py --run-skill` checks every number against the engine and checks the top-3 movements and that cash plus runway are stated (see `03_evals/GRADING.md`).
 - Every number must trace to an engine output and name its month/window. Never restate figures differently from the engine.
 - No causal language ("because", "driven by", "due to") without explicit source evidence.
+
+## Procedure at a glance
+1. Intake gate: `python scripts/run_pipeline.py <client> <YYYY-MM>` (stops, with the cell and the fix, if the workbook fails a check).
+2. Read the packet's `warnings` and `data_quality`; report them before any figure.
+3. Run sections 1 to 8 below as the request needs them; the engine supplies every figure.
+4. Draft commentary per section 9 from the packet only; save it as `outputs/<client>/commentary_<month>.md`.
+5. Grade it (`python 03_evals/grade_commentary.py --commentary <file>`) and have `finance-reviewer` review it; fix once, then stop.
+6. Build the Excel pack; leave sign-off cells blank for the human.
+
+## Never do
+- Compute, round or "fix" a number yourself; state only packet values, with their month or window.
+- State a cause ("because", "driven by", "due to") without source evidence; ask a question instead.
+- Open the workbook while writing, or any other client's folder or outputs.
+- Modify the source workbook, or an expected value in `03_evals/` to make a check pass.
+- Read, print or commit secrets (environment files, tokens, authorization codes).
+- Call a QuickBooks create, update or delete tool.
+- Fill the sign-off column, or call the pack approved; only a human does that.
+- Guess a missing statement, TTM window or label; say "not available".
+
+## Output format
+Files in `outputs/<client>/`: `commentary_<month>.md` (below), `monthly_review_<month>.xlsx` (sign-off pack), `analysis.xlsx`, `summary.json`, `review_packet_<month>.json`. Commentary is a `#` title and seven `##` sections in fixed order, with numbered statements continuing across sections. Excerpt (abc, 2026-06, real output):
+
+```markdown
+# ABC Inc: commentary for 2026-06
+
+## Headline
+1. Revenue for 2026-06 was $195,898.16, a decrease of $12,452.80 (-5.98%) from 2026-05.
+...
+## Cash & runway
+13. The cash balance at 2026-06 was $713,481.26, a decrease of $215,543.33 (-23.20%) from 2026-05.
+...
+## Questions
+17. Is the Technology increase of $15,832.89 against 2025-06 expected to continue?
+```
+
+## How this skill is evaluated
+Numbers: 33 golden cases (`03_evals/golden_cases.json`). Words: `grade_commentary.py` (every number, top-3 movements, cash and runway, section order) plus the `finance-reviewer` agent plus a human. Triggering: `run_trigger_evals.py`. Regression: mutation test and fault injection. One command: `python scripts/regress.py`. Detail and limits: `03_evals/GRADING.md`.
 
 ## Export and evaluation
 - Write a new workbook to `/outputs` with source metadata, mapping/assumptions, monthly metrics, category trends, data-quality warnings, and commentary.
@@ -102,7 +157,9 @@ Produce a consistent, review-ready monthly trend analysis for a human finance re
 - `month-end-close-review`, `fractional-cfo-insights`, `sec-reporting-support`, `company-context` — firm workflows; see `.claude/skills/skill-catalog.md`.
 
 ## Version
-1.0 — 2026-10-14
+1.2 — 2026-10-15
 
 ## Changelog
+- 1.2 (2026-10-15): v3.0 upgrade. Added When to trigger, Inputs contract, Procedure at a glance, Never do, Output format with an excerpt, and How this skill is evaluated; no change to the analysis rules. Config and walkthrough docs added in `02_skill/`.
+- 1.1 (2026-10-14): Phase C. Section 9 fixes the commentary section order (Headline · Revenue · Margins · Opex · Cash & runway · One-offs · Questions); packet now carries `yoy` (same month last year) and `adjusted_net_income` (excluding one-offs); grader checks sections.
 - 1.0 (2026-10-14): Baseline. Added Version and Changelog sections; no behaviour change.

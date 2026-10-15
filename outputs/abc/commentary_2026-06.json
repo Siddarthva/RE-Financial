@@ -15,7 +15,30 @@
     "12. The packet reports no one-off items in 2026-06."
   ],
   "grade": {
-    "passed": true,
+    "passed": false,
+    "sections": {
+      "required": [
+        "Headline",
+        "Revenue",
+        "Margins",
+        "Opex",
+        "Cash & runway",
+        "One-offs",
+        "Questions"
+      ],
+      "found": [],
+      "missing": [
+        "Headline",
+        "Revenue",
+        "Margins",
+        "Opex",
+        "Cash & runway",
+        "One-offs",
+        "Questions"
+      ],
+      "in_order": true,
+      "passed": false
+    },
     "numbers_checked": 27,
     "numbers_matched": 27,
     "numbers": [

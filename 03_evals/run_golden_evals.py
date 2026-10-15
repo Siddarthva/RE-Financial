@@ -10,6 +10,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "03_evals"))
 from financial_analysis import normalize_monthly, category_summary, make_commentary  # noqa: E402
 import abc_workbook_adapter as abc  # noqa: E402
 
@@ -255,10 +256,109 @@ def run_intake_case(case):
     return not missing, (f"missing {missing} in: " if missing else "refused: ") + message[:160]
 
 
+def run_flux_item_case(case):
+    """G26-G28: the flux table's row for one account equals values read by hand from the source cells."""
+    import close_artifacts
+    import monthly_review
+    import run_client
+    inp, exp = case["input"], case["expected"]
+    cells = source_cells()
+    for ref, want in case["source_cells"].items():
+        m = re.fullmatch(r"([A-Z]+)(\d+)", ref)
+        if not close(cells.get((int(m.group(2)), m.group(1))), want):
+            return False, f"source cell {ref} is {cells.get((int(m.group(2)), m.group(1)))!r}, case records {want!r}"
+    a = abc_outputs()
+    month = pd.Timestamp(inp["month"] + "-01")
+    packet = monthly_review.build_computed(a["account_month"], a["monthly"], month, None)
+    flux = close_artifacts.build_flux(packet, close_artifacts.locate(run_client.load_config("abc")))
+    row = next((i for i in flux["items"] if i["account"] == inp["account"]), None)
+    if row is None:
+        return False, f"{inp['account']} not flagged"
+    ok = row["reason_code"] == exp["reason_code"] and row["source_cell_current"] == exp["source_cell_current"]         and row["source_cell_prior"] == exp["source_cell_prior"]         and all(close(row[k], exp[k]) for k in ("current", "prior", "dollar_change"))
+    return ok, f"{row['reason_code']} {row['current']} vs {row['prior']} ({row['dollar_change']:+,.2f}) at {row['source_cell_current']}"
+
+
+def run_skill_text_case(case):
+    """G29-G30: the saved skill output for ABC 2026-06 passes its grader against the engine JSON."""
+    import grade_workflow_skills as gw
+    inp = case["input"]
+    d = ROOT / "outputs" / inp["client"]
+    flux = json.loads((d / f"flux_{inp['month']}.json").read_text(encoding="utf-8"))
+    text = (d / inp["file"].format(month=inp["month"])).read_text(encoding="utf-8")
+    if inp["grader"] == "flux":
+        problems = gw.grade_flux(text, flux)
+    else:
+        review = json.loads((d / f"review_{inp['month']}.json").read_text(encoding="utf-8"))
+        packet = json.loads((d / f"review_packet_{inp['month']}.json").read_text(encoding="utf-8"))
+        problems = gw.grade_questions(text, flux, review, packet)
+    return not problems, "grader passed" if not problems else "; ".join(problems[:3])
+
+
+def _check_source_cells(case):
+    cells = source_cells()
+    for ref, want in case["source_cells"].items():
+        m = re.fullmatch(r"([A-Z]+)(\d+)", ref)
+        if not close(cells.get((int(m.group(2)), m.group(1))), want):
+            return f"source cell {ref} is {cells.get((int(m.group(2)), m.group(1)))!r}, case records {want!r}"
+    return None
+
+
+def run_yoy_case(case):
+    """G31: the packet's year-over-year block equals values read by hand from the source cells."""
+    import monthly_review
+    bad = _check_source_cells(case)
+    if bad:
+        return False, bad
+    a = abc_outputs()
+    y = monthly_review.build_computed(a["account_month"], a["monthly"], pd.Timestamp(case["input"]["month"] + "-01"), None)["yoy"]
+    e, g = case["expected"], y["margins"]["gross_margin"]
+    ok = (y["prior_year_month"] == e["prior_year_month"] and close(y["revenue"]["value"], e["revenue"]) and close(y["revenue"]["prior_value"], e["prior_revenue"])
+          and close(y["revenue"]["yoy_change"], e["yoy_change"]) and close(y["revenue"]["yoy_pct"], e["yoy_pct"], 1e-5)
+          and close(g["margin"], e["gross_margin"], 1e-5) and close(g["prior_margin"], e["prior_gross_margin"], 1e-5)
+          and close(g["yoy_change_pp"], e["yoy_change_pp"], 1e-4))
+    return ok, f"revenue {y['revenue']['value']} vs {y['revenue']['prior_value']} ({y['revenue']['yoy_pct']:+.4%}); gross margin change {g['yoy_change_pp']:+.4f} pp"
+
+
+def run_adjusted_case(case):
+    """G32: net income excluding the month's one-offs equals the hand calculation from the source cells."""
+    import monthly_review
+    bad = _check_source_cells(case)
+    if bad:
+        return False, bad
+    a = abc_outputs()
+    month = case["input"]["month"]
+    ones = [{"account": r.account, "section": r.section, "month": f"{r.month:%Y-%m}", "amount": r.amount}
+            for r in abc.find_one_off_items(a["account_month"]).itertuples()]
+    ni = a["monthly"].at[pd.Timestamp(month + "-01"), "net_income"]
+    got, e = monthly_review.adjusted_net_income(ni, ones, month), case["expected"]
+    ok = (close(got["net_income"], e["net_income"]) and close(got["one_off_effect_on_net_income"], e["one_off_effect_on_net_income"])
+          and close(got["adjusted_net_income"], e["adjusted_net_income"]) and sorted(got["items"]) == sorted(e["items"]))
+    return ok, f"net income {got['net_income']:,.2f}, one-off effect {got['one_off_effect_on_net_income']:+,.2f}, adjusted {got['adjusted_net_income']:,.2f}"
+
+
+def run_sections_case(case):
+    """G33: the saved ABC commentary has every required section, in order."""
+    import grade_commentary
+    inp = case["input"]
+    text = (ROOT / "outputs" / inp["client"] / inp["file"].format(month=inp["month"])).read_text(encoding="utf-8")
+    r = grade_commentary.check_sections(text)
+    return r["passed"] == case["expected"]["passed"] and r["found"] == case["expected"]["sections"], f"found {r['found']}, missing {r['missing']}"
+
+
 def run_case(case):
+    if case["type"] == "yoy_view":
+        return run_yoy_case(case)
+    if case["type"] == "adjusted_net_income":
+        return run_adjusted_case(case)
+    if case["type"] == "commentary_sections":
+        return run_sections_case(case)
     typ, data, expected = case["type"], case["input"], case["expected"]
     if typ == "intake_gate":
         return run_intake_case(case)
+    if typ == "flux_item":
+        return run_flux_item_case(case)
+    if typ == "skill_text":
+        return run_skill_text_case(case)
     if isinstance(case.get("source"), str) and case["source"].startswith("workbook"):
         return run_real_case(case)
     if typ.startswith("abc_"):

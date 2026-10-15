@@ -17,6 +17,19 @@ python src/run_client.py xyz
 python scripts/scan_secrets.py . outputs
 ```
 
+## Result: v2.1 verification pass, 2026-10-15
+
+Run before the commit that contains these changes (working tree, not a clean checkout). Unit, golden, commentary, links and secret scan from `python scripts/regress.py` (fast layers re-run after the last code change); mutation and fault injection from their own scripts after the last change to each. A full `regress.py` run earlier the same day reported mutation 18/19: one new mutant ("flux ignores the percentage threshold") survived because no test covered the percent threshold, and the harness could not read failures of tests that have a docstring. Both are fixed (new test `test_flux_needs_both_the_dollar_and_the_percent_threshold`; `mutation_test.py` reads the FAIL/ERROR summary lines and copies `.claude/` so hook tests run in the mutant copy).
+
+| Check | Result | Counts |
+|---|---|---|
+| Unit tests | **PASS** | 184 run, 184 OK |
+| Golden cases | **PASS** | 33/33 (workbook 12, workbook+perturbation 12, ABC cell-sourced 9) |
+| Mutation test | **PASS** | 19/19 caught, 0 survived |
+| Robustness (fault injection) | **PASS** | 32/32 pass (6 stricter than declared, 0 looser), source workbook hash unchanged |
+| Secret scan (git-tracked files) | **PASS** | 0 findings, 199 text files |
+| Link check | **PASS** | 66 files, 165 links, 0 broken |
+
 ## Result: v2.0 final, 2026-10-14
 
 Run at commit `c9336d2` (clean tree). Unit and golden suites were re-run for this entry; the mutation and robustness results are from the run earlier the same day on the same source (no source change since).

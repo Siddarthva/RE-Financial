@@ -24,9 +24,10 @@ sys.path.insert(0, str(SRC.parent / "03_evals"))
 import abc_workbook_adapter as engine  # noqa: E402
 import close_artifacts  # noqa: E402
 import excel_layout  # noqa: E402
+import owner_memo  # noqa: E402
 import run_client  # noqa: E402
 from client_sandbox import client_sandbox  # noqa: E402
-from grade_commentary import grade  # noqa: E402
+from grade_commentary import grade, grade_memo  # noqa: E402
 
 METRICS = ["revenue", "cost_of_goods_sold", "gross_profit", "operating_expenses", "operating_income", "net_income"]
 MARGINS = {"gross_profit": "gross_margin_pct", "operating_income": "operating_margin_pct", "net_income": "net_margin_pct"}
@@ -38,7 +39,45 @@ def _num(x):
     return None if pd.isna(x) else round(float(x), 6)
 
 
-def build_computed(account_month, monthly, month, cash=None, gross_margin_drop_pp=None):
+def _pct(change, base):
+    return _num(change / abs(base)) if base else None
+
+
+def build_yoy(account_month, monthly, month, categories=None, top_n=3):
+    """Same month a year earlier: revenue, the three margins and the top opex categories (by this month's spend).
+
+    `categories` is {category: {Timestamp: amount}} (the engine's rollup). Returns {"available": False, ...} when the
+    data has no column for the same month last year, so a short history is stated instead of guessed."""
+    prior = month - pd.DateOffset(years=1)
+    if prior not in monthly.index:
+        return {"available": False, "month": f"{month:%Y-%m}", "prior_year_month": f"{prior:%Y-%m}",
+                "reason": f"No data for {prior:%Y-%m}, so there is no same-month comparison."}
+    out = {"available": True, "month": f"{month:%Y-%m}", "prior_year_month": f"{prior:%Y-%m}"}
+    v, p = monthly.at[month, "revenue"], monthly.at[prior, "revenue"]
+    out["revenue"] = {"value": _num(v), "prior_value": _num(p), "yoy_change": _num(v - p), "yoy_pct": _pct(v - p, p)}
+    out["margins"] = {name: {"margin": _num(monthly.at[month, col]), "prior_margin": _num(monthly.at[prior, col]),
+                             "yoy_change_pp": _num((monthly.at[month, col] - monthly.at[prior, col]) * 100)}
+                      for name, col in (("gross_margin", "gross_margin_pct"), ("operating_margin", "operating_margin_pct"),
+                                        ("net_margin", "net_margin_pct"))}
+    cats = {}
+    for name, by_month in (categories or {}).items():
+        v, p = by_month.get(month), by_month.get(prior)
+        if v is not None and p is not None and pd.notna(v) and pd.notna(p):
+            cats[name] = {"value": _num(v), "prior_value": _num(p), "yoy_change": _num(v - p), "yoy_pct": _pct(v - p, p)}
+    out["opex_categories"] = dict(sorted(cats.items(), key=lambda kv: abs(kv[1]["value"]), reverse=True)[:top_n])
+    return out
+
+
+def adjusted_net_income(net_income, one_offs, month):
+    """Net income with the month's one-off items taken out. A one-off in income raises net income and one in costs
+    lowers it, so the adjustment removes `amount` (income) or adds back `amount` (costs and operating expenses)."""
+    items = [o for o in one_offs if o["month"] == month]
+    effect = sum(o["amount"] if o["section"] == "income" else -o["amount"] for o in items)
+    return {"month": month, "net_income": _num(net_income), "one_off_effect_on_net_income": _num(effect),
+            "adjusted_net_income": _num(net_income - effect), "items": {o["account"]: o["amount"] for o in items}}
+
+
+def build_computed(account_month, monthly, month, cash=None, gross_margin_drop_pp=None, categories=None):
     """The JSON that commentary is graded against: every month's totals/MoM/TTM/margins and the chosen month's line items.
 
     `monthly` is the adapter summary indexed by month; `month` is a Timestamp that must have a prior month.
@@ -76,6 +115,7 @@ def build_computed(account_month, monthly, month, cash=None, gross_margin_drop_p
                                       "mom_change": _num(v - p), "mom_pct": _num((v - p) / abs(p)) if p else None}
         if sections[account] == "operating expenses":
             out["line_items"][account]["share_of_opex"] = _num(v / monthly.at[month, "operating_expenses"])
+    out["yoy"] = build_yoy(account_month, monthly, month, categories)
     ranked = sorted(out["line_items"].items(), key=lambda kv: abs(kv[1]["mom_change"] or 0), reverse=True)
     out["top_movements"] = [{"account": a, "mom_change": d["mom_change"]} for a, d in ranked[:3]]
     if gross_margin_drop_pp is not None:
@@ -90,12 +130,30 @@ def build_computed(account_month, monthly, month, cash=None, gross_margin_drop_p
     return out
 
 
+def rollup_categories(account_month, cfg):
+    """{category: {Timestamp: amount}} from the client's opex category mapping (the same rollup the analysis workbook uses)."""
+    rollup = engine.build_category_rollup(engine.build_expense_category_trends(account_month, cfg["subtotal_rows"]), cfg["account_to_category"])
+    out = {}
+    for r in rollup.itertuples():
+        out.setdefault(r.category, {})[r.month] = r.amount
+    return out
+
+
+def add_one_offs(packet, account_month):
+    """one_offs list and the adjusted net income (excluding the review month's one-offs), both from the engine."""
+    packet["one_offs"] = [{"account": r.account, "section": r.section, "month": f"{r.month:%Y-%m}", "amount": r.amount}
+                          for r in engine.find_one_off_items(account_month).itertuples()]
+    month = packet["latest_month"]
+    packet["adjusted_net_income"] = adjusted_net_income(packet["months"][month]["net_income"]["value"], packet["one_offs"], month)
+    return packet
+
+
 def prepare(client, month_text, clients_root=run_client.CLIENTS_ROOT, outputs_root=run_client.OUTPUTS_ROOT):
     if not MONTH.match(month_text):
         raise ValueError(f"Month must look like 2026-06, got {month_text!r}")
     month = pd.Timestamp(f"{month_text}-01")
     with client_sandbox(client, clients_root, outputs_root):  # same intake gate as scripts/run_pipeline.py, before anything is written
-        report, _, _ = close_artifacts.intake_gate(run_client.load_config(client, clients_root), month_text, engine)
+        report, _, loc = close_artifacts.intake_gate(run_client.load_config(client, clients_root), month_text, engine)
         refused = close_artifacts.refusal(report, month_text)
         if refused:
             raise ValueError(refused)
@@ -112,14 +170,19 @@ def prepare(client, month_text, clients_root=run_client.CLIENTS_ROOT, outputs_ro
         if cfg["sheets"].get("balance_sheet"):
             bs = engine.parse_wide_income_statement(cfg["workbook_path"], {**engine.ABC_BS_LAYOUT, "sheet": cfg["sheets"]["balance_sheet"]})
             cash = engine.cash_position(bs.loc[:, bs.columns <= month])
+        categories = rollup_categories(am, cfg)
         packet = build_computed(am, monthly.set_index("month"), month, cash,
-                                gross_margin_drop_pp=cfg.get("thresholds", {}).get("gross_margin_drop_pp"))
+                                gross_margin_drop_pp=cfg.get("thresholds", {}).get("gross_margin_drop_pp"), categories=categories)
         packet["client"], packet["display_name"] = client, cfg["display_name"]
-        packet["one_offs"] = [{"account": r.account, "section": r.section, "month": f"{r.month:%Y-%m}", "amount": r.amount}
-                              for r in engine.find_one_off_items(am).itertuples()]
+        add_one_offs(packet, am)
         packet["warnings"] = json.loads(paths["summary"].read_text(encoding="utf-8"))["warnings"]
-        out = Path(outputs_root) / client / f"review_packet_{month_text}.json"
+        out_dir = Path(outputs_root) / client
+        out = out_dir / f"review_packet_{month_text}.json"
         out.write_text(json.dumps(packet, indent=2), encoding="utf-8")
+        # The intake report and the flux table (with the client's materiality) travel with the packet; the pack reads them.
+        (out_dir / f"intake_{month_text}.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+        flux = close_artifacts.build_flux(packet, loc, close_artifacts.materiality(cfg))
+        (out_dir / f"flux_{month_text}.json").write_text(json.dumps(flux, indent=2), encoding="utf-8")
     return out
 
 
@@ -153,22 +216,26 @@ def auto_questions(packet):
 
 
 OK, BAD = PatternFill("solid", fgColor="C6EFCE"), PatternFill("solid", fgColor="FFC7CE")
-NOTE_COLUMNS = {"Statement", "Reviewer note", "Issue", "Suggested fix", "Question", "Why it matters", "Answer"}
+NOTE_COLUMNS = {"Statement", "Reviewer note", "Issue", "Suggested fix", "Question", "Why it matters", "Answer", "Detail", "Fix hint",
+                "Why flagged", "Value"}
 ID_FORMATS = {"#": excel_layout.PLAIN, "Statement": excel_layout.PLAIN}
+SCORE_CATEGORIES = ("numbers", "coverage", "causes", "tone")
 
 
-def _sheet(wb, title, header, rows):
+def _sheet(wb, title, header, rows, formats=None):
     ws = wb.create_sheet(title)
     ws.append(header)
     for r in rows:
         ws.append(list(r))
-    return excel_layout.polish_sheet(ws, wrap=NOTE_COLUMNS, formats=ID_FORMATS)
+    return excel_layout.polish_sheet(ws, wrap=NOTE_COLUMNS, formats={**ID_FORMATS, **(formats or {})})
 
 
-def _read(path, what, fix, as_json=False):
-    """Read an input file, or raise ValueError saying which file and what to do next."""
+def _read(path, what, fix, as_json=False, optional=False):
+    """Read an input file, or raise ValueError saying which file and what to do next (None if optional and absent)."""
     path = Path(path)
     if not path.is_file():
+        if optional:
+            return None
         raise ValueError(f"{what} not found: {path}. {fix}")
     text = path.read_text(encoding="utf-8")
     if not as_json:
@@ -177,6 +244,65 @@ def _read(path, what, fix, as_json=False):
         return json.loads(text)
     except ValueError as exc:
         raise ValueError(f"{what} is not valid JSON: {path} (line {getattr(exc, 'lineno', '?')}). {fix}") from None
+
+
+def check_review(review, n_statements):
+    """Format problems in the finance-reviewer's JSON: every change cites a statement number, and the four checklist
+    scores (numbers, coverage, causes, tone) are present as {ok, of}. An approval with a short score is inconsistent."""
+    problems = []
+    verdict, changes = review.get("verdict"), review.get("changes", [])
+    if verdict not in ("approve", "changes"):
+        problems.append(f"verdict must be 'approve' or 'changes', got {verdict!r}")
+    if verdict == "approve" and changes:
+        problems.append("verdict is 'approve' but the changes list is not empty")
+    for i, c in enumerate(changes, 1):
+        n = c.get("statement")
+        if not isinstance(n, int) or isinstance(n, bool) or not 0 <= n <= n_statements:
+            problems.append(f"change {i} must cite a statement number from 1 to {n_statements} (0 only for something missing), got {n!r}")
+        elif n == 0 and c.get("type") != "missed_movement":
+            problems.append(f"change {i} uses statement 0, which is only for a missed movement")
+        if not str(c.get("issue", "")).strip() or not str(c.get("fix", "")).strip():
+            problems.append(f"change {i} needs both an issue and a fix")
+    scores = review.get("scores")
+    if not isinstance(scores, dict) or set(scores) != set(SCORE_CATEGORIES):
+        problems.append(f"scores must have exactly {', '.join(SCORE_CATEGORIES)}")
+    else:
+        for k in SCORE_CATEGORIES:
+            v = scores[k]
+            if not (isinstance(v, dict) and isinstance(v.get("ok"), int) and isinstance(v.get("of"), int) and 0 <= v["ok"] <= v["of"]):
+                problems.append(f"score '{k}' must be {{\"ok\": n, \"of\": m}} with 0 <= n <= m")
+            elif verdict == "approve" and v["ok"] < v["of"]:
+                problems.append(f"verdict is 'approve' but score '{k}' is {v['ok']}/{v['of']}")
+    return problems
+
+
+def _score_text(review):
+    s = review.get("scores")
+    if not isinstance(s, dict):
+        return "not given"
+    return ", ".join(f"{k} {s[k]['ok']}/{s[k]['of']}" for k in SCORE_CATEGORIES if isinstance(s.get(k), dict) and {"ok", "of"} <= set(s[k]))
+
+
+def _usd(x):
+    return "n/a" if x is None else f"{'-' if x < 0 else ''}${abs(x):,.2f}"
+
+
+def _signoff_status(out_dir, month_text):
+    path = out_dir / f"approval_{month_text}.json"
+    try:
+        rec = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
+    except ValueError:
+        return "Approval file unreadable"
+    return f"{rec['status'].capitalize()} by {rec.get('reviewer', '?')}" if rec and rec.get("status") else "Awaiting human approval (nobody has signed off)"
+
+
+def _facts_sheet(ws, facts):
+    ws.append(["Item", "Value"])
+    for k, v in facts:
+        ws.append([k, v])
+    excel_layout.polish_sheet(ws, wrap={"Value"}, formats={"Value": excel_layout.PLAIN}, table=False)
+    for (c,) in ws.iter_rows(min_row=2, max_col=1):
+        c.font = Font(bold=True)
 
 
 def build(client, month_text, commentary_path, review_path, clients_root=run_client.CLIENTS_ROOT, outputs_root=run_client.OUTPUTS_ROOT):
@@ -188,8 +314,11 @@ def build(client, month_text, commentary_path, review_path, clients_root=run_cli
                        f"Run 'python src/monthly_review.py prepare {client} {month_text}' first.", as_json=True)
         text = _read(commentary_path, "Commentary file", "Save the drafted commentary first (step 3 of /monthly-analysis).")
         review = _read(review_path, "Reviewer verdict", "Save the finance-reviewer's JSON verdict first (step 4 of /monthly-analysis).", as_json=True)
+        intake = _read(out_dir / f"intake_{month_text}.json", "Intake report", "", as_json=True, optional=True)
+        flux = _read(out_dir / f"flux_{month_text}.json", "Flux table", "", as_json=True, optional=True)
         statements = parse_statements(text)
-        overall = grade(text, packet)
+        overall = grade(text, packet, require_sections=True)
+        review_problems = check_review(review, len(statements))
         notes = {n["statement"]: n for n in review.get("statement_notes", [])}
         rows, number_rows = [], []
         for n, line in statements:
@@ -200,25 +329,53 @@ def build(client, month_text, commentary_path, review_path, clients_root=run_cli
             ok = not misses and note.get("status", "ok") == "ok"
             rows.append((n, line, auto, note.get("status", "not reviewed"), note.get("note", ""), "OK" if ok else "CHANGE", ""))
             number_rows += [(n, x["token"], x["kind"], "yes" if x["matched"] else "NO", x["fact"]) for x in g["numbers"]]
-        auto_pass = overall["passed"]
-        approved = review.get("verdict") == "approve" and auto_pass
+        approved = review.get("verdict") == "approve" and overall["passed"] and not review_problems
+        questions = [(q["source"] if isinstance(q, dict) and "source" in q else "Reviewer", q["question"], q.get("why", "")) for q in review.get("open_questions", [])]
+        questions += auto_questions(packet)
+        memo_path = out_dir / f"owner_memo_{month_text}.md"
+        memo_path.write_text(owner_memo.render(packet, [q for _, q, _ in questions]), encoding="utf-8")
+        memo = grade_memo(memo_path.read_text(encoding="utf-8"), packet)
+        checks = intake["checks"] if intake else []
+        cur, yoy = packet["months"][packet["latest_month"]], packet.get("yoy", {})
+        adj, cash = packet.get("adjusted_net_income"), packet.get("cash")
+        runway = cash["runway_months"].get(cash["primary_window"]) if cash else None
+        sections = overall["sections"]
         wb = Workbook()
-        ws = wb.active
-        ws.title = "Summary"
-        facts = [("Client", packet["display_name"]), ("Month", packet["latest_month"]),
-                 ("Verdict", "APPROVED" if approved else "CHANGES REQUIRED"),
-                 ("Reviewer verdict", review.get("verdict", "missing")),
-                 ("Automatic number check", f"{overall['numbers_matched']}/{overall['numbers_checked']} numbers match the JSON"),
-                 ("Top 3 movements named", f"{sum(m['mentioned'] for m in overall['top_movements'])}/3"),
-                 ("Cash risk covered", "yes" if overall["cash_risk"]["covered"] else "NO"),
-                 ("Open changes", len(review.get("changes", []))),
-                 ("Final sign-off (name / date)", ""), ("Source packet", f"review_packet_{month_text}.json")]
-        ws.append(["Item", "Value"])
-        for k, v in facts:
-            ws.append([k, v])
-        excel_layout.polish_sheet(ws, formats={"Value": excel_layout.PLAIN}, table=False)
-        for (c,) in ws.iter_rows(min_row=2, max_col=1):
-            c.font = Font(bold=True)
+        cover = wb.active
+        cover.title = "Cover"
+        _facts_sheet(cover, [
+            ("Client", packet["display_name"]), ("Month", packet["latest_month"]),
+            ("Verdict", "APPROVED" if approved else "CHANGES REQUIRED"),
+            ("Sign-off status", _signoff_status(out_dir, month_text)),
+            ("Revenue", _usd(cur["revenue"]["value"])),
+            ("Revenue vs same month last year", f"{yoy['revenue']['yoy_pct']:+.1%} vs {yoy['prior_year_month']}"
+             if yoy.get("available") and yoy["revenue"]["yoy_pct"] is not None else "not available"),
+            ("Gross margin", f"{cur['gross_profit']['margin']:.1%}"),
+            ("Net income", _usd(cur["net_income"]["value"])),
+            ("Net income excluding one-offs", _usd(adj["adjusted_net_income"]) if adj else "not available"),
+            ("Cash", _usd(cash["value"]) if cash else "not available"),
+            ("Runway", f"{runway:.1f} months ({cash['primary_window']} average burn)" if runway is not None else "not calculable"),
+            ("Data checks", f"{sum(c['passed'] for c in checks)}/{len(checks)} pass" if checks else "intake report not found"),
+            ("Flux threshold", flux["materiality"]["statement"] if flux and "materiality" in flux else "flux table not found"),
+            ("Flux items flagged", len(flux["items"]) if flux else "n/a"),
+            ("Numbers matched", f"{overall['numbers_matched']}/{overall['numbers_checked']}"),
+            ("Commentary sections", "all present, in order" if sections["passed"] else "PROBLEM: " + (
+                "missing " + ", ".join(sections["missing"]) if sections["missing"] else "out of order")),
+            ("Reviewer checklist", _score_text(review)),
+            ("Owner memo", f"graded {'PASS' if memo['passed'] else 'FAIL'} ({memo['numbers_matched']}/{memo['numbers_checked']} numbers), {memo_path.name}")])
+        cover["B4"].fill = OK if approved else BAD
+        ws = wb.create_sheet("Summary")
+        _facts_sheet(ws, [
+            ("Client", packet["display_name"]), ("Month", packet["latest_month"]),
+            ("Verdict", "APPROVED" if approved else "CHANGES REQUIRED"),
+            ("Reviewer verdict", review.get("verdict", "missing")),
+            ("Automatic number check", f"{overall['numbers_matched']}/{overall['numbers_checked']} numbers match the JSON"),
+            ("Top 3 movements named", f"{sum(m['mentioned'] for m in overall['top_movements'])}/3"),
+            ("Cash risk covered", "yes" if overall["cash_risk"]["covered"] else "NO"),
+            ("Required sections present", "yes" if sections["passed"] else "NO"),
+            ("Open changes", len(review.get("changes", []))),
+            ("Reviewer format problems", "; ".join(review_problems) or "none"),
+            ("Final sign-off (name / date)", ""), ("Source packet", f"review_packet_{month_text}.json")])
         ws["B4"].fill = OK if approved else BAD
         sheet = _sheet(wb, "Commentary Sign-off", ["#", "Statement", "Automatic number check", "Reviewer status", "Reviewer note", "Result", "Sign-off (name / date)"],
                        rows)
@@ -230,10 +387,18 @@ def build(client, month_text, commentary_path, review_path, clients_root=run_cli
                 row[4].number_format = "0.0;[Red](0.0)"
         _sheet(wb, "Top Movements", ["Account", "MoM change", "Named in commentary?"],
                [(m["account"], m["mom_change"], "yes" if m["mentioned"] else "NO") for m in overall["top_movements"]])
+        data_rows = close_artifacts.data_check_rows(intake) if intake else [
+            ("Intake report not found", "FAIL", "", "", f"Run 'python src/monthly_review.py prepare {client} {month_text}'.")]
+        for row in _sheet(wb, "Data checks", ["Check", "Result", "Cell", "Detail", "Fix hint"], data_rows).iter_rows(min_row=2):
+            row[1].fill = OK if row[1].value == "PASS" else BAD
+        if flux:
+            flux_rows = [(i["account"], i["section"], i["reason_code"], i["severity"], i["current"], i["prior"], i["dollar_change"],
+                          i["pct_change"], i["source_cell_current"], i["threshold_rule"]) for i in flux["items"]]
+            _sheet(wb, "Flux Items", ["Account", "Section", "Reason", "Severity", "Current", "Prior", "Change", "Change %", "Source cell", "Why flagged"],
+                   flux_rows or [("None flagged", "", "", "", None, None, None, None, "", flux["materiality"]["statement"])],
+                   formats={"Change %": excel_layout.PCT})
         _sheet(wb, "Reviewer Changes", ["Statement", "Type", "Issue", "Suggested fix"],
                [(c.get("statement", ""), c.get("type", ""), c.get("issue", ""), c.get("fix", "")) for c in review.get("changes", [])] or [("", "", "None", "")])
-        questions = [(q["source"] if isinstance(q, dict) and "source" in q else "Reviewer", q["question"], q.get("why", "")) for q in review.get("open_questions", [])]
-        questions += auto_questions(packet)
         _sheet(wb, "Open Questions", ["#", "Source", "Question", "Why it matters", "Owner", "Answer", "Status"],
                [(i, s, q, w, "", "", "Open") for i, (s, q, w) in enumerate(questions, 1)] or [(1, "", "None", "", "", "", "")])
         excel_layout.drop_empty(wb)

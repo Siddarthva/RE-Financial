@@ -1,0 +1,22 @@
+{
+  "name": "flux-explanations",
+  "kind": "skill",
+  "cases": [
+    {
+      "prompt": "Draft the preparer explanations for the flagged items in the June 2026 flux for ABC.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Fill in the Preparer explanation column of the flux table, evidence only, no causes.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "For each flagged flux item write the amount, prior, change, source cell and one question for the client.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Write the executive commentary for ABC June 2026.",
+      "should_trigger": false
+    }
+  ]
+}

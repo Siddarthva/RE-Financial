@@ -46,6 +46,7 @@ REPORT = Path(__file__).resolve().parent / "ROBUSTNESS_REPORT.md"
 RESULTS = ROOT / "outputs" / "robustness_results.json"
 CLIENT, MONTH = "abc", "2026-06"
 IS, BS = "Income Statement", "Balance Sheet"
+TIEOUT_STOP = "Current Year Earnings = year-to-date net income"
 CORE = ("latest_month", "prior_month", "months", "line_items", "top_movements", "cash", "gross_margin_flags", "one_offs")
 
 
@@ -421,8 +422,13 @@ def judge(fault: Fault, r: dict, cell: str | None, baseline: dict) -> dict:
     expect = fault.expect.replace("{cell}", cell or "?")
     if r["status"] != "success":
         msg = " | ".join(r["errors"]) or r["stderr_tail"] or f"exit {r['exit']}"
-        ok = fault.required == "STOP" and expect in msg and r["packet"] is None and r["exit"] != 0
-        return {"actual": "STOP", "pass": ok, "message": msg}
+        stopped = r["packet"] is None and r["exit"] != 0
+        ok = fault.required == "STOP" and expect in msg and stopped
+        # Stricter than declared: the Balance Sheet tie-out (added after this suite's declarations were fixed) refuses a
+        # file whose net income no longer matches Current Year Earnings, before the declared WARN can happen. A refusal
+        # is never SILENT-WRONG, so it passes, but it is counted and shown separately (the declaration is NOT edited).
+        stricter = fault.required == "WARN" and stopped and TIEOUT_STOP in msg
+        return {"actual": "STOP", "pass": ok or stricter, "message": msg, "stricter": stricter}
     new_warnings = [w for w in r["packet"].get("warnings", []) if w not in baseline["packet"]["warnings"]]
     same = core(r["packet"]) == core(baseline["packet"]) and same_values(r["values"], baseline["values"])
     if new_warnings:
@@ -479,7 +485,8 @@ def main(argv=None) -> int:
         else:
             jp, js = judge(f, r["pipeline"], r["cell"], baseline), judge(f, r["skill"], r["cell"], baseline)
             row = {"actual": jp["actual"], "skill_actual": js["actual"], "pass": jp["pass"] and js["pass"],
-                   "message": jp["message"], "skill_message": js["message"]}
+                   "message": jp["message"], "skill_message": js["message"],
+                   "stricter": bool(jp.get("stricter") and js.get("stricter"))}
         for k in ("message", "skill_message"):  # temp paths name the user's home folder; keep them out of the report
             row[k] = re.sub(r"[A-Za-z]:[\\/][^|'\"]*?re_fault_\w+", "<temp>", row[k])
         rows.append({"id": f.fid, "family": f.family, "fault": f.name, "required": f.required, **row})
@@ -509,9 +516,13 @@ def write_report(rows, before, after):
              "workbook (`Account Values` sheet) equals the baseline. **SILENT-WRONG** (success, different numbers, no warning) must never occur.", "",
              f"**Result: {sum(1 for r in rows if r['pass'])}/{len(rows)} pass; SILENT-WRONG: "
              f"{sum(1 for r in rows if 'SILENT-WRONG' in (r['actual'], r['skill_actual']))}.**", "",
+             "**Stricter than declared:** a fault declared WARN that the Balance Sheet tie-out refuses (STOP) before the warning could happen. "
+             "Passes because nothing wrong is accepted; the declarations were not edited. Before the tie-out existed (commit c8421e4) these ran as WARN. "
+             "Rule: an expectation only moves toward stricter (HANDLE, WARN, STOP), never looser; no row moved looser. "
+             f"Rows moved to STOP: {', '.join(r['id'] for r in rows if r.get('stricter')) or 'none'}. Per-fault reasons: `03_evals/evals_caught.md`.", "",
              "| ID | Family | Fault | Required | Pipeline | Skill path | Pass | Message shown (pipeline) |", "|---|---|---|---|---|---|---|---|"]
     for r in rows:
-        mark = "✅" if r["pass"] else "—" if r["pass"] is None else "❌"
+        mark = "✅ (stricter)" if r.get("stricter") else "✅" if r["pass"] else "—" if r["pass"] is None else "❌"
         lines.append(f"| {r['id']} | {r['family']} | {esc(r['fault'])} | {r['required']} | {r['actual']} | {r['skill_actual']} | {mark} | {esc(r['message'][:400])} |")
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     RESULTS.write_text(json.dumps({"source_sha256_unchanged": before == after, "results": rows}, indent=2), encoding="utf-8")

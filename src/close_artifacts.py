@@ -90,8 +90,25 @@ def cell_ref(loc: dict, account: str, section: str | None, month: str) -> str | 
     return f"{loc['sheet']}!{get_column_letter(col + 1)}{row}"
 
 
-def build_flux(packet: dict, loc: dict) -> dict:
+def materiality(cfg: dict | None = None) -> dict:
+    """The flux thresholds for one client: `thresholds.materiality` in its config, else the engine defaults.
+    Shown in the flux JSON and the sign-off pack so the reviewer sees why each item was flagged."""
+    own = ((cfg or {}).get("thresholds") or {}).get("materiality") or {}
+    unknown = set(own) - {"min_dollars", "min_pct", "sign_flip_dollars"}
+    if unknown:
+        raise ValueError(f"Unknown materiality setting(s) in the client config: {sorted(unknown)}. "
+                         "Use min_dollars, min_pct and sign_flip_dollars.")
+    out = {"min_dollars": float(own.get("min_dollars", FLUX_MIN_DOLLARS)), "min_pct": float(own.get("min_pct", FLUX_MIN_PCT)),
+           "sign_flip_dollars": float(own.get("sign_flip_dollars", FLUX_SIGN_FLIP_DOLLARS))}
+    if min(out.values()) < 0:
+        raise ValueError("Materiality thresholds must not be negative.")
+    return {**out, "source": "client config" if own else "engine default"}
+
+
+def build_flux(packet: dict, loc: dict, rule: dict | None = None) -> dict:
     month, prior = packet["latest_month"], packet["prior_month"]
+    rule = rule or materiality()
+    min_d, min_p, flip_d = rule["min_dollars"], rule["min_pct"], rule["sign_flip_dollars"]
     items = []
     for account, v in packet["line_items"].items():
         cur, pri = v.get("value") or 0.0, v.get("prior_value") or 0.0
@@ -99,28 +116,30 @@ def build_flux(packet: dict, loc: dict) -> dict:
         if delta is None:
             continue
         code = None
-        if pri == 0 and cur != 0 and abs(delta) >= FLUX_MIN_DOLLARS:
+        if pri == 0 and cur != 0 and abs(delta) >= min_d:
             code = "NEW_ITEM"
-        elif cur == 0 and pri != 0 and abs(delta) >= FLUX_MIN_DOLLARS:
+        elif cur == 0 and pri != 0 and abs(delta) >= min_d:
             code = "DROPPED_ITEM"
-        elif pri * cur < 0 and abs(delta) >= FLUX_SIGN_FLIP_DOLLARS:
+        elif pri * cur < 0 and abs(delta) >= flip_d:
             code = "SIGN_FLIP"
-        elif abs(delta) >= FLUX_MIN_DOLLARS and v.get("mom_pct") is not None and abs(v["mom_pct"]) >= FLUX_MIN_PCT:
+        elif abs(delta) >= min_d and v.get("mom_pct") is not None and abs(v["mom_pct"]) >= min_p:
             code = "LARGE_MOVE"
         if not code:
             continue
-        sev, rule = REASONS[code]
+        sev, rule_text = REASONS[code]
         items.append({
             "account": account, "section": v.get("section"), "reason_code": code, "severity": sev,
             "metric": f"{account} ({v.get('section')})", "current": cur, "prior": pri,
             "dollar_change": delta, "pct_change": v.get("mom_pct"),
             "source_cell_current": cell_ref(loc, account, v.get("section"), month),
             "source_cell_prior": cell_ref(loc, account, v.get("section"), prior),
-            "threshold_rule": rule.format(d=FLUX_MIN_DOLLARS, f=FLUX_SIGN_FLIP_DOLLARS, p=FLUX_MIN_PCT),
+            "threshold_rule": rule_text.format(d=min_d, f=flip_d, p=min_p),
         })
     items.sort(key=lambda r: abs(r["dollar_change"]), reverse=True)
     return {"client": packet.get("client"), "period": month, "prior_period": prior,
-            "rule": {"min_dollars": FLUX_MIN_DOLLARS, "min_pct": FLUX_MIN_PCT, "sign_flip_dollars": FLUX_SIGN_FLIP_DOLLARS},
+            "rule": {"min_dollars": min_d, "min_pct": min_p, "sign_flip_dollars": flip_d},
+            "materiality": {**rule, "statement": (f"Flagged when the month-over-month change is at least ${min_d:,.0f} and {min_p:.0%}; "
+                                                   f"a sign change is flagged from ${flip_d:,.0f}. Source: {rule['source']}.")},
             "items": items}
 
 
@@ -216,6 +235,86 @@ def refusal(report: dict, month: str) -> str | None:
     return f"Intake checks failed (details in intake_{month}.json): " + " | ".join(failed)
 
 
+DATA_CHECK_FIXES = (
+    ("Income statement sheet present", "Restore the sheet name or set sheets.income_statement in the client config."),
+    ("Header row found", "Check the header label in the client config against the workbook."),
+    ("Month columns contiguous", "Remove or fill the gap between month columns so each month sits next to the previous one."),
+    ("Total row present", "Restore the total row label or fix the matching name under totals in the client config."),
+    ("Every amount is a number", "Replace the text or error in the listed cell with a number."),
+    ("Gross profit", "Find the month where the subtotal was keyed or linked wrongly and correct it."),
+    ("Operating income", "Find the month where the subtotal was keyed or linked wrongly and correct it."),
+    ("foots to its lines", "A detail line or its total is wrong in the listed month; compare the lines with the total."),
+    ("Balance Sheet rows present", "Restore the row label or set balance_sheet_rows in the client config."),
+    ("Balance Sheet balances", "Find the month's line that was keyed or linked wrongly."),
+    ("Current Year Earnings", "Check that the Balance Sheet and Income Statement come from the same export."),
+)
+
+
+def data_check_rows(report: dict) -> list[tuple]:
+    """Rows for the pack's 'Data checks' sheet: check, PASS/FAIL, cell reference, fix hint (empty when it passed)."""
+    rows = []
+    for c in report["checks"]:
+        hint = "" if c["passed"] else next((h for key, h in DATA_CHECK_FIXES if key in c["check"]), "Open the cell and compare it with the source export.")
+        detail = c["detail"].split("Fix:")[0].strip(" ;") if c["detail"] else ""
+        rows.append((c["check"], "PASS" if c["passed"] else "FAIL", c["cell_ref"], detail if not c["passed"] else "", hint))
+    return rows
+
+
+BS_ROWS = {"total_assets": "Total Assets", "total_liabilities_equity": "Total Liabilities and Equity",
+           "current_year_earnings": "Current Year Earnings"}
+BS_TOLERANCE = 0.01
+
+
+def balance_sheet_checks(cfg: dict, monthly: pd.DataFrame, account_month: pd.DataFrame) -> list[dict]:
+    """Balance Sheet checks for clients that have one: it balances every month, and Current Year Earnings equals
+    year-to-date net income (fiscal year per config). Returns [] when the client has no Balance Sheet sheet.
+    Each failure names the cells and what to fix, so the reviewer does not have to dig."""
+    bs_sheet = cfg["sheets"].get("balance_sheet")
+    if not bs_sheet:
+        return []
+    from abc_workbook_adapter import ABC_BS_LAYOUT, parse_wide_income_statement
+    rows = {**BS_ROWS, **cfg.get("balance_sheet_rows", {})}
+    bs = parse_wide_income_statement(cfg["workbook_path"], {**ABC_BS_LAYOUT, "sheet": bs_sheet})
+    bs_loc = locate({**cfg, "sections": {}, "sheets": {**cfg["sheets"], "income_statement": bs_sheet},
+                     "layout": {"header_label": ABC_BS_LAYOUT["header_label"], "month_format": ABC_BS_LAYOUT["month_format"]}})
+    out = []
+
+    def add(name, ok, ref, detail=""):
+        out.append({"check": name, "passed": bool(ok), "cell_ref": ref, "detail": detail})
+
+    missing = [v for v in rows.values() if v not in bs.index]
+    if missing:
+        add("Balance Sheet rows present", False, bs_sheet,
+            f"missing {', '.join(missing)}. Fix: restore the row label in the Balance Sheet or set balance_sheet_rows in the client config.")
+        return out
+    add("Balance Sheet rows present", True, bs_sheet, ", ".join(rows.values()))
+
+    def ref(label, ts):
+        return cell_ref(bs_loc, label, None, f"{ts:%Y-%m}") or f"{bs_sheet}!{label} {ts:%Y-%m}"
+
+    diff = bs.loc[rows["total_assets"]] - bs.loc[rows["total_liabilities_equity"]]
+    off = [(ts, d) for ts, d in diff.items() if not abs(d) <= BS_TOLERANCE]  # NaN counts as off
+    add("Balance Sheet balances (assets = liabilities + equity, every month)", not off,
+        _first([ref(rows["total_assets"], ts) for ts, _ in off]) if off else bs_sheet,
+        "Fix: find the month's line that was keyed or linked wrongly; " + "; ".join(f"{ts:%Y-%m}: assets - liabilities & equity = {d:,.2f}" for ts, d in off[:3]) if off else "")
+
+    ni = monthly.set_index("month")["net_income"]
+    start = cfg["fiscal_year"]["start_month"]
+    fy = ni.index.map(lambda m: m.year + (1 if m.month >= start and start != 1 else 0))
+    ytd = ni.groupby(fy).cumsum()
+    cye = bs.loc[rows["current_year_earnings"]]
+    off = []
+    for ts, v in ytd.items():
+        got = cye.get(ts)
+        if got is None or not abs(got - v) <= BS_TOLERANCE:
+            off.append((ts, got, v))
+    add("Current Year Earnings = year-to-date net income (every month)", not off,
+        _first([ref(rows["current_year_earnings"], ts) for ts, _, _ in off]) if off else bs_sheet,
+        "Fix: check that the Balance Sheet and Income Statement are from the same export; " + "; ".join(
+            f"{ts:%Y-%m}: balance sheet {g if g is None else format(g, ',.2f')} vs YTD net income {v:,.2f}" for ts, g, v in off[:3]) if off else "")
+    return out
+
+
 def build_intake(cfg: dict, loc: dict, monthly: pd.DataFrame, account_month: pd.DataFrame) -> dict:
     """Workbook card data: sheets, period range, hash, and pass/fail checks with cell refs."""
     path = Path(cfg["workbook_path"])
@@ -256,6 +355,8 @@ def build_intake(cfg: dict, loc: dict, monthly: pd.DataFrame, account_month: pd.
     sub = {s.casefold() for s in cfg.get("subtotal_rows", [])}
     for sid, v in cfg["sections"].items():
         detail = [a for a in account_month.index if sections.get(a) == sid and a.casefold() not in sub]
+        # A wrong section header would otherwise leave that section's lines unassigned without any error.
+        add(f"Section header matched: {v['header']}", bool(detail), sheet, f"{len(detail)} lines under it" if detail else f"no lines found under a row labelled {v['header']!r}")
         if v["total"] not in account_month.index or not detail:
             continue
         diff = account_month.loc[detail].sum(min_count=1) - account_month.loc[v["total"]]
@@ -263,6 +364,7 @@ def build_intake(cfg: dict, loc: dict, monthly: pd.DataFrame, account_month: pd.
         add(f"{v['total']} foots to its lines (every month)", not off,
             _first([cell_ref(loc, v["total"], None, m) or m for m, _ in off]) if off else sheet,
             "; ".join(f"{m}: lines - total = {d:,.2f}" for m, d in off[:3]))
+    checks += balance_sheet_checks(cfg, monthly, account_month)
     return {
         "workbook": path.name, "sha256": sha256_file(path), "sheets_detected": sheets,
         "period_start": f"{monthly['month'].iloc[0]:%Y-%m}", "period_end": latest, "months": len(monthly),

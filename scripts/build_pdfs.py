@@ -229,7 +229,7 @@ def render(browser, name: str, title: str, body: str, opts: dict, sha: str, date
     footer = (f'<div style="font-size:8px;width:100%;padding:0 18mm;color:#555;font-family:Segoe UI,Arial,sans-serif;'
               f'display:flex;justify-content:space-between;"><span>{html.escape(sha)} &middot; {html.escape(date)}</span>'
               f'<span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span></div>')
-    sizes = [11, 10.5, 10, 9.5, 9, 8.5, 8, 7.5] if opts.get("one_page") else [11]
+    sizes = [11, 10.5, 10, 9.5, 9] if opts.get("one_page") else [11]
     pdf_path = OUT / f"{name}.pdf"
     for fs in sizes:
         page.evaluate(f"document.documentElement.style.setProperty('--fs', '{fs}pt')")

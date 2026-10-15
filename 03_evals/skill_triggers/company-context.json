@@ -1,0 +1,22 @@
+{
+  "name": "company-context",
+  "kind": "skill",
+  "cases": [
+    {
+      "prompt": "What services does RE Financial Services offer?",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Before we start a new client task, which workflow and skill should we use?",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Does the firm do fractional CFO work and SEC reporting?",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Explain what a flux analysis is.",
+      "should_trigger": false
+    }
+  ]
+}

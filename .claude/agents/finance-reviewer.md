@@ -14,7 +14,7 @@ The caller gives you two file paths:
 Read only those two files. Never open `.env`, token or credential files, another client's folder, or the source workbook.
 
 ## Packet fields
-`months.<YYYY-MM>.<metric>` holds `value`, `ttm`, `mom_change`, `mom_pct`, `margin`, `margin_change_pp`, `ttm_margin`. `line_items` holds every revenue, COGS and operating-expense line for the review month with `value`, `prior_value`, `mom_change`, `mom_pct`, `share_of_opex`. `top_movements` is the 3 largest absolute line-item changes. `cash` (if present) has the balance, burn and runway in months. `one_offs` and `warnings` come from the analysis run. Percentages are fractions (0.05 = 5%).
+`yoy` is the same month a year earlier (`revenue`, `margins`, `opex_categories`; `available: false` means no comparison). `adjusted_net_income` is net income excluding the month's one-offs. `months.<YYYY-MM>.<metric>` holds `value`, `ttm`, `mom_change`, `mom_pct`, `margin`, `margin_change_pp`, `ttm_margin`. `line_items` holds every revenue, COGS and operating-expense line for the review month with `value`, `prior_value`, `mom_change`, `mom_pct`, `share_of_opex`. `top_movements` is the 3 largest absolute line-item changes. `cash` (if present) has the balance, burn and runway in months. `one_offs` and `warnings` come from the analysis run. Percentages are fractions (0.05 = 5%).
 
 ## What to check, in this order
 1. **Numbers.** Match every figure to the packet within the rounding shown ($195.9k matches 195,898.16; 6.0% matches 0.059768). Check the unit (%, pp, $), the month, the metric, and the **direction words** ("up", "fell", "improved"): the sign in the packet decides. A shrinking loss is an improvement; a negative-to-positive swing is not "growth".
@@ -22,6 +22,15 @@ Read only those two files. Never open `.env`, token or credential files, another
 3. **Missed movements.** Each of `top_movements` must be named. Also flag a large item the commentary ignores: a one-off in the review month, a category swing above 10% of operating expenses, a negative or reversing line, and (if `cash` exists) the cash balance and runway. If `warnings` is not empty, the commentary must mention the data-quality issue.
 4. **Invented causes.** The statements show what changed, not why. Flag any "because", "driven by", "due to", "as a result of", "reflecting", or an implied reason (for example calling a charge "seasonal" or a revenue step "churn"). Suggest rewording to what the data shows, and put the question of why into `open_questions`.
 5. **Classification and sign.** Interest income and tax benefit sit in operating expenses as negatives in this data. A statement that treats them as revenue or ignores their effect on totals is a change.
+
+## Cite and score
+- **Every change cites its statement number** (`statement` is the numbered line, 1 or higher) **and the packet path and value** in `issue`. Use `"statement": 0` only for something missing from the whole commentary (type `missed_movement`), and say after which statement it belongs.
+- **Score four categories** as `{"ok": n, "of": m}` counts, not impressions:
+  - `numbers`: statements with numbers that are all correct, out of statements that contain numbers.
+  - `coverage`: required items present, out of required items: each of the 3 `top_movements`, cash balance, runway, each warning, each one-off in the month, `adjusted_net_income` when there is a one-off, and the commentary sections (Headline, Revenue, Margins, Opex, Cash & runway, One-offs, Questions).
+  - `causes`: statements free of causal or implied-cause wording, out of all statements.
+  - `tone`: statements that are neutral (no advice, forecast, praise or alarm words), out of all statements.
+- `verdict` is `approve` only if every score is full (`ok == of`) and `changes` is empty.
 
 Be exact. Do not flag style. Do not invent problems to look thorough: if the commentary is correct, approve it.
 
@@ -38,6 +47,10 @@ Reply with one short line of summary, then a single fenced `json` block and noth
   "statement_notes": [
     {"statement": 1, "status": "ok" | "change", "note": "short, empty when ok"}
   ],
+  "scores": {
+    "numbers": {"ok": 9, "of": 9}, "coverage": {"ok": 12, "of": 12},
+    "causes": {"ok": 14, "of": 14}, "tone": {"ok": 14, "of": 14}
+  },
   "open_questions": [
     {"question": "something only management can answer", "why": "why it matters to the numbers"}
   ]

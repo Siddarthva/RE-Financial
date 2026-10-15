@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK = "data/ABC Inc - Financial Statements.xlsx"
 REPORT = ROOT / "outputs" / "mutation_report.md"
 FA, AD = "src/financial_analysis.py", "src/abc_workbook_adapter.py"
+CA, MR = "src/close_artifacts.py", "src/monthly_review.py"
 
 # (mutation, file, original text, mutated text). Each original must occur exactly once.
 MUTANTS = [
@@ -63,21 +64,45 @@ MUTANTS = [
     ("Wrong margin denominator (gross profit / COGS)", AD,
      'out["gross_margin_pct"] = (out["gross_profit"] / out["revenue"])',
      'out["gross_margin_pct"] = (out["gross_profit"] / out["cost_of_goods_sold"])'),
+    # --- Added 2026-10-15: the intake gate, flux, year-over-year and adjusted net income live outside the two engine modules above.
+    ("Flux ignores the percentage threshold", CA,
+     'elif abs(delta) >= min_d and v.get("mom_pct") is not None and abs(v["mom_pct"]) >= min_p:',
+     'elif abs(delta) >= min_d and v.get("mom_pct") is not None:'),
+    ("Year-over-year compares with last month", MR,
+     "    prior = month - pd.DateOffset(years=1)\n    if prior not in monthly.index:",
+     "    prior = month - pd.DateOffset(months=1)\n    if prior not in monthly.index:"),
+    ("Adjusted net income sign reversed", MR,
+     'effect = sum(o["amount"] if o["section"] == "income" else -o["amount"] for o in items)',
+     'effect = sum(-o["amount"] if o["section"] == "income" else o["amount"] for o in items)'),
+    ("Balance Sheet tie-out tolerance made huge", CA,
+     "BS_TOLERANCE = 0.01",
+     "BS_TOLERANCE = 1e12"),
+    ("Section footing check made blind", CA,
+     'off = [(f"{m:%Y-%m}", d) for m, d in diff.items() if not abs(d) <= 0.01]',
+     'off = [(f"{m:%Y-%m}", d) for m, d in diff.items() if not abs(d) <= 1e12]'),
+    ("Prior-month column no longer required", CA,
+     'for m, role in ((month, "the requested month"), (prior, f"the prior month of {month}")):',
+     'for m, role in ((month, "the requested month"),):'),
 ]
 
-
 def make_copy(dest: Path):
-    for name in ("src", "tests", "03_evals", "clients", "01_connection", "scripts"):  # tests import from 01_connection/ and scripts/
-        shutil.copytree(ROOT / name, dest / name, ignore=shutil.ignore_patterns("__pycache__"))
+    for name in ("src", "tests", "03_evals", "clients", "01_connection", "scripts", "02_skill", ".claude"):  # tests import from 01_connection/, scripts/ and 02_skill/; hook and skill tests read .claude/
+        shutil.copytree(ROOT / name, dest / name, ignore=shutil.ignore_patterns("__pycache__", "settings.local.json"))
+    # Saved skill outputs (commentary, flux notes, client questions, review) that tests and golden cases G29-G33 read.
+    shutil.copytree(ROOT / "outputs" / "abc", dest / "outputs" / "abc", ignore=shutil.ignore_patterns("__pycache__"))
     (dest / "data").mkdir()
     shutil.copy2(ROOT / WORKBOOK, dest / WORKBOOK)  # tests read the copy; the original is never opened for write
 
 
-def run_evals(project: Path):
-    """Return (failing unit tests, failing golden case ids, raw log tail)."""
-    unit = subprocess.run([sys.executable, "-X", "utf8", "-m", "unittest", "discover", "-s", "tests", "-v"],
+def run_evals(project: Path, fail_fast: bool = False):
+    """Return (failing unit tests, failing golden case ids). With fail_fast the unit run stops at the first failing test:
+    enough to call a mutant caught, and it keeps the whole run to minutes. The baseline always runs in full."""
+    unit = subprocess.run([sys.executable, "-X", "utf8", "-m", "unittest", "discover", "-s", "tests", "-v"] + (["-f"] if fail_fast else []),
                           cwd=project, capture_output=True, text=True, encoding="utf-8", timeout=600)
-    failed_tests = sorted(set(re.findall(r"^(test_\w+) \(.*?\) \.\.\. (?:FAIL|ERROR)", unit.stderr, re.M)))
+    # Inline "test_x (...) ... FAIL" is replaced by the docstring's first line for a test that has one, so also read the
+    # "FAIL: test_x (...)" / "ERROR: test_x (...)" summary lines; otherwise a failing documented test looks like no failure.
+    failed_tests = sorted(set(re.findall(r"^(test_\w+) \(.*?\) \.\.\. (?:FAIL|ERROR)", unit.stderr, re.M))
+                          | set(re.findall(r"^(?:FAIL|ERROR): (test_\w+) \(", unit.stderr, re.M)))
     failed_tests += sorted(set(f"{m} (setUpClass)" for m in re.findall(r"^ERROR: setUpClass \(.*?\.(\w+)\)", unit.stderr, re.M)))
     golden = subprocess.run([sys.executable, "-X", "utf8", "03_evals/run_golden_evals.py"],
                             cwd=project, capture_output=True, text=True, encoding="utf-8", timeout=600)
@@ -105,7 +130,7 @@ def main():
             if code.count(old) != 1:
                 raise SystemExit(f"Mutant {i} ({name}, {rel}): expected 1 match, found {code.count(old)}. Update MUTANTS.")
             target.write_text(code.replace(old, new), encoding="utf-8")
-            tests, golden = run_evals(work)
+            tests, golden = run_evals(work, fail_fast=True)
             caught_by = golden + tests
             rows.append((name, Path(rel).name, bool(caught_by), caught_by))
             print(f"[{i}/{len(MUTANTS)}] {name} in {Path(rel).name}: {'caught' if caught_by else 'SURVIVED'}")

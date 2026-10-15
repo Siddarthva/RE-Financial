@@ -1,0 +1,22 @@
+{
+  "name": "sec-reporting-support",
+  "kind": "skill",
+  "cases": [
+    {
+      "prompt": "Prepare support for the 10-Q: a traceability matrix and tie-outs.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Draft an MD&A-style variance narrative for qualified review.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Build the 10-K tie-out workpaper from the statements.",
+      "should_trigger": true
+    },
+    {
+      "prompt": "Monthly revenue trend for the ABC workbook.",
+      "should_trigger": false
+    }
+  ]
+}
