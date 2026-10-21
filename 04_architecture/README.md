@@ -8,8 +8,8 @@
 |---|---|---|
 | [`architecture.md`](architecture.md) | The one-page note: structure, what the model sees, hosting, ten-client isolation, credential security, memory, what breaks first. Each point is marked **Implemented** or **Proposed**. | `src/`, `tests/test_client_isolation.py`, [`01_connection/`](../01_connection/README.md) |
 | [`workflow.md`](workflow.md) | The six-stage monthly close (intake gate → calculate and flux → skill draft → reviewer → package → human approval and lock), with the gate at each stage and who acts | `scripts/run_pipeline.py`, `src/monthly_review.py`, `scripts/approve.py` |
-| [`workflows/`](workflows/README.md) | One page per workflow (a–g): inputs, outputs, gates, failure messages, idempotency, tests | [`tests/test_workflow_failures.py`](../tests/test_workflow_failures.py) (12 tests) |
-| [`verification_matrix.md`](verification_matrix.md) | Every line of the brief mapped to a command or file and its result from a clean-state run on 2026-10-14 | Commands listed in the matrix |
+| [`workflows/`](workflows/README.md) | One page per workflow (a–g): inputs, outputs, gates, failure messages, idempotency, tests | [`tests/test_workflow_failures.py`](../tests/test_workflow_failures.py) (17 tests) |
+| [`verification_matrix.md`](verification_matrix.md) | Every line of the brief mapped to a command or file and its result from the final pre-submission run on 2026-10-15 | Commands listed in the matrix |
 | [`brief_traceability.md`](brief_traceability.md) | Each requirement, where it is answered, Done / Partial / Not done, and why | The files it names |
 
 ### Workflow pages

@@ -69,19 +69,21 @@ The brief asks for four deliverables. Each has its own folder.
 
 ## 3. Latest results
 
-From the full regress run on **2026-10-15** (tag `v3.0-submission`). Full records: [`03_evals/FINAL_RUN.md`](03_evals/FINAL_RUN.md) and [`04_architecture/verification_matrix.md`](04_architecture/verification_matrix.md).
+From the full regress run on **2026-10-15** (`outputs/regress_results.json`, `git_head` ed13e86, three commits after tag `v3.0-submission` = 9c850b8; code is the same, docs differ). Full records: [`03_evals/FINAL_RUN.md`](03_evals/FINAL_RUN.md) and [`04_architecture/verification_matrix.md`](04_architecture/verification_matrix.md).
 
+<!-- counts:start readme-results -->
 | Check | Command | Result |
 |---|---|---|
 | Unit tests (incl. UI number checks and robustness regressions) | `python -m unittest discover -s tests` | **185 / 185 pass** |
 | Golden cases | `python 03_evals/run_golden_evals.py` | **33 / 33 pass** |
 | Mutation test | `python 03_evals/mutation_test.py` | **19 / 19 mutants caught**, 0 survived |
 | Commentary grader | `python 03_evals/grade_commentary.py` | **PASS** on engine text, reviewed text and saved skill output; **FAIL** on the deliberately flawed control, as intended |
-| Fault injection (broken workbooks) | `python 03_evals/robustness/fault_injection.py` | **38 / 38 faults handled correctly** on both entry points |
+| Fault injection (broken workbooks) | `python 03_evals/robustness/fault_injection.py` | **38 / 38 faults handled correctly** on both entry points; 0 silent wrong |
 | Client runs | `python src/run_client.py abc` / `xyz` | Both succeed; `xyz` reports 1 expected warning |
 | Live QuickBooks (read-only) | `python 01_connection/qbo_test_connection.py abc --test` | **Pass**: CompanyInfo, monthly P&L Jan–Jun 2026, Balance Sheet at 30 Jun 2026; no write tool registered |
 | Secret scan (tracked files) | `python scripts/scan_secrets.py <paths>` | **0 findings** |
 | Source workbook integrity | SHA-256 before and after every run | **Unchanged** (`75da8d679a89551f…`) |
+<!-- counts:end -->
 
 **What these prove:** the numbers are right on the supplied workbook, the checks can fail when something is wrong, broken input never yields a silent wrong answer, and the connection worked on the date shown.
 **What they don't prove:** that the commentary is insightful. Usefulness is judged by the reviewer subagent and a human, not by code.
@@ -134,8 +136,8 @@ Then open **[`02_skill/sample_outputs/`](02_skill/sample_outputs/)** to see what
 **Optional, slower checks:**
 
 ```powershell
-python 03_evals/mutation_test.py                  # ~6-22 min. Expect: 19/19 mutants caught
-python 03_evals/robustness/fault_injection.py     # ~2 min. Expect: 38/38 faults handled
+python 03_evals/mutation_test.py                  # ~18 min (measured 2026-10-15). Expect: 19/19 mutants caught
+python 03_evals/robustness/fault_injection.py     # ~5 min (measured 2026-10-15). Expect: 38/38 faults handled
 python src/run_client.py xyz                      # a second, different company from config only
 streamlit run 05_review_workspace/app/Home.py     # optional UI; reads outputs/ only
 ```

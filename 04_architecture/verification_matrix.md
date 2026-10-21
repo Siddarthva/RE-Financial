@@ -4,7 +4,7 @@ Two parts: the **current** results (final pre-submission run, 2026-10-15) and, b
 
 ## Current results (final pre-submission run, 2026-10-15)
 
-Run on the committed tree, in this order, one suite at a time.
+Run on the working tree before the commit that contained the changes (see `03_evals/FINAL_RUN.md`), in this order, one suite at a time.
 
 | Command | Exit | Result |
 |---|---|---|
@@ -12,7 +12,7 @@ Run on the committed tree, in this order, one suite at a time.
 | `python 03_evals/run_golden_evals.py` | 0 | **33/33** |
 | `python 03_evals/mutation_test.py` | 0 | **19/19 mutants caught**, 0 survived |
 | `python 03_evals/robustness/fault_injection.py` | 0 | **38/38 faults behaved as required**; source workbook hash unchanged |
-| `git ls-files -z \| xargs -0 python scripts/scan_secrets.py` | 0 | 175 text files scanned, 0 findings |
+| `git ls-files -z \| xargs -0 python scripts/scan_secrets.py` | 0 | 0 findings (246 tracked files in the 2026-10-15 full regress record; earlier runs counted text files only, e.g. 175 and 223) |
 | `python scripts/check_links.py` | 0 | 0 broken links (count in the final run record) |
 
 Not re-run in this pass: the grader on the three commentary texts, the pipeline for abc/xyz, the loader dry run and the live QuickBooks checks. Their last results are in the history below and in `03_evals/FINAL_RUN.md`.
@@ -39,7 +39,7 @@ Not re-run in this pass: the grader on the three commentary texts, the pipeline 
 | 3.4 | Commentary quality beyond numbers | `GRADING.md` | Tone and causes not code-graded | Partial |
 | 4.1 | Structure, files, skills, memory | `04_architecture/architecture.md` | Doc review only | Done |
 | 4.2 | Hosting | `architecture.md` "Hosting" | Doc review only | Done |
-| 4.3 | Ten clients, data separation | `tests/test_client_isolation.py` | In unit run, OK | Partial (two clients; OS/credential separation Proposed) |
+| 4.3 | Ten clients, data separation | `tests/test_client_isolation.py` | In unit run, OK | Partial (three clients: abc, xyz, lmn, plus `tests/test_lmn_isolation.py`; OS/credential separation Proposed) |
 | D1 | Working connection | `01_connection/` | Checks a–d PASS; MCP server is an untracked clone | Partial |
 | D2 | Skill files | `.claude/skills/`, `.claude/commands/monthly-analysis.md` | Saved skill output graded PASS; the skill was **not** re-run live today | Done |
 | D3 | Eval cases and grading | `03_evals/` | As above | Done |

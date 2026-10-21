@@ -2,7 +2,7 @@
 
 One YAML file per client holds every client-specific fact. The engine has no client names in it. Validation is in `load_config()` (`src/run_client.py`); label lookups are in the intake gate (`src/close_artifacts.py`).
 
-**How "what breaks" was measured:** [`config_break_lab.py`](config_break_lab.py) copies `xyz` (or `abc` for Balance Sheet fields) to a temp folder, damages one field, runs `scripts/run_pipeline.py`, and records the result in [`config_break_lab_results.json`](config_break_lab_results.json) (24 cases including a baseline; re-run it any time, about 40 s; `tests/test_config_break_lab.py` pins four of them). Messages below are abridged from that file. **Stop** = the run exits 1 at the stage shown, writes no analysis, and names the problem. **Warn** = the run completes and the problem is listed in `summary.json` → `warnings`. **Silent** = nothing flags it.
+**How "what breaks" was measured:** [`config_break_lab.py`](config_break_lab.py) copies `xyz` (or `abc` for Balance Sheet fields) to a temp folder, damages one field, runs `scripts/run_pipeline.py`, and records the result in [`config_break_lab_results.json`](config_break_lab_results.json) (25 entries including a baseline; re-run it any time, about 40 s; `tests/test_config_break_lab.py` pins four of them). Messages below are abridged from that file. **Stop** = the run exits 1 at the stage shown, writes no analysis, and names the problem. **Warn** = the run completes and the problem is listed in `summary.json` → `warnings`. **Silent** = nothing flags it.
 
 Rule of thumb: a wrong label or format stops the run at **Intake**. A wrong *judgement* (a valid fiscal-year start, a mapping to the wrong category) cannot be detected by code; the reviewer must check it.
 

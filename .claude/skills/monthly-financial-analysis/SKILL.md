@@ -47,7 +47,7 @@ Produce a consistent, review-ready monthly trend analysis for a human finance re
 ## Engine (source of truth for arithmetic)
 - `src/abc_workbook_adapter.py`: `parse_wide_income_statement(path, layout)`, `build_monthly_summary(account_month, totals)` (MoM, margins, calendar-checked TTM), `build_expense_category_trends(account_month, subtotal_rows)` (detail OPEX rows only), `build_category_rollup`, `add_fiscal_year` (fiscal-year labels and FYTD), `find_one_off_items`, `generate_commentary`. The defaults reproduce the ABC layout.
 - `src/financial_analysis.py`: `normalize_monthly` (validates one row per month; MoM, margins, calendar-checked TTM), `category_summary`, `make_commentary`.
-- Golden cases in `03_evals/golden_cases.json` (run `python evals\run_golden_evals.py`) cover the engine rules (G01–G08, G14) and the real ABC workbook (G09–G13). See `03_evals/GRADING.md`.
+- Golden cases in `03_evals/golden_cases.json` (run `python 03_evals/run_golden_evals.py`): 33 cases, G01–G33 (workbook 12, workbook+perturbation 12, ABC cell-sourced 9); index in `03_evals/CASE_INDEX.md`. See `03_evals/GRADING.md`.
 - Known engine caveat: `financial_analysis.category_summary` `expense_mom_pct` has no zero-denominator guard; treat infinite values as undefined.
 
 ## 1. Workbook audit (always first)

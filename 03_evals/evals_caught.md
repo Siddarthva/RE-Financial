@@ -119,7 +119,7 @@ Thin coverage worth knowing (caught, but by a single eval): adapter gross-margin
 
 ## Workflow failure modes (2026-10-14, Phase 3: `04_architecture/workflows/`)
 
-19 failure modes across workflows a–g were run by hand. Before the fixes, 10 failed badly: 8 tracebacks, 1 silent exit, and 1 overwrite of a saved file. 2 more surfaced raw library errors (`DateParseError`, `FileNotFoundError`). All now give one clear line; guarded by `tests/test_workflow_failures.py` (12 tests).
+19 failure modes across workflows a–g were run by hand. Before the fixes, 10 failed badly: 8 tracebacks, 1 silent exit, and 1 overwrite of a saved file. 2 more surfaced raw library errors (`DateParseError`, `FileNotFoundError`). All now give one clear line; guarded by `tests/test_workflow_failures.py` (12 tests at the time; 17 as of 2026-10-22).
 - **Path traversal:** `run_pipeline.py ../x 2026-06` built `outputs/../x/` before validating the id, and `client_sandbox` created `outputs/<client>/.tmp` for any id. Both now refuse invalid ids before building a path.
 - **Tracebacks on the skill path:** `monthly_review.py prepare/build` crashed on refused intake, bad month, unknown client, or a missing or invalid packet, commentary or verdict. Now one `ERROR:` line naming the file and the next step.
 - **Loader:** a bad `--from` and a missing or invalid `--compare` file crashed. An empty range exited 0 and **overwrote `outputs/abc/qbo_load_plan.json` with an empty plan** (found when the probe did exactly that; restored from git). Now a usage error, or a message with nothing written.

@@ -6,6 +6,7 @@
     python scripts/regress.py --only unit golden     # run just these layers (names below)
 
 Layers, in order: unit, golden, commentary (the flawed control must FAIL), trigger, guards, mutation, faults.
+Last guard: `render_counts.py --check` against this run's results (the README count tables must match them).
 Prints a summary table, writes outputs/regress_results.json, exits 1 if any check regressed, 0 if all held.
 Nothing here edits an expected value: each check is a call to the existing eval, and its exit code is the verdict.
 """
@@ -99,6 +100,18 @@ def main(argv=None) -> int:
         results.append({"layer": "guards", "check": "source workbook unchanged", "ok": before == after == WORKBOOK_SHA,
                         "detail": f"sha256 {str(after)[:12]}…", "seconds": 0.0, "tail": ""})
     skipped = [n for _, n, _, _, _, slow in CHECKS if slow and args.fast]
+    sha_now = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    RESULTS.parent.mkdir(exist_ok=True)
+
+    def write_results():
+        failed = [r for r in results if not r["ok"]]
+        RESULTS.write_text(json.dumps({"started": started.isoformat(timespec="seconds"), "git_head": sha_now, "mode": "fast" if args.fast else "full",
+                                       "all_held": not failed, "skipped": skipped, "results": results}, indent=2), encoding="utf-8")
+
+    if any(r["check"] == "unit tests" for r in results) and (not args.only or "guards" in args.only):
+        write_results()  # render_counts reads the unit count from this file, so it must hold this run's result first
+        results.append(run_check("guards", "doc counts (render_counts --check)", PY + ["scripts/render_counts.py", "--check"], "pass", r"(\d+ blocks, \d+ stale)"))
+        print(f"    {'ok' if results[-1]['ok'] else 'REGRESSION'}  doc counts: {results[-1]['detail']}", flush=True)
     print("\n| Layer | Check | Result | Detail | Time |\n|---|---|---|---|---|")
     for r in results:
         print(f"| {r['layer']} | {r['check']} | {'ok' if r['ok'] else '**REGRESSION**'} | {r['detail']} | {r['seconds']}s |")
@@ -109,10 +122,7 @@ def main(argv=None) -> int:
         print(f"\n--- {r['check']} (last output) ---\n{r['tail']}")
     print(f"\n{len(results) - len(failed)}/{len(results)} checks held" + (f"; {len(skipped)} skipped (--fast)" if skipped else "")
           + ("; REGRESSION in: " + ", ".join(r["check"] for r in failed) if failed else "") + ".")
-    RESULTS.parent.mkdir(exist_ok=True)
-    sha_now = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-    RESULTS.write_text(json.dumps({"started": started.isoformat(timespec="seconds"), "git_head": sha_now, "mode": "fast" if args.fast else "full",
-                                   "all_held": not failed, "skipped": skipped, "results": results}, indent=2), encoding="utf-8")
+    write_results()
     return 1 if failed else 0
 
 

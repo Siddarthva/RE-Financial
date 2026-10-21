@@ -8,7 +8,7 @@ Source: "Build Exercise — AI Solutions Builder" (RE Financial Services), the P
 |---|---|---|---|
 | Connect securely and reliably (native connector, open-source MCP, or custom MCP) | `01_connection/connection_decision.md`, `01_connection/.mcp.json.example` | **Done** | Official Intuit MCP server over stdio. Write, update and delete flags are `true`. Secrets stay outside the repo; hooks and the secret scan enforce it. |
 | Demonstrate it working against the sandbox | `01_connection/evidence/quickbooks/`, `01_connection/qbo_test_connection.py` | **Done** | Eight live read-only calls (P&L, GL, balance sheet, company info) are saved with secrets redacted (2026-10-12). A retest on 2026-10-13 had failed; that was a bug in `qbo_test_connection.py` (it sent no `params`, which the server's input check rejects), not an expired token. Fixed. `qbo_test_connection.py abc --test` on 2026-10-14 (03:49 UTC) returned `ok: true`, live read-only CompanyInfo query succeeded; 8 evidence pairs saved. Re-checked 2026-10-14 04:34–04:36 UTC (CompanyInfo, monthly P&L, Balance Sheet, tool list): `01_connection/evidence/quickbooks/2026-10-14/`. |
-| Document what was chosen, what was rejected, and why | `01_connection/connection_decision.md`, `01_connection/part1-quickbooks-mcp.md` | **Done** | Native connector and custom MCP are rejected with reasons. `part1-quickbooks-mcp.md` still contains an older "not yet demonstrated" paragraph about a Claude connection error; a note at its top says it is out of date. |
+| Document what was chosen, what was rejected, and why | `01_connection/connection_decision.md`, `01_connection/part1-quickbooks-mcp.md` | **Done** | Custom MCP is rejected with reasons; the native connector is not rejected, only marked not verified (no first-party QuickBooks connector could be confirmed on 2026-10-15), with its scores and what would change the choice. `part1-quickbooks-mcp.md` still contains an older "not yet demonstrated" paragraph about a Claude connection error; a note at its top says it is out of date. |
 | Where it would run if a whole team needed it | `01_connection/connection_decision.md` ("Team hosting") | **Partial** | Written as a design only and labelled Proposed. The server has no network transport, so a shared service would need a wrapper that does not exist. |
 | How credentials are handled throughout | `01_connection/connection_decision.md` ("Credential flow"), `.claude/hooks/guard_secrets.py`, `scripts/scan_secrets.py`, `01_connection/dependency_risk.md` | **Done** | Hook blocks reads of environment and token files. Evidence is redacted and tested. The audit found 49 npm vulnerabilities, 3 in runtime dependencies, all classed unreachable over stdio; none were fixed. The hook matches file names, not contents. |
 
@@ -29,7 +29,7 @@ Source: "Build Exercise — AI Solutions Builder" (RE Financial Services), the P
 | Requirement | Where | Status | Reason |
 |---|---|---|---|
 | At least five golden cases (data state plus expected output) | `03_evals/golden_cases.json`, `03_evals/run_golden_evals.py` | **Done** | 33 cases by `source`: `workbook` 12 (G01, G02, G03, G06, G26–G33), `workbook+perturbation` 12 (G04, G05, G07, G08, G14, G19–G25), ABC cell-sourced 9 (G09–G13, G15–G18). Expected values for the real-workbook cases were derived by hand from source cells, not from the adapter. |
-| How the system is graded | `03_evals/GRADING.md`, `03_evals/grade_commentary.py` | **Done** | Three graders: numbers, commentary (numbers, top-3 movements, cash risk), and mutation. |
+| How the system is graded | `03_evals/GRADING.md`, `03_evals/grade_commentary.py` | **Done** | Four graders: numbers (golden cases), commentary (numbers, top-3 movements, cash risk), mutation, and robustness (fault injection). |
 | How a regression is detected after a change | `03_evals/mutation_test.py`, `scripts/export_eval_results.py`, `.claude/hooks/test_after_edit.py` | **Done** | 19 injected bugs must each fail a test or case. 38 corrupted-workbook faults (32 + 6 WARN-path variants) (`03_evals/robustness/fault_injection.py`) must each STOP, WARN or be handled as declared on both entry points; the pre-fix code scored 9/32 with 8 silent wrong results. The post-edit hook reruns unit tests after edits under `src/`. There is no CI service; the checks run on demand. |
 | Grading quality of the commentary itself | `03_evals/GRADING.md` | **Partial** | Numbers and coverage are graded; tone, usefulness and causal reasoning are not. |
 
@@ -37,16 +37,16 @@ Source: "Build Exercise — AI Solutions Builder" (RE Financial Services), the P
 
 | Requirement | Where | Status | Reason |
 |---|---|---|---|
-| Project structure: files, skills, memory | `04_architecture/architecture.md` | **Done** | Covers structure and a Memory section. The note is 614 words (38 Markdown lines, some long; `wc -w`). Not checked as a printed page. |
+| Project structure: files, skills, memory | `04_architecture/architecture.md` | **Done** | Covers structure and a Memory section. The note is 467 words (46 Markdown lines, some long; `wc -w`, 2026-10-22). Not checked as a printed page. |
 | Hosting choices | `04_architecture/architecture.md` ("Hosting") | **Done** | One Windows machine, implemented; shared hosting is Proposed. |
-| What changes at ten clients, and keeping each client's data separate | `04_architecture/architecture.md` ("Ten-client isolation") | **Partial** | Per-client config and output folders with an in-process audit hook are implemented and tested with two clients. Per-client OAuth grants, processes and OS accounts are Proposed. The hook covers this Python process only, not Claude's own tools. |
+| What changes at ten clients, and keeping each client's data separate | `04_architecture/architecture.md` ("Ten-client isolation") | **Partial** | Per-client config and output folders with an in-process audit hook are implemented and tested with three clients (`abc`, `xyz`, `lmn`; `tests/test_lmn_isolation.py`). Per-client OAuth grants, processes and OS accounts are Proposed. The hook covers this Python process only, not Claude's own tools. |
 
 ## Deliverables
 
 | Deliverable | Where | Status | Reason |
 |---|---|---|---|
 | The working connection (config, deployed server, or code) | `01_connection/` | **Partial** | Config template, scripts and evidence are in the repo. The MCP server itself is Intuit's repository, cloned beside the repo and not tracked, so it is not in the submission zip. A reviewer must clone it, build it and run the OAuth step. |
-| The skill file(s) | `.claude/skills/`, `.claude/commands/`, `.claude/agents/` | **Done** | Seven skills, one command, one reviewer agent. The monthly analysis skill is the one the brief asks for. |
+| The skill file(s) | `.claude/skills/`, `.claude/commands/`, `.claude/agents/` | **Done** | Nine skills, two commands (`/monthly-analysis`, `/close-review`), one reviewer agent. The monthly analysis skill is the one the brief asks for. |
 | Eval cases and grading approach | `03_evals/` | **Done** | See Part 3. |
 | One-page architecture note | `04_architecture/architecture.md` | **Done** | See Part 4. |
 

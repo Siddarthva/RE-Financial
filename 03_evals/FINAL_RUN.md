@@ -32,6 +32,8 @@ Full `python scripts/regress.py` (not `--fast`; `outputs/regress_results.json`: 
 | Internal links | **PASS** | 80 files, 172 links, 0 broken |
 | Secret scan (git-tracked files) | **PASS** | 0 findings, 223 text files (243 tracked paths) |
 
+Later count, same day: the full regress record in `outputs/regress_results.json` (`git_head` ed13e86) found 82 files, 179 links and 246 tracked files; the table above is the earlier run, before that commit added files.
+
 Counts: 185 unit tests (one new: `test_owner_memo_survives_missing_gross_margin`); fault suite 38 = 32 originals + F02b, F13b, F16b, F17b, F21b, F27b; 0 SILENT-WRONG.
 
 Along the way: the first variant run was 5/6. F17b (zero revenue) failed because the reviewer Excel and owner memo crashed on a missing gross margin; fixed in `src/owner_memo.py` and `src/monthly_review.py`, expectation unchanged. See `03_evals/evals_caught.md`.

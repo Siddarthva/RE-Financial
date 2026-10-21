@@ -35,7 +35,7 @@ A model asked to do arithmetic can be fluent and wrong. Here the model never see
 | Pipeline, no model | `python scripts/run_pipeline.py abc 2026-06` | Intake gate, calculation, flux, packet, manifest in `outputs/abc/`. The month is the reporting month; TTM needs 12 consecutive months ending there. Optional `--clients-root DIR` and `--outputs-root DIR` point at other folders (tests and experiments use them so `outputs/` is untouched) |
 | Engine only | `python src/run_client.py abc` | `analysis.xlsx`, `summary.json`, `commentary.md` |
 
-Then approve with `python scripts/approve.py abc 2026-06 --reviewer NAME --reason TEXT`. There is no `/close-review` command; the close review is the `month-end-close-review` skill, loaded when asked.
+Then approve with `python scripts/approve.py abc 2026-06 --reviewer NAME --reason TEXT`. To run all six close stages in order and stop at the first failed gate, use `/close-review abc 2026-06` ([`.claude/commands/close-review.md`](../.claude/commands/close-review.md)); it applies the `month-end-close-review` workflow and never approves.
 
 ## Add a client in 3 steps
 
@@ -63,7 +63,7 @@ Recipe for a **new metric**: compute it in `src/`, expose it in the packet, add 
 
 ## Sample outputs, sheet by sheet
 
-[`sample_outputs/`](sample_outputs/) holds abc, 2026-06: copies of files in `outputs/abc/`. No separate owner memo exists.
+[`sample_outputs/`](sample_outputs/) holds abc, 2026-06: copies of files in `outputs/abc/`, including the owner memo [`owner_memo_2026-06.md`](sample_outputs/owner_memo_2026-06.md), written by `/monthly-analysis` step 5.
 
 | File | Contents |
 |---|---|
