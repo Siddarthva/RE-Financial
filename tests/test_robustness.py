@@ -101,20 +101,22 @@ class IntakeGate(Base):
     def test_missing_prior_month_stops(self):  # F01
         self.assertIn("no column for 2026-05", self.gate(copy_with(self.tmp, set_cell("D5", None))))
 
-    def test_corrupt_and_locked_files_stop_with_a_cause(self):  # F29, F31
+    def test_corrupt_file_stops_with_a_cause(self):  # F29
         bad = self.tmp / "bad.xlsx"
         bad.write_bytes(b"not a workbook")
         self.assertIn("Not a valid .xlsx workbook", self.gate(bad))
-        if sys.platform == "win32":
-            import msvcrt
-            path = copy_with(self.tmp)
-            with open(path, "r+b") as f:
-                msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, path.stat().st_size)
-                try:
-                    self.assertIn("open or locked", self.gate(path))
-                finally:
-                    f.seek(0)
-                    msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, path.stat().st_size)
+
+    @unittest.skipUnless(sys.platform == "win32", "F31 needs Windows: msvcrt byte-range locks (Excel holding the file) have no POSIX equivalent that blocks reads")
+    def test_locked_file_stops_with_a_cause(self):  # F31
+        import msvcrt
+        path = copy_with(self.tmp)
+        with open(path, "r+b") as f:
+            msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, path.stat().st_size)
+            try:
+                self.assertIn("open or locked", self.gate(path))
+            finally:
+                f.seek(0)
+                msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, path.stat().st_size)
 
 
 class SkillPathUsesTheGate(Base):

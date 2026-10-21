@@ -1,0 +1,63 @@
+# Offline checks only: no secrets, no QuickBooks server, no Claude. Tests that need those skip with a reason.
+# Mutation and fault injection (~25 min) stay in `python scripts/regress.py` (full), run locally before a release.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONUTF8: "1"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install requirements
+        run: python -m pip install -r requirements.txt
+
+      - name: Source workbook hash (before)
+        run: python scripts/ci_workbook_hash.py
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests
+
+      - name: Golden evals
+        run: python 03_evals/run_golden_evals.py
+
+      - name: Commentary grader (engine text must PASS)
+        run: python 03_evals/grade_commentary.py
+
+      - name: Commentary grader (flawed control must FAIL with exit 1)
+        run: |
+          if python 03_evals/grade_commentary.py --commentary outputs/abc/commentary_2026-06_flawed_control.md; then
+            echo "The flawed control passed: the grader no longer detects a known-bad text."; exit 1
+          else
+            code=$?
+            test "$code" -eq 1 || { echo "Control crashed with exit $code instead of a clean FAIL."; exit 1; }
+          fi
+
+      - name: Doc count tables are current
+        run: python scripts/render_counts.py --check
+
+      - name: Secret scan (tracked files)
+        run: git ls-files -z | xargs -0 python scripts/scan_secrets.py
+
+      - name: Source workbook hash (after)
+        run: python scripts/ci_workbook_hash.py
