@@ -530,7 +530,7 @@ The full log, with fixes and regression tests: [`03_evals/evals_caught.md`](03_e
 - **Stretch goal not completed.** The loader and its 18-entry plan are built and tested against a fake, but no live write was made, and the skill reads the workbook, not QuickBooks. This was deliberate: a write needs a separately approved credential. Also, a QuickBooks P&L couldn't reproduce the workbook's 70 expense accounts anyway.
 - **Live connection needs your own setup.** A reviewer needs their own Intuit sandbox, the cloned MCP server and `npm run auth`. Without them, `--test` explains what is missing.
 - **Team hosting and ten-client isolation are designs.** Three clients exist (`abc`, `xyz`, `lmn`); isolation is in-process, not an OS or credential boundary.
-- **The MCP server is not in this repo.** It's Intuit's code, cloned beside it and untracked. Its npm audit findings are triaged in `dependency_risk.md`; none were fixed upstream.
+- **The MCP server is not in this repo.** It's Intuit's code, cloned beside it and untracked. Its npm audit findings are triaged in `dependency_risk.md`; `npm audit fix` was applied to the local clone on 2026-10-22 (0 critical/high left), but the clone is untracked, so a fresh clone starts from Intuit's lockfile.
 - **Different workbook shapes need code.** New clients need only a config, but the parser expects a wide sheet with one column per month.
 - **Commentary quality is only partly graded.** Numbers, coverage and the "no causes" rule are checked by code; usefulness is judged by the LLM reviewer and a human.
 - **Tested on Windows 11 only**, with Python 3.13.5.

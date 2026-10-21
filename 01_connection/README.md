@@ -11,7 +11,7 @@
 | Connect securely | sections 4-6: read-only enforcement, credential lifecycle table, 7 threats |
 | Connect reliably | section 7: 12 failures, message, recovery, test |
 | Where it runs for a team | section 8: diagram and 3-phase rollout (Proposed) |
-| Dependency risk | [`dependency_risk.md`](dependency_risk.md): 49 npm audit findings, 2 critical, 37 high, 10 moderate; 3 in runtime dependencies; none fixed |
+| Dependency risk | [`dependency_risk.md`](dependency_risk.md): 2026-10-13: 49 npm audit findings (3 runtime). 2026-10-22: `npm audit fix` applied in the local clone, 51 → 23 (0 critical, 0 high); runtime 10 → 3 moderate; build and live `--test` pass |
 
 ## Architecture today (Implemented)
 
@@ -49,7 +49,7 @@ Without your own sandbox you can still read the saved evidence (no credentials n
 | [`evidence/quickbooks/checks.json`](evidence/quickbooks/checks.json), [`redaction_log.json`](evidence/quickbooks/redaction_log.json), [`redact_and_verify.py`](evidence/quickbooks/redact_and_verify.py) | Pass/fail checks; what was redacted; residual-secret scan | 2026-10-12 |
 | [`../tests/test_qbo_reliability.py`](../tests/test_qbo_reliability.py), [`../tests/test_qbo_diagnose.py`](../tests/test_qbo_diagnose.py) | 12 failure modes behave as the reliability table says (fake server, no network) | run 2026-10-15 |
 | [`../tests/test_evidence_redaction.py`](../tests/test_evidence_redaction.py) | Saved evidence holds no secret-like text | latest `regress.py` run |
-| [`dependency_risk.md`](dependency_risk.md) | 49 npm findings, 3 runtime, none fixed | 2026-10-13 |
+| [`dependency_risk.md`](dependency_risk.md) | 51 → 23 after `npm audit fix` (0 critical/high), runtime 3 moderate left | 2026-10-22 |
 | [`part1-quickbooks-mcp.md`](part1-quickbooks-mcp.md) | Setup record (steps taken; some paragraphs predate the fix and say so) | 2026-10-12 to 14 |
 
 **Limit:** the sandbox holds Intuit's sample data, not ABC's. The monthly analysis reads the supplied workbook; **QuickBooks data is not an input to it.**

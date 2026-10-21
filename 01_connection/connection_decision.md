@@ -14,7 +14,7 @@ Scores are 1 (poor) to 5 (strong). **They are my judgement, not benchmarks.** "?
 
 | Criterion | A. Native Claude connector | B. Open-source MCP (Intuit official) **chosen** | C. Custom MCP / REST client |
 |---|---|---|---|
-| Security | ? (3) Token held by a vendor-run service; scopes and data handling not established | 4 Local process, no listener, secrets in a file outside the repo; 49 npm audit findings, 3 runtime ([`dependency_risk.md`](dependency_risk.md)) | 3 Best control in theory; every security decision becomes ours to get right |
+| Security | ? (3) Token held by a vendor-run service; scopes and data handling not established | 4 Local process, no listener, secrets in a file outside the repo; 49 npm audit findings on 2026-10-13, 0 critical/high after `npm audit fix` on 2026-10-22 ([`dependency_risk.md`](dependency_risk.md)) | 3 Best control in theory; every security decision becomes ours to get right |
 | Read-only enforceability | ? (2) No evidence a per-category tool gate exists | 4 Write/update/delete tools are not registered when the 3 flags are `true`: 71 tools, none a writer ([`2026-10-14/01_tools_list.response.json`](evidence/quickbooks/2026-10-14/01_tools_list.response.json)). Not an authorization boundary: the OAuth grant itself can write | 5 Could register only reads. Not built |
 | Maintenance | 5 Vendor-run | 3 Pull upstream, fix npm findings, track API versions | 1 OAuth refresh, pagination, throttling, API versioning all ours |
 | Setup time | ? (4) Presumably click-through, if it exists for a sandbox | 3 About 15 minutes once you have a developer app (README) | 1 Days, plus tests |
