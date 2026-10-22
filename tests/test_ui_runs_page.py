@@ -1,4 +1,4 @@
-"""Runs page (05_review_workspace/app/views/runs.py): one list of the run folders in demo_runs/, with everything for the selected run.
+"""Runs page (05_review_workspace/app/views/runs.py): one list of the run folders in runs/, with everything for the selected run.
 
 Uses invented fixture runs in a temp folder; no model is called. The Claude button's subprocess and the pipeline button's script are mocked.
 Also covers scripts/new_run.py `mark` / `finish` (stage timings) and that no page imports engine modules.
@@ -31,7 +31,7 @@ TIMINGS = {name: {"started": "2026-10-22T05:49:00+00:00", "ended": "2026-10-22T0
 
 
 def build(tmp):
-    demo = Path(tmp) / "demo_runs"
+    demo = Path(tmp) / "runs"
     one = make_run(demo, 1)
     two = make_run(demo, 2, rev=111111.11, ni=-222222.22)
     for d, started in ((one, "2026-10-22T05:48:45+00:00"), (two, "2026-10-22T06:30:00+00:00")):
@@ -76,9 +76,9 @@ class RunsPage(unittest.TestCase):
     def setUpClass(cls):
         cls.tmp = tempfile.TemporaryDirectory()
         cls.demo, cls.one, cls.two, cls.pipe_dir = build(cls.tmp.name)
-        cls.default = render_page("runs", cls.demo)  # newest run (the pipeline-only Output 003) is selected
-        cls.full = render_page("runs", cls.demo, pick="output_001")
-        cls.pipe = render_page("runs", cls.demo, pick="output_003")
+        cls.default = render_page("runs", cls.demo)  # newest run (the pipeline-only Run 3) is selected
+        cls.full = render_page("runs", cls.demo, pick="run1")
+        cls.pipe = render_page("runs", cls.demo, pick="run3")
 
     @classmethod
     def tearDownClass(cls):
@@ -87,7 +87,7 @@ class RunsPage(unittest.TestCase):
     def test_all_run_folders_listed_newest_first_and_nothing_else(self):
         df = runs_table(self.default)
         self.assertEqual(list(df.columns), ["Run", "Type", "Started (IST)", "Client", "Period", "Final grade", "Reviewer verdict", "Git SHA", "Status"])
-        self.assertEqual(list(df["Run"]), ["Output 003", "Output 002", "Output 001"])
+        self.assertEqual(list(df["Run"]), ["Run 3", "Run 2", "Run 1"])
         self.assertEqual(list(df["Type"]), ["Pipeline only", "Full (Claude)", "Full (Claude)"])
         self.assertEqual(df.loc[1, "Final grade"], "PASS")
         self.assertEqual(df.loc[1, "Reviewer verdict"], "approve")
@@ -100,9 +100,9 @@ class RunsPage(unittest.TestCase):
         self.assertEqual([h.value for h in at.header], SECTIONS)
         text = shown(at)
         self.assertIn("written by claude, graded by code", text.lower())
-        df = next(d.value for d in at.dataframe if "Statement" in d.value.columns)
-        self.assertEqual(list(df["Flag"]), ["", "changed in first review"])
-        self.assertEqual(len(at.get("json")), 7)  # packet, both reviews, grade record, final grade, flux, run.json
+        df = next(d.value for d in at.dataframe if "Final" in d.value.columns)
+        self.assertEqual(list(df["Flag"]), ["", "change requested"])
+        self.assertEqual(len(at.get("json")), 8)  # run.json, packet, flux, grade record, final grade, both reviews, evals summary
         self.assertEqual(len(at.get("download_button")), 1)
         self.assertIn("PASS", text)
         self.assertEqual(len(at.error), 0)
@@ -118,33 +118,33 @@ class RunsPage(unittest.TestCase):
     def test_failing_final_grade_shows_red_banner(self):
         with tempfile.TemporaryDirectory() as t:
             make_run(Path(t), 9, grade_passed=False)
-            at = render_page("runs", t, pick="output_009")
+            at = render_page("runs", t, pick="run9")
         self.assertEqual([e.value for e in at.error], ["Code grader failed: not ready for sign-off"])
 
     def test_pipeline_only_run_has_note_not_run_stages_packet_and_no_commentary(self):
         at = self.pipe
         self.assertFalse(at.exception, [e.value for e in at.exception])
-        self.assertIn("Claude stages were not run for this run. Use 'Run full analysis with Claude' or /demo-run.",
-                      [w.value for w in at.warning])
+        self.assertIn("Claude stages were not run for this run.", [i.value for i in at.info])
         tl = next(d.value for d in at.dataframe if "Duration" in d.value.columns)
         status = dict(zip(tl["Stage"], tl["Status"]))
         self.assertEqual(status["Intake"], "done")
         for stage in data.CLAUDE_STAGES:
             self.assertEqual(status[stage], "not run", stage)
         self.assertEqual(dict(zip(tl["Stage"], tl["Duration"]))["Calculate"], "3.7s")
-        self.assertEqual(len(at.get("json")), 1)  # the run's own packet
-        self.assertEqual(json.loads(at.get("json")[0].value)["months"][M]["revenue"]["value"], 987654.32)
+        docs = [json.loads(j.value) for j in at.get("json")]
+        packets = [x for x in docs if "line_items" in x]
+        self.assertEqual([x["months"][M]["revenue"]["value"] for x in packets], [987654.32])  # only the run's own packet
         everything = shown(at) + " ".join(d.value.to_string() for d in at.dataframe)
         self.assertNotIn("Revenue was $195,898.16", everything)
-        self.assertFalse([h for h in at.header if h.value == "3. Commentary review"])
+        self.assertFalse([d for d in at.dataframe if "Final" in d.value.columns])  # no commentary table
         self.assertEqual(len(at.get("download_button")), 0)
 
     def test_every_amount_shown_exists_in_that_runs_packet(self):
-        for at, d in ((self.full, self.one), (render_page("runs", self.demo, pick="output_002"), self.two)):
+        for at, d in ((self.full, self.one), (render_page("runs", self.demo, pick="run2"), self.two)):
             ok = allowed(d)
             for kind, found in {k: set(rx.findall(shown(at))) for k, rx in TOKEN.items()}.items():
                 self.assertEqual(found - ok[kind], set(), f"{kind} not in this run's packet")
-        self.assertIn("$111,111", shown(render_page("runs", self.demo, pick="output_002")))
+        self.assertIn("$111,111", shown(render_page("runs", self.demo, pick="run2")))
 
     def test_buttons_and_hint(self):
         labels = [b.label for b in self.default.button]
@@ -155,14 +155,14 @@ class RunsPage(unittest.TestCase):
 
     def test_pipeline_button_calls_new_run_and_selects_the_new_folder(self):
         with mock.patch.object(actions.subprocess, "run") as run:
-            run.return_value = mock.Mock(returncode=0, stdout="C:\\x\\demo_runs\\output_004\n", stderr="")
+            run.return_value = mock.Mock(returncode=0, stdout="Run folder: C:\\x\\runs\\run4\nrun4 summary\n", stderr="")
             at = render_page("runs", self.demo)
-            with mock.patch.object(data, "DEMO_RUNS", self.demo), mock.patch.object(actions, "claude_path", return_value="claude"):
+            with mock.patch.object(data, "RUNS", self.demo), mock.patch.object(actions, "claude_path", return_value="claude"):
                 next(b for b in at.button if b.label == "Run pipeline only (no Claude)").click()
                 at.run()
         args = run.call_args.args[0]
         self.assertEqual(args[1:], ["scripts/new_run.py", "abc", M])
-        self.assertEqual(at.session_state["run_pick_next"], "output_004")
+        self.assertEqual(at.session_state["run_pick_next"], "run4")
 
     def test_claude_button_runs_mocked_subprocess_and_selects_new_run(self):
         with tempfile.TemporaryDirectory() as t:
@@ -175,11 +175,11 @@ class RunsPage(unittest.TestCase):
 
             with mock.patch.object(actions.subprocess, "Popen", side_effect=fake_popen) as popen:
                 at = render_page("runs", demo)
-                with mock.patch.object(data, "DEMO_RUNS", demo), mock.patch.object(actions, "claude_path", return_value="claude"):
+                with mock.patch.object(data, "RUNS", demo), mock.patch.object(actions, "claude_path", return_value="claude"):
                     next(b for b in at.button if b.label == "Run full analysis with Claude").click()
                     at.run()
             popen.assert_called_once()
-            self.assertEqual(at.session_state["run_pick_next"], "output_002")
+            self.assertEqual(at.session_state["run_pick_next"], "run2")
 
 
 class ClaudeCommand(unittest.TestCase):
@@ -236,22 +236,23 @@ class StageTimings(unittest.TestCase):
             self.assertEqual(sorted(json.loads((f / "run.json").read_text(encoding="utf-8"))["timings"]),
                              ["Grade attempt 2", "Revise", "Skill draft"])
 
-    def test_finish_sets_outcomes_and_skips_unneeded_revision(self):
+    def test_fill_from_files_sets_outcomes_and_skips_unneeded_revision(self):
         with tempfile.TemporaryDirectory() as t:
             f = Path(t)
-            out = f / "abc"
-            out.mkdir()
-            (f / "run.json").write_text(json.dumps({"client": "abc", "month": M, "stages": {}}), encoding="utf-8")
-            (out / f"commentary_grade_{M}.json").write_text(json.dumps({"retry_used": False, "attempts": [{"passed": True, "numbers": "2/2", "mismatches": []}]}))
-            (out / f"commentary_final_grade_{M}.json").write_text(json.dumps({"passed": True, "numbers": "2/2", "mismatches": []}))
-            (out / f"review_{M}_first.json").write_text(json.dumps({"verdict": "approve"}))
-            (out / f"review_{M}.json").write_text(json.dumps({"verdict": "approve"}))
-            for s in ("Grade attempt 1", "Final grade", "Review (first)"):
-                new_run.mark(f, s, "start")
-                new_run.mark(f, s, "end")
-            tm = new_run.finish(f)["timings"]
+            for sec in ("03_commentary", "04_review", "06_pack"):
+                (f / sec).mkdir()
+            run = {"client": "abc", "month": M, "mode": "claude", "stages": {}}
+            (f / "03_commentary" / f"commentary_grade_{M}.json").write_text(json.dumps({"retry_used": False, "attempts": [{"passed": True, "numbers": "2/2", "mismatches": []}]}))
+            (f / "03_commentary" / f"commentary_final_grade_{M}.json").write_text(json.dumps({"passed": True, "numbers": "2/2", "mismatches": []}))
+            (f / "04_review" / f"review_{M}_first.json").write_text(json.dumps({"verdict": "approve"}))
+            (f / "04_review" / f"review_{M}_final.json").write_text(json.dumps({"verdict": "approve"}))
+            for s_ in ("Grade attempt 1", "Final grade", "Review (first)"):
+                run.setdefault("timings", {})[s_] = {"started": "x", "ended": "y", "duration_s": 1.0, "status": "done"}
+            new_run._fill_from_files(f, run)
+            tm = run["timings"]
             self.assertEqual([tm[k]["status"] for k in ("Grade attempt 1", "Final grade", "Review (first)")], ["PASS", "PASS", "approve"])
             self.assertTrue(tm["Revise"]["status"].startswith("skipped"))
+            self.assertEqual((run["reviewer_first_verdict"], run["reviewer_final_verdict"], run["retry_used"]), ("approve", "approve", False))
 
 
 class NoEngineImports(unittest.TestCase):

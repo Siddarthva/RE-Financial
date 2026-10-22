@@ -56,7 +56,7 @@ def no_runs() -> None:
 def run_header(text: str, run) -> None:
     """Page title plus the line that says which run folder every number on the page comes from."""
     st.title(text)
-    st.markdown(f'<div class="crw-cap">Showing: Output {run.number} (<code>{run.folder}</code>)'
+    st.markdown(f'<div class="crw-cap">Showing: Run {run.number} (<code>{run.folder}</code>)'
                 f"{f' · {run.client} {run.month}' if run.client and run.month else ''}</div>", unsafe_allow_html=True)
 
 

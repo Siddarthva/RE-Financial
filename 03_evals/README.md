@@ -7,7 +7,7 @@
 <!-- counts:start evals-layers -->
 | Layer | Command | What it proves | Latest |
 |---|---|---|---|
-| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 271 run, 271 OK |
+| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 284 run, 284 OK |
 | Golden cases | `python 03_evals/run_golden_evals.py` | Engine numbers and flags equal values derived by hand from source cells | 47 / 47 |
 | Commentary grader | `python 03_evals/grade_commentary.py` | Every number in the text matches the engine JSON; top-3 movements named; cash and runway covered | engine, reviewed and saved-skill text PASS; flawed control FAILs as intended |
 | Mutation test | `python 03_evals/mutation_test.py` | The tests and golden cases above fail when a known bug is injected | 19 / 19 mutants caught |

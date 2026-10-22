@@ -1,4 +1,4 @@
-"""The two run buttons. Both create a new demo_runs/output_NNN/ folder; the page then switches to it."""
+"""The two run buttons. Both create a new runs/runN/ folder; the page then switches to it."""
 import re
 
 import streamlit as st
@@ -8,7 +8,7 @@ import data
 import ui
 
 HINT = "To run the full analysis with Claude, type /demo-run <client> <YYYY-MM> in Claude Code (the claude CLI was not found on PATH)."
-TIMEOUT_MSG = "Claude did not finish within 10 minutes and was stopped. Check demo_runs/ for a partial run folder, or run /demo-run in Claude Code."
+TIMEOUT_MSG = "Claude did not finish within 10 minutes and was stopped. Check runs/ for the run folder (it is kept), or run /demo-run in Claude Code."
 _PERIOD = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 
 
@@ -24,7 +24,7 @@ def _claude(client, period, ok):
         return st.caption(HINT)
     if not st.button("Run full analysis with Claude", disabled=not ok,
                      help="Runs: claude -p \"/demo-run <client> <period>\" with the allowed tools of .claude/commands/demo-run.md. "
-                          "Takes a few minutes; the run appears as its own Output NNN."):
+                          "Takes a few minutes; the run appears as its own Run N."):
         return
     before = {r.name for r in data.list_runs()}
     with st.expander("Live log", expanded=True):
@@ -32,6 +32,8 @@ def _claude(client, period, ok):
         with st.spinner("Claude is running /demo-run (up to 10 minutes)..."):
             status, log = actions.run_claude(client, period, on_line=lambda t: box.code(ui.scrub(t[-4000:]), language=None))
     new = [r.name for r in data.list_runs() if r.name not in before]
+    if new:
+        actions.save_claude_log(data.list_runs()[0].dir, status, log)
     _select(new[0] if new else None)
     st.session_state["claude_result"] = {"status": status, "log": ui.scrub(log)[-6000:], "new": new[0] if new else None}
     st.rerun()
@@ -39,7 +41,7 @@ def _claude(client, period, ok):
 
 def _pipeline(client, period, ok):
     if not st.button("Run pipeline only (no Claude)", type="primary", disabled=not ok,
-                     help="Runs scripts/new_run.py for the client and period: a new Output NNN folder with intake and calculate only. "
+                     help="Runs scripts/new_run.py for the client and period: a new runs/runN folder with intake, calculate and the evals. "
                           "Its Claude stages are recorded as not run."):
         return
     with st.spinner("Running pipeline..."):

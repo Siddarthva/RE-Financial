@@ -26,4 +26,7 @@ At the end of every task, report:
 3. **What is still unverified** — anything assumed, skipped, or not tested.
 
 ## UI rule
-- `app/` never calculates financial figures: the UI shows only files inside the selected demo_runs run folder; project pages are labelled.
+- `app/` never calculates financial figures: the UI shows only files inside the selected runs/runN folder; project pages are labelled.
+
+## Runs
+- `runs/` is permanent. Never delete `runs/` or any `runs/runN` folder (not in tests, cleanup or "to start fresh"); a run never writes to `outputs/` or touches another run. Tests use temp folders only.

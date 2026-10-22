@@ -1,11 +1,11 @@
 # scan-secrets: allow-fake-fixtures  (CANARIES below are invented values, used to prove they are never displayed)
-"""The workspace app displays what is inside the selected run folder (demo_runs/output_NNN/) and nothing else.
+"""The workspace app displays what is inside the selected run folder (runs/runN/) and nothing else.
 
-Uses invented fixture runs in a temp folder (never outputs/ or the real demo_runs/). Runs every client-data page headless
+Uses invented fixture runs in a temp folder (never outputs/ or the real runs/). Runs every client-data page headless
 (streamlit AppTest) and checks:
   1. FILE ACCESS: file opening is patched; opening any data file outside the selected run folder fails the test. The only
      exceptions are the project pages' declared files (Evaluations, Architecture & Security);
-  2. with no demo_runs folder (or an empty one) every client-data page shows only the empty state: no $, % or pp, plus the run buttons;
+  2. with no runs folder (or an empty one) every client-data page shows only the empty state: no $, % or pp, plus the run buttons;
   3. with two runs holding different numbers each page shows only the selected run's numbers, and switching runs switches them all;
   4. a file the run lacks reads "Not produced in this run: <file>" and is never borrowed from another run;
   5. every $ / % / pp shown (outside the verbatim commentary and raw JSON) exists in that run's packet; key figures equal the packet;
@@ -28,7 +28,7 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = next((p for p in (ROOT / "05_review_workspace" / "app",) if (p / "Home.py").is_file()), None)
-CLIENT_PAGES = ["overview", "analysis", "insights", "datasources", "runs", "demo_run"]
+CLIENT_PAGES = ["overview", "analysis", "insights", "datasources", "runs", "run_detail"]
 FORBIDDEN = {"abc_workbook_adapter", "financial_analysis", "monthly_review", "run_client", "close_artifacts",
              "client_sandbox", "openpyxl", "numpy", "scipy"}
 DATA_SUFFIXES = {".json", ".jsonl", ".md", ".xlsx", ".csv", ".txt", ".yaml", ".yml", ".xls"}
@@ -52,8 +52,8 @@ CANARIES = ["eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjYW5hcnkifQ.c2lnbmF0dXJlMTIz", "rea
 
 def enrich(d, *, approved=False, status=None):
     """Add the files the engine would have written next to the packet: tables, intake, flux (two items), manifest, audit log."""
-    out = Path(d) / "abc"
-    pk = json.loads((out / f"review_packet_{M}.json").read_text(encoding="utf-8"))
+    nums, intake_dir, pack_dir = Path(d) / "02_numbers", Path(d) / "01_intake", Path(d) / "06_pack"
+    pk = json.loads((nums / f"review_packet_{M}.json").read_text(encoding="utf-8"))
     rev, ev = pk["months"][M]["revenue"]["value"], pk["line_items"]["Events & Conferences"]
     files = {
         f"tables_{M}.json": {"months": [M], "revenue_by_stream": {"Subscriptions": {M: rev}}, "opex_by_category": {"Events": {M: ev["value"]}}},
@@ -70,13 +70,13 @@ def enrich(d, *, approved=False, status=None):
         f"manifest_20261022T070000Z-abc-{M}.json": {"run_id": f"20261022T070000Z-abc-{M}", "skill_version": "1"},
     }
     for name, obj in files.items():
-        (out / name).write_text(json.dumps(obj), encoding="utf-8")
-    (out / "audit_log.jsonl").write_text(json.dumps({"period": M, "event": "pipeline", "at": "2026-10-22"}) + "\n", encoding="utf-8")
+        ((intake_dir if name.startswith("intake_") else nums) / name).write_text(json.dumps(obj), encoding="utf-8")
+    (nums / "audit_log.jsonl").write_text(json.dumps({"period": M, "event": "pipeline", "at": "2026-10-22"}) + "\n", encoding="utf-8")
     if approved:
-        (out / f"approval_{M}.json").write_text(json.dumps(
+        (pack_dir / f"approval_{M}.json").write_text(json.dumps(
             {"status": "approved", "reviewer": "T. Reviewer", "reason": "ok", "decided_at": "2026-10-14T00:00:00+00:00"}), encoding="utf-8")
     if status:
-        (out / "qbo_status.json").write_text(json.dumps(status), encoding="utf-8")
+        (nums / "qbo_status.json").write_text(json.dumps(status), encoding="utf-8")
     return d
 
 
@@ -118,7 +118,7 @@ def stray(opened, run_dir, scratch, extra=()):
     """Data files opened that are neither inside the run folder nor a declared project file. Python/library files are ignored.
     The one other exception is the run index: the selector and the Runs table read each run's run.json, and only that file."""
     ok = {Path(p).resolve() for p in extra}
-    index = lambda p: p.name == "run.json" and re.fullmatch(r"output_\d{3,}", p.parent.name)  # noqa: E731
+    index = lambda p: p.name == "run.json" and re.fullmatch(r"run\d+", p.parent.name)  # noqa: E731
     return sorted({str(p) for p in opened if p.suffix.lower() in DATA_SUFFIXES and (under(p, ROOT) or under(p, scratch))
                    and not (run_dir is not None and under(p, run_dir)) and p not in ok and not index(p)})
 
@@ -156,7 +156,7 @@ def tokens(text):
 
 def without_commentary(text, run_dir):
     """The commentary is Claude's verbatim text; every other string on the page is checked against the packet."""
-    f = Path(run_dir) / "abc" / f"commentary_{M}.md"
+    f = Path(run_dir) / "03_commentary" / f"commentary_{M}_final.md"
     lines = set(f.read_text(encoding="utf-8").splitlines()) if f.is_file() else set()
     return "\n".join(ln for ln in text.replace("\\$", "$").splitlines() if ln.strip() not in lines)
 
@@ -178,7 +178,7 @@ class NoCalculationImports(unittest.TestCase):
 
     def test_clean_interpreter_loads_every_page_without_calculation_modules(self):
         code = (f"import sys; sys.path.insert(0, r'{APP}')\nimport data, ui, actions\n"
-                "from views import analysis, architecture, datasources, demo_run, evaluations, insights, overview, run_controls, runs\n"
+                "from views import analysis, architecture, datasources, run_detail, evaluations, insights, overview, run_controls, runs\n"
                 f"print([m for m in {sorted(FORBIDDEN - {'numpy', 'scipy'})!r} if m in sys.modules])")  # pandas itself loads numpy
         r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=tempfile.gettempdir())
         self.assertEqual(r.returncode, 0, r.stderr[-500:])
@@ -198,7 +198,7 @@ class NoCalculationImports(unittest.TestCase):
             a, b = make_run(Path(t), 1), make_run(Path(t), 2)
             run = data.Run(a)
             with self.assertRaises(ValueError):
-                run._path(f"../../{b.name}/abc/review_packet_{M}.json")
+                run._path(f"../{b.name}/02_numbers/review_packet_{M}.json")
 
 
 @unittest.skipUnless(APP, "app/ not present in this copy")
@@ -207,7 +207,7 @@ class RunOnlyDisplay(unittest.TestCase):
     def setUpClass(cls):
         cls.tmp = tempfile.TemporaryDirectory()
         cls.scratch = Path(cls.tmp.name).resolve()
-        cls.root = cls.scratch / "demo_runs"
+        cls.root = cls.scratch / "runs"
         cls.a = enrich(make_run(cls.root, 1), approved=False)
         cls.b = enrich(make_run(cls.root, 2, rev=111111.11, ni=-222222.22))
         cls.c = make_pipeline_run(cls.root, 3)
@@ -223,7 +223,7 @@ class RunOnlyDisplay(unittest.TestCase):
         cls.tmp.cleanup()
 
     def runs(self):
-        return {"output_001": self.a, "output_002": self.b, "output_003": self.c}.items()
+        return {"run1": self.a, "run2": self.b, "run3": self.c}.items()
 
     # 1. file access ---------------------------------------------------------------------------------------------
     def test_no_page_opens_a_file_outside_the_selected_run_folder(self):
@@ -234,42 +234,42 @@ class RunOnlyDisplay(unittest.TestCase):
 
     def test_the_guard_would_catch_a_borrowed_file(self):
         with OpenSpy() as spy:
-            (self.b / "abc" / f"review_packet_{M}.json").read_bytes()  # a page reading another run's file
+            (self.b / "02_numbers" / f"review_packet_{M}.json").read_bytes()  # a page reading another run's file
         self.assertEqual(len(stray(spy.opened, self.a, self.scratch)), 1)
 
     def test_pages_render_and_name_the_run_they_show(self):
         for (page, name), at in self.at.items():
             self.assertEqual([e.value for e in at.exception], [], f"{page}/{name}")
-            self.assertIn(f"Showing: Output {name[-3:]} (", " ".join(m.value for m in at.markdown), f"{page}/{name}")
+            self.assertIn(f"Showing: Run {name[3:]} (", " ".join(m.value for m in at.markdown), f"{page}/{name}")
 
     # 3. each page shows only the selected run's numbers, and switching switches them -----------------------------
     def test_switching_runs_switches_every_number(self):
-        for page in ("overview", "analysis", "runs", "demo_run"):
-            one, two = page_text(self.at[page, "output_001"], self.a), page_text(self.at[page, "output_002"], self.b)
+        for page in ("overview", "analysis", "runs", "run_detail"):
+            one, two = page_text(self.at[page, "run1"], self.a), page_text(self.at[page, "run2"], self.b)
             self.assertIn("$195,898", one, page)
             self.assertNotIn("$111,111", one, page)
             self.assertIn("$111,111", two, page)
             self.assertNotIn("$195,898", two, page)
             self.assertNotIn("$987,654", one + two, page)  # the pipeline-only run's packet
-        for page in ("overview", "analysis", "demo_run"):
-            three = page_text(self.at[page, "output_003"], self.c)
+        for page in ("overview", "analysis", "run_detail"):
+            three = page_text(self.at[page, "run3"], self.c)
             self.assertIn("$987,654", three, page)
             self.assertNotIn("$195,898", three, page)
             self.assertNotIn("$111,111", three, page)
 
     def test_sidebar_selector_is_the_only_selector_and_drives_the_page(self):
-        with mock.patch.object(data, "DEMO_RUNS", self.root):
+        with mock.patch.object(data, "RUNS", self.root):
             at = AppTest.from_file(str(APP / "Home.py"), default_timeout=120).run()
             self.assertEqual([e.value for e in at.exception], [])
             self.assertEqual([s.label for s in at.sidebar.selectbox], ["Run"])
             self.assertEqual(len(at.sidebar.text_input), 0)
             options = list(at.sidebar.selectbox[0].options)
-            self.assertEqual([o.split(" · ")[0] for o in options], ["Output 003", "Output 002", "Output 001"])
+            self.assertEqual([o.split(" · ")[0] for o in options], ["Run 3", "Run 2", "Run 1"])
             at.sidebar.selectbox[0].select(options[2]).run()
-            self.assertIn("Showing: Output 001", " ".join(m.value for m in at.markdown))
+            self.assertIn("Showing: Run 1", " ".join(m.value for m in at.markdown))
             self.assertIn("$195,898", shown(at))
             at.sidebar.selectbox[0].select(options[1]).run()
-            self.assertIn("Showing: Output 002", " ".join(m.value for m in at.markdown))
+            self.assertIn("Showing: Run 2", " ".join(m.value for m in at.markdown))
             self.assertIn("$111,111", shown(at))
             self.assertNotIn("$195,898", without_commentary(shown(at), self.b))
 
@@ -281,36 +281,36 @@ class RunOnlyDisplay(unittest.TestCase):
             seen.update({sec: [p.title for p in ps] for sec, ps in pages.items()})
             return real(pages, *a, **k)
 
-        with mock.patch.object(data, "DEMO_RUNS", self.root), mock.patch.object(st, "navigation", side_effect=spy):
+        with mock.patch.object(data, "RUNS", self.root), mock.patch.object(st, "navigation", side_effect=spy):
             AppTest.from_file(str(APP / "Home.py"), default_timeout=120).run()
-        self.assertEqual(seen, {"Run data": ["Overview", "Financial Analysis", "Insights & Review", "Data Sources", "Runs", "Demo runs"],
+        self.assertEqual(seen, {"Run data": ["Overview", "Financial Analysis", "Insights & Review", "Data Sources", "Runs", "Run detail"],
                                 "Project (not run data)": ["Evaluations", "Architecture & Security"]})
 
     # 4. missing means missing ------------------------------------------------------------------------------------
     def test_files_the_run_lacks_say_not_produced_and_are_never_borrowed(self):
-        c = {page: collect(self.at[page, "output_003"]).replace("<code>", "").replace("</code>", "") for page in CLIENT_PAGES}
-        self.assertIn(f"Not produced in this run: commentary_{M}.md", c["overview"])
-        self.assertIn(f"Not produced in this run: review_{M}.json", c["insights"])
-        self.assertIn(f"Not produced in this run: approval_{M}.json", c["insights"])
-        self.assertIn("Not produced in this run: qbo_status.json", c["datasources"])
-        self.assertIn(f"Not produced in this run: monthly_review_{M}.xlsx", c["analysis"])
+        c = {page: collect(self.at[page, "run3"]).replace("<code>", "").replace("</code>", "") for page in CLIENT_PAGES}
+        self.assertIn(f"Not produced in this run: 03_commentary/commentary_{M}_final.md", c["overview"])
+        self.assertIn(f"Not produced in this run: 04_review/review_{M}_final.json", c["insights"])
+        self.assertIn(f"Not produced in this run: 06_pack/approval_{M}.json", c["insights"])
+        self.assertIn("Not produced in this run: 02_numbers/qbo_status.json", c["datasources"])
+        self.assertIn(f"Not produced in this run: 06_pack/monthly_review_{M}.xlsx", c["analysis"])
         for needle in ("What drove Bad Debts?", "Revenue was $195,898.16", "$195,898", "$111,111"):
             self.assertFalse([p for p in CLIENT_PAGES if needle in c[p]], needle)
-        a = {page: collect(self.at[page, "output_001"]).replace("<code>", "").replace("</code>", "") for page in CLIENT_PAGES}
-        self.assertIn("Not produced in this run: qbo_status.json", a["datasources"])  # even though other files exist
+        a = {page: collect(self.at[page, "run1"]).replace("<code>", "").replace("</code>", "") for page in CLIENT_PAGES}
+        self.assertIn("Not produced in this run: 02_numbers/qbo_status.json", a["datasources"])  # even though other files exist
         self.assertNotIn("Not produced in this run: commentary", a["overview"])
 
     def test_every_number_table_and_text_block_names_its_source_file(self):
         for name, run in self.runs():
             if run is self.c:
                 continue
-            for page in ("overview", "analysis", "insights", "demo_run"):
+            for page in ("overview", "analysis", "insights", "run_detail"):
                 notes = " ".join(m.value for m in self.at[page, name].markdown)
-                self.assertIn(f"from <code>{name}/abc/review_packet_{M}.json</code>" if page != "insights" else f"from <code>{name}/abc/flux_{M}.json</code>",
+                self.assertIn(f"from <code>{name}/02_numbers/review_packet_{M}.json</code>" if page != "insights" else f"from <code>{name}/02_numbers/flux_{M}.json</code>",
                               notes, f"{page}/{name}")
-        notes = " ".join(m.value for m in self.at["overview", "output_001"].markdown)
-        self.assertIn(f"from <code>output_001/abc/commentary_{M}.md</code>", notes)
-        self.assertIn(f"from <code>output_001/abc/intake_{M}.json</code>", notes)
+        notes = " ".join(m.value for m in self.at["overview", "run1"].markdown)
+        self.assertIn(f"from <code>run1/03_commentary/commentary_{M}_final.md</code>", notes)
+        self.assertIn(f"from <code>run1/01_intake/intake_{M}.json</code>", notes)
 
     # 5. numbers --------------------------------------------------------------------------------------------------
     def test_every_displayed_amount_and_percentage_exists_in_that_runs_packet(self):
@@ -324,7 +324,7 @@ class RunOnlyDisplay(unittest.TestCase):
         for name, run in self.runs():
             if run is self.c:
                 continue
-            pk = json.loads((run / "abc" / f"review_packet_{M}.json").read_text(encoding="utf-8"))
+            pk = json.loads((run / "02_numbers" / f"review_packet_{M}.json").read_text(encoding="utf-8"))
             m = pk["months"][M]
             metrics = {x.label: x for x in self.at["overview", name].metric}
             rev = m["revenue"]
@@ -337,18 +337,18 @@ class RunOnlyDisplay(unittest.TestCase):
             self.assertEqual(metrics["Runway (3m burn)"].value, f"{pk['cash']['runway_months']['3m']:.1f} months")
 
     def test_tables_ttm_and_flux_come_from_the_run_files(self):
-        at = self.at["analysis", "output_002"]
+        at = self.at["analysis", "run2"]
         streams = next(d.value for d in at.dataframe if "Item" in d.value.columns and "Subscriptions" in set(d.value["Item"]))
         self.assertEqual(list(streams[M]), ["$111,111"])
         ttm = next(d.value for d in at.dataframe if "Month" in d.value.columns and not any("Δ" in c or "margin" in c.lower() for c in d.value.columns))
         self.assertEqual(set(ttm["Revenue"]), {"not available"})
-        at = self.at["insights", "output_001"]
+        at = self.at["insights", "run1"]
         table = next(d.value for d in at.dataframe if "Severity" in d.value.columns)
         self.assertEqual(list(table["Account"]), ["Events & Conferences", "Bad Debts"])  # sorted by absolute $ change, not file order
         self.assertEqual(list(table["Severity"]), ["High", "Low"])
 
     def test_reviewer_explanations_are_not_shown(self):
-        text = collect(self.at["insights", "output_001"])
+        text = collect(self.at["insights", "run1"])
         self.assertIn("What drove Bad Debts?", text)
         self.assertNotIn("large swing", text)
 
@@ -363,17 +363,17 @@ class RunOnlyDisplay(unittest.TestCase):
     def test_unreadable_json_shows_a_message_not_a_traceback(self):
         with tempfile.TemporaryDirectory() as t:
             d = enrich(make_run(Path(t), 1))
-            (d / "abc" / f"review_packet_{M}.json").write_text("{not json", encoding="utf-8")
-            at = render_page("overview", t, pick="output_001")
+            (d / "02_numbers" / f"review_packet_{M}.json").write_text("{not json", encoding="utf-8")
+            at = render_page("overview", t, pick="run1")
         self.assertEqual([e.value for e in at.exception], [])
-        self.assertIn(f"Could not read {M}".replace(M, f"review_packet_{M}.json"), collect(at).replace("<code>", "").replace("</code>", ""))
+        self.assertIn(f"Could not read 02_numbers/review_packet_{M}.json", collect(at).replace("<code>", "").replace("</code>", ""))
 
     def test_credentials_in_a_run_file_are_withheld(self):
         status = {"method": "x", "flags": {}, "last_successful_retrieval": "2026-10-12",
                   "last_test": {"tested_at": "t", "ok": False, "message": " | ".join(CANARIES)}}
         with tempfile.TemporaryDirectory() as t:
             enrich(make_run(Path(t), 1), status=status)
-            text = collect(render_page("datasources", t, pick="output_001"))
+            text = collect(render_page("datasources", t, pick="run1"))
         for c in CANARIES:
             self.assertNotIn(c, text)
             self.assertNotIn(c.split(":")[-1].split("=")[-1].strip(), text)
@@ -383,7 +383,7 @@ class RunOnlyDisplay(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             enrich(make_run(Path(t), 1), approved=True)
             for page in ("insights", "overview", "analysis"):
-                at = render_page(page, t, pick="output_001")
+                at = render_page(page, t, pick="run1")
                 self.assertEqual([e.value for e in at.exception], [], page)
                 self.assertIn("Locked - approved", collect(at), page)
                 self.assertNotIn("Approve", [b.label for b in at.button])
@@ -392,7 +392,7 @@ class RunOnlyDisplay(unittest.TestCase):
 
 @unittest.skipUnless(APP, "app/ not present in this copy")
 class EmptyState(unittest.TestCase):
-    def test_no_demo_runs_folder_shows_only_the_empty_state_and_the_run_buttons(self):
+    def test_no_runs_folder_shows_only_the_empty_state_and_the_run_buttons(self):
         with tempfile.TemporaryDirectory() as t:
             for root in (Path(t) / "missing", Path(t)):  # absent, then present but empty
                 for page in CLIENT_PAGES:
@@ -416,7 +416,7 @@ class EmptyState(unittest.TestCase):
                 self.assertEqual(stray(spy.opened, None, scratch), [], page)
 
     def test_sidebar_has_no_selectors_without_runs(self):
-        with tempfile.TemporaryDirectory() as t, mock.patch.object(data, "DEMO_RUNS", Path(t) / "none"):
+        with tempfile.TemporaryDirectory() as t, mock.patch.object(data, "RUNS", Path(t) / "none"):
             at = AppTest.from_file(str(APP / "Home.py"), default_timeout=120).run()
         self.assertEqual([e.value for e in at.exception], [])
         self.assertEqual(len(at.sidebar.selectbox), 0)
@@ -459,7 +459,7 @@ class ProjectPages(unittest.TestCase):
             at = self.render("evaluations", outputs=out, docs=docs)
         self.assertEqual([e.value for e in at.exception], [])
         self.assertEqual({m.label: m.value for m in at.metric}["Unit tests"], "7/9")
-        self.assertNotIn("Showing: Output", " ".join(m.value for m in at.markdown))
+        self.assertNotIn("Showing: Run", " ".join(m.value for m in at.markdown))
 
 
 if __name__ == "__main__":

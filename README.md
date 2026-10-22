@@ -74,7 +74,7 @@ From the post-submission full regress run on **2026-10-22** (`outputs/regress_re
 <!-- counts:start readme-results -->
 | Check | Command | Result |
 |---|---|---|
-| Unit tests (incl. UI number checks and robustness regressions) | `python -m unittest discover -s tests` | **271 / 271 pass** |
+| Unit tests (incl. UI number checks and robustness regressions) | `python -m unittest discover -s tests` | **284 / 284 pass** |
 | Golden cases | `python 03_evals/run_golden_evals.py` | **47 / 47 pass** |
 | Mutation test | `python 03_evals/mutation_test.py` | **19 / 19 mutants caught**, 0 survived |
 | Commentary grader | `python 03_evals/grade_commentary.py` | **PASS** on engine text, reviewed text and saved skill output; **FAIL** on the deliberately flawed control, as intended |
@@ -214,27 +214,30 @@ python scripts/approve.py abc 2026-06 --reviewer "Your Name" --reason "Bad Debts
 
 Approval is refused unless the reviewer verdict is `approve`. Once approved, the period is **locked**: the pipeline won't re-run it, and every decision is appended to `outputs/abc/audit_log.jsonl`.
 
-### 6.6 Demo runs (one numbered folder per analysis; the UI shows only the selected run)
+### 6.6 Runs (one permanent `runs/runN/` folder per analysis; the UI shows only the selected run)
 
-`/demo-run <client> <YYYY-MM>` does what `/monthly-analysis` does (prepare, draft, grade with one retry, `finance-reviewer`, one revision, pack and owner memo), but every file goes into its own folder, `demo_runs/output_001/`, `output_002/`, ... (git-ignored, next free number, never reused). `outputs/` is not touched. It always grades the final text once more, records the result in `run.json`, and never runs `approve.py`.
+Every analysis creates `runs/run1/`, `runs/run2/`, ... (next free number, never reused; sorted numerically, so run10 comes after run9). A run holds everything it produced, including its own eval results, and never writes to `outputs/`. The folder layout is in `runs/README.md`. `runs/run*/` is git-ignored; `runs/README.md` is tracked, so the folder is always visible. A failed stage keeps the folder with status "failed", the error and the log.
 
 ```powershell
-# in Claude Code
+# in Claude Code: full run with Claude (draft, grade with one retry, finance-reviewer, one revision, pack, evals)
 /demo-run abc 2026-06
-# in PowerShell, then refresh the browser after each run
+/demo-run abc 2026-06 --with-regress     # also saves regress.py --fast to 05_evals/regress_fast.json (about 9 min)
+# in PowerShell: pipeline only (intake, calculate, golden evals, hash check; no Claude)
+python scripts/new_run.py abc 2026-06
+# then refresh the browser
 streamlit run 05_review_workspace/app/Home.py
 ```
 
-The UI is strict: **it shows only files inside the selected run folder**. The sidebar has one selector, "Run" (`Output 003 · abc 2026-06 · 12:10 IST · Full (Claude) · PASS`, newest first); client and period come from that run's `run.json`. Every client-data page (Overview, Financial Analysis, Insights & Review, Data Sources, Runs, Demo runs) starts with "Showing: Output NNN (demo_runs/output_NNN)" and puts a small "from output_NNN/abc/<file>" caption under each number, table and text block. Nothing falls back to `outputs/<client>/`, `02_skill/sample_outputs/` or another run: a file the run lacks reads "Not produced in this run: <file name>" (for example no commentary in a pipeline-only run). With no `demo_runs/` folder (or an empty one) every client-data page shows only "No runs yet. Click 'Run full analysis with Claude' or run /demo-run abc 2026-06" and the run buttons, with no numbers.
+Each run folder has `SUMMARY.md`, `run.json`, `01_intake`, `02_numbers`, `03_commentary` (draft and final), `04_review` (first and final), `05_evals` (golden results, commentary grade, flawed-control check, workbook hash, `evals_summary.json`), `06_pack` and `logs`. A pipeline-only run has `NOT_RUN.md` in 03, 04 and 06.
 
-- **Run pipeline only (no Claude)** calls `scripts/new_run.py`, so it also gets its own `output_NNN/` folder; its `run.json` marks the Claude stages "not run". **Run full analysis with Claude** runs `/demo-run`. Either way the selector switches to the new run.
-- **Demo runs page**: run summary, headline numbers, commentary review table (first and final reviewer status, `change` rows highlighted), grade history, reviewer scores and open questions, movements and flux items, owner memo, raw JSON, and the Excel pack download. A failing final grade shows a red "Code grader failed: not ready for sign-off" banner.
-- **Project (not run data)** is a separate sidebar section with Evaluations and Architecture & Security. Each carries the banner "Project-level results, not from a run" with its source file and that file's date. Grades and reviews that belong to a run appear on the run's pages, not there.
-- The decision form is gone from the UI: sign-off stays in `scripts/approve.py` (§6.5), and an `approval_<month>.json` inside a run folder is shown (read-only, "Locked - approved").
+The UI is strict: **it shows only files inside the selected run folder**. The sidebar has one selector, "Run" (`Run 3 · abc 2026-06 · 12:10 IST · Full (Claude) · PASS`, newest first). Every client-data page starts with "Showing: Run N (runs/runN)" and captions each block with its path inside the run. A file the run lacks reads "Not produced in this run: <path>". With no run folders every client-data page shows only "No runs yet..." and the run buttons.
 
-The pages only read files and never calculate or import engine modules; `tests/test_ui_numbers.py` patches file opening, renders every client-data page for fixture runs and fails if any data file outside the selected run folder is opened (the only exception is each run's `run.json`, read to build the selector and the Runs table). `python scripts/new_run.py abc 2026-06` creates a folder and runs intake and calculate without the model steps.
+- **Run pipeline only (no Claude)** calls `scripts/new_run.py`. **Run full analysis with Claude** runs `/demo-run` and keeps the session in `logs/claude_session.log`. Either way the selector switches to the new run.
+- **Run detail / Runs pages** show, in order: SUMMARY.md, headline numbers, commentary review table (draft vs final, `change` rows highlighted), grade history, reviewer scores and open questions, this run's evals with PASS/FAIL badges, flux and top movements, owner memo, raw JSON, Excel downloads. A failing final grade shows a red "Code grader failed: not ready for sign-off" banner.
+- **Project (not run data)** is a separate sidebar section with Evaluations and Architecture & Security.
+- Sign-off stays in `scripts/approve.py` (§6.5).
 
----
+The pages only read files and never calculate or import engine modules; `tests/test_ui_numbers.py` patches file opening and fails if any data file outside the selected run folder is opened.
 
 ## 7. Part 1: QuickBooks sandbox connection
 
@@ -524,7 +527,7 @@ The full log, with fixes and regression tests: [`03_evals/evals_caught.md`](03_e
 | Add a golden case | Add an entry to `03_evals/golden_cases.json` with `source`, the cell references and the expected values; run the runner |
 | Add a metric or flag | Follow the G18 pattern ([§8.5](#85-extending-it-a-worked-example)): engine function → packet → golden case → unit test → log entry |
 | See results in a UI | `streamlit run 05_review_workspace/app/Home.py` |
-| Show a live analysis in the UI | `/demo-run abc 2026-06` in Claude Code, then refresh the Streamlit app ([§6.6](#66-demo-runs-one-numbered-folder-per-analysis-the-ui-shows-only-the-selected-run)) |
+| Show a live analysis in the UI | `/demo-run abc 2026-06` in Claude Code, then refresh the Streamlit app ([§6.6](#66-runs-one-permanent-runsrunn-folder-per-analysis-the-ui-shows-only-the-selected-run)) |
 | Build the submission zip | `python scripts/package_submission.py` (scans for secrets first; includes only git-tracked files) |
 
 ---

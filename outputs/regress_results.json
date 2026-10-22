@@ -1,6 +1,6 @@
 {
-  "started": "2026-10-22T07:16:19+00:00",
-  "git_head": "5e9ed45",
+  "started": "2026-10-22T08:00:59+00:00",
+  "git_head": "c97ef46",
   "mode": "fast",
   "all_held": true,
   "skipped": [
@@ -12,8 +12,8 @@
       "layer": "unit",
       "check": "unit tests",
       "ok": true,
-      "detail": "271",
-      "seconds": 461.3,
+      "detail": "284",
+      "seconds": 700.8,
       "tail": ""
     },
     {
@@ -21,7 +21,7 @@
       "check": "golden cases",
       "ok": true,
       "detail": "47/47",
-      "seconds": 21.4,
+      "seconds": 19.1,
       "tail": ""
     },
     {
@@ -29,7 +29,7 @@
       "check": "engine commentary",
       "ok": true,
       "detail": "PASS",
-      "seconds": 2.7,
+      "seconds": 2.2,
       "tail": ""
     },
     {
@@ -37,7 +37,7 @@
       "check": "reviewed commentary (abc 2026-06)",
       "ok": true,
       "detail": "PASS",
-      "seconds": 3.2,
+      "seconds": 2.3,
       "tail": ""
     },
     {
@@ -45,7 +45,7 @@
       "check": "saved skill output",
       "ok": true,
       "detail": "PASS",
-      "seconds": 2.5,
+      "seconds": 2.1,
       "tail": ""
     },
     {
@@ -53,7 +53,7 @@
       "check": "FLAWED CONTROL must fail",
       "ok": true,
       "detail": "FAIL (failed, as it must)",
-      "seconds": 3.5,
+      "seconds": 2.0,
       "tail": ""
     },
     {
@@ -69,7 +69,7 @@
       "check": "client-questions grader",
       "ok": true,
       "detail": "PASS",
-      "seconds": 0.3,
+      "seconds": 0.2,
       "tail": ""
     },
     {
@@ -84,7 +84,7 @@
       "layer": "guards",
       "check": "internal links",
       "ok": true,
-      "detail": "88 files, 211 links, 0 broken",
+      "detail": "89 files, 211 links, 0 broken",
       "seconds": 0.4,
       "tail": ""
     },
@@ -92,8 +92,8 @@
       "layer": "guards",
       "check": "secret scan",
       "ok": true,
-      "detail": "314 tracked files, 0 findings",
-      "seconds": 1.5,
+      "detail": "315 tracked files, 0 findings",
+      "seconds": 1.2,
       "tail": ""
     },
     {
@@ -109,7 +109,7 @@
       "check": "doc counts (render_counts --check)",
       "ok": true,
       "detail": "3 blocks, 0 stale",
-      "seconds": 0.3,
+      "seconds": 0.2,
       "tail": ""
     }
   ]

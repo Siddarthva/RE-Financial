@@ -203,12 +203,14 @@ def main():
     src = ap.add_mutually_exclusive_group()
     src.add_argument("--commentary", type=Path, help="commentary text file to grade")
     src.add_argument("--run-skill", action="store_true", help="run the skill via `claude -p` and grade its output")
+    ap.add_argument("--outputs-dir", type=Path, default=OUTPUTS, help="where abc_computed.json and commentary_grade.json go (a run folder passes a temp dir)")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
-    OUTPUTS.mkdir(exist_ok=True)
+    out_dir = args.outputs_dir
+    out_dir.mkdir(exist_ok=True)
 
     computed = build_computed()
-    (OUTPUTS / "abc_computed.json").write_text(json.dumps(computed, indent=2), encoding="utf-8")
+    (out_dir / "abc_computed.json").write_text(json.dumps(computed, indent=2), encoding="utf-8")
     if args.commentary:
         text, label = args.commentary.read_text(encoding="utf-8"), str(args.commentary)
     elif args.run_skill:
@@ -220,8 +222,8 @@ def main():
         text, label = "\n".join(abc.generate_commentary(abc.build_monthly_summary(am), am, cash)), "engine generate_commentary()"
 
     report = grade(text, computed)
-    (OUTPUTS / "commentary_grade.json").write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
-    print(f"Grading: {label}\nComputed JSON: {OUTPUTS / 'abc_computed.json'}\n")
+    (out_dir / "commentary_grade.json").write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    print(f"Grading: {label}\nComputed JSON: {out_dir / 'abc_computed.json'}\n")
     for n in report["numbers"]:
         print(f"  {'OK  ' if n['matched'] else 'MISS'} {n['kind']:<7} {n['token']}")
     print(f"\nNumbers: {report['numbers_matched']}/{report['numbers_checked']} match computed values")

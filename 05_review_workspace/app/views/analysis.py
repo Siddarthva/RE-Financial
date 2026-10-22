@@ -26,7 +26,7 @@ def render():
     if xl:
         st.download_button("Download reviewer Excel", xl[1], file_name=xl[0],
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        ui.source_note(f"{run.name}/{run.client}/{xl[0]}")
+        ui.source_note(f"{run.name}/{run.filename('pack')}")
     else:
         ui.missing_name(run.filename("pack"))
 

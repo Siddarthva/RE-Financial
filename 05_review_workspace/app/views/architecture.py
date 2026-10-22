@@ -9,7 +9,7 @@ digraph G {
   wb [label="Source workbook\\n(read-only)"];
   qb [label="QuickBooks MCP\\n(stdio, read-only)", style="rounded,dashed"];
   engine [label="Python engine\\ncomputes every number"];
-  out [label="demo_runs/output_NNN/\\nJSON + Excel"];
+  out [label="runs/runN/\\nJSON + Excel"];
   skill [label="Skill draft\\ncommentary"];
   grader [label="Deterministic grader"];
   rev [label="finance-reviewer\\n(second model)"];

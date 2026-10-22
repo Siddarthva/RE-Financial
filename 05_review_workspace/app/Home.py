@@ -1,6 +1,6 @@
 """Close Review Workspace - entry point. Run: streamlit run 05_review_workspace/app/Home.py
 
-Client-data pages show only what is inside the run chosen in the sidebar (demo_runs/output_NNN/). The two project pages
+Client-data pages show only what is inside the run chosen in the sidebar (runs/runN/). The two project pages
 (Evaluations, Architecture & Security) are listed separately and are not run data."""
 import sys
 from pathlib import Path
@@ -11,7 +11,7 @@ import streamlit as st  # noqa: E402
 
 import data  # noqa: E402
 import ui  # noqa: E402
-from views import (analysis, architecture, datasources, demo_run, evaluations,  # noqa: E402
+from views import (analysis, architecture, datasources, run_detail, evaluations,  # noqa: E402
                    insights, overview, runs)
 
 st.set_page_config(page_title=ui.APP_NAME, page_icon=None, layout="wide")
@@ -38,7 +38,7 @@ st.navigation({
         st.Page(insights.render, title="Insights & Review", url_path="insights"),
         st.Page(datasources.render, title="Data Sources", url_path="sources"),
         st.Page(runs.render, title="Runs", url_path="runs"),
-        st.Page(demo_run.render, title="Demo runs", url_path="demo_runs"),
+        st.Page(run_detail.render, title="Run detail", url_path="run_detail"),
     ],
     "Project (not run data)": [
         st.Page(evaluations.render, title="Evaluations", url_path="evaluations"),

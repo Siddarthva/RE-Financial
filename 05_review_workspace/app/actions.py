@@ -1,6 +1,7 @@
 """Buttons that run the engine's own scripts. No calculation happens here; results are read back via data.py."""
 from __future__ import annotations
 
+import json
 import queue
 import re
 import shutil
@@ -25,15 +26,29 @@ def _run(args: list[str], timeout: int = 180) -> tuple[bool, str]:
 
 
 def run_analysis(client: str, period: str) -> tuple[bool, str]:
-    """Pipeline only (no Claude): scripts/new_run.py makes the next demo_runs/output_NNN/ folder and runs intake + calculate into it."""
-    return _run(["scripts/new_run.py", client, period])
+    """Pipeline only (no Claude): scripts/new_run.py makes the next runs/runN/ folder with intake, calculate and the evals."""
+    return _run(["scripts/new_run.py", client, period], timeout=900)
 
 
 def new_run_folder(output: str) -> str | None:
-    """The run folder name (output_NNN) that new_run.py printed as its last line, or None."""
-    last = (output.strip().splitlines() or [""])[-1].strip()
-    name = Path(last.replace("\\", "/")).name
-    return name if re.match(r"^output_\d{3,}$", name) else None
+    """The run folder name (runN) from the 'Run folder: <path>' line that new_run.py prints, or None."""
+    for line in output.splitlines():
+        if line.startswith("Run folder:"):
+            name = Path(line.split(":", 1)[1].strip().replace("\\", "/")).name
+            return name if re.match(r"^run\d+$", name) else None
+    return None
+
+
+def save_claude_log(folder: Path, status: str, log: str) -> None:
+    """Keep the Claude session in runs/runN/logs/claude_session.log. A run that Claude did not finish is closed as failed (kept, never deleted)."""
+    (folder / "logs").mkdir(exist_ok=True)
+    (folder / "logs" / "claude_session.log").write_text(log, encoding="utf-8")
+    try:
+        status_now = json.loads((folder / "run.json").read_text(encoding="utf-8")).get("status")
+    except (OSError, ValueError):
+        status_now = None
+    if status_now == "running":
+        _run(["scripts/new_run.py", "finish", str(folder), "--failed", f"Claude session ended ({status}) before the run was finished"], timeout=900)
 
 
 def run_golden_evals() -> tuple[bool, str]:
