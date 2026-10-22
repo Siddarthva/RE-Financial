@@ -233,6 +233,33 @@ def parse_long_income_statement(path, layout):
     return data
 
 
+def write_long_workbook(frames, path, columns=None, month_format="%Y-%m", section_headers=None):
+    """Write parsed frames ({sheet name: account x month frame}) as a long-format workbook: one row per (account, month)
+    in the frame's account order, with the section header label (or blank) in the section column. Used to prove the
+    long parser gives the same numbers as the wide one; never writes over a source file."""
+    from openpyxl import Workbook
+    columns = columns or {"account": "Account", "month": "Month", "amount": "Amount", "section": "Section"}
+    headers = section_headers or {sid: h for sid, (h, _) in ABC_LAYOUT["sections"].items()}
+    wb = Workbook()
+    wb.remove(wb.active)
+    for sheet, frame in frames.items():
+        ws = wb.create_sheet(sheet)
+        ws.append([columns["account"], columns["month"], columns["amount"], columns["section"]])
+        sections = frame.attrs.get("sections", {})
+        for account in frame.index:
+            for month in frame.columns:
+                v = frame.at[account, month]
+                ws.append([account, month.strftime(month_format), None,
+                           headers.get(sections.get(account)) if sections.get(account) else None])
+                if not pd.isna(v):
+                    # openpyxl writes floats with 16 significant digits ("%.16g"), which can change the last bit;
+                    # store the exact shortest repr as a numeric cell, as Excel itself does (17 digits).
+                    cell = ws.cell(ws.max_row, 3)
+                    cell._value, cell.data_type = repr(float(v)), "n"
+    wb.save(path)
+    return path
+
+
 def build_monthly_summary(account_month, totals=None):
     def find_row(name):
         matches = account_month.loc[account_month.index.str.casefold() == name.casefold()]

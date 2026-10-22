@@ -1363,5 +1363,252 @@
     },
     "derivation": "(Jun 2026 4875.00 - Sep 2026 2001.00) / 3 = 2874.00 / 3 = 958.00 per month.",
     "grading": "Packet value within the tolerance; every named source field must still hold its recorded value."
+  },
+  {
+    "id": "G41",
+    "name": "Long format (c08): Jun 2026 revenue",
+    "type": "source_fields",
+    "source": {
+      "kind": "long",
+      "cells": [
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Ledger",
+          "cell": "C46",
+          "value": 370574.72
+        }
+      ]
+    },
+    "input": {
+      "client": "c08",
+      "month": "2026-06",
+      "packet_path": "months.2026-06.revenue.value"
+    },
+    "expected": {
+      "value": 370574.72,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+    },
+    "derivation": "Ledger!C46 (Total Income, 2026-06) = 370574.72.",
+    "grading": "Packet value within the tolerance; every named source cell must still hold its recorded value."
+  },
+  {
+    "id": "G42",
+    "name": "Long format (c08): Jun 2026 revenue MoM change",
+    "type": "source_fields",
+    "source": {
+      "kind": "long",
+      "cells": [
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Ledger",
+          "cell": "C46",
+          "value": 370574.72
+        },
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Ledger",
+          "cell": "C45",
+          "value": 367034.78
+        }
+      ]
+    },
+    "input": {
+      "client": "c08",
+      "month": "2026-06",
+      "packet_path": "months.2026-06.revenue.mom_change"
+    },
+    "expected": {
+      "value": 3539.94,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+    },
+    "derivation": "370574.72 - 367034.78 = 3539.94 (C46 - C45).",
+    "grading": "Packet value within the tolerance; every named source cell must still hold its recorded value."
+  },
+  {
+    "id": "G43",
+    "name": "Long format (c08): Jun 2026 revenue MoM %",
+    "type": "source_fields",
+    "source": {
+      "kind": "long",
+      "cells": [
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Ledger",
+          "cell": "C46",
+          "value": 370574.72
+        },
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Ledger",
+          "cell": "C45",
+          "value": 367034.78
+        }
+      ]
+    },
+    "input": {
+      "client": "c08",
+      "month": "2026-06",
+      "packet_path": "months.2026-06.revenue.mom_pct"
+    },
+    "expected": {
+      "value": 0.009645,
+      "tol": 1e-06
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+    },
+    "derivation": "3539.94 / 367034.78 = 0.009645 (+0.96%).",
+    "grading": "Packet value within the tolerance; every named source cell must still hold its recorded value."
+  },
+  {
+    "id": "G44",
+    "name": "Long format (c08): Jun 2026 gross margin",
+    "type": "source_fields",
+    "source": {
+      "kind": "long",
+      "cells": [
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Ledger",
+          "cell": "C106",
+          "value": 240129.87
+        },
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Ledger",
+          "cell": "C46",
+          "value": 370574.72
+        }
+      ]
+    },
+    "input": {
+      "client": "c08",
+      "month": "2026-06",
+      "packet_path": "months.2026-06.gross_profit.margin"
+    },
+    "expected": {
+      "value": 0.647993,
+      "tol": 1e-06
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+    },
+    "derivation": "Gross Profit C106 / Total Income C46 = 240129.87 / 370574.72 = 0.647993.",
+    "grading": "Packet value within the tolerance; every named source cell must still hold its recorded value."
+  },
+  {
+    "id": "G45",
+    "name": "Long format (c08): Salaries line-item MoM change",
+    "type": "source_fields",
+    "source": {
+      "kind": "long",
+      "cells": [
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Ledger",
+          "cell": "C121",
+          "value": 81680.92
+        },
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Ledger",
+          "cell": "C120",
+          "value": 93480.44
+        }
+      ]
+    },
+    "input": {
+      "client": "c08",
+      "month": "2026-06",
+      "packet_path": "line_items.Salaries.mom_change"
+    },
+    "expected": {
+      "value": -11799.52,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+    },
+    "derivation": "81680.92 - 93480.44 = -11799.52 (C121 - C120).",
+    "grading": "Packet value within the tolerance; every named source cell must still hold its recorded value."
+  },
+  {
+    "id": "G46",
+    "name": "Long format (c08): Jun 2026 month-end cash",
+    "type": "source_fields",
+    "source": {
+      "kind": "long",
+      "cells": [
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Balance Sheet",
+          "cell": "C31",
+          "value": 722926.35
+        }
+      ]
+    },
+    "input": {
+      "client": "c08",
+      "month": "2026-06",
+      "packet_path": "cash.value"
+    },
+    "expected": {
+      "value": 722926.35,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+    },
+    "derivation": "Balance Sheet!C31 (Total Cash and Cash Equivalents, 2026-06) = 722926.35.",
+    "grading": "Packet value within the tolerance; every named source cell must still hold its recorded value."
+  },
+  {
+    "id": "G47",
+    "name": "Long format (c08): cash MoM change",
+    "type": "source_fields",
+    "source": {
+      "kind": "long",
+      "cells": [
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Balance Sheet",
+          "cell": "C31",
+          "value": 722926.35
+        },
+        {
+          "file": "clients/c08/c08_financials.xlsx",
+          "sheet": "Balance Sheet",
+          "cell": "C30",
+          "value": 539583.15
+        }
+      ]
+    },
+    "input": {
+      "client": "c08",
+      "month": "2026-06",
+      "packet_path": "cash.mom_change"
+    },
+    "expected": {
+      "value": 183343.2,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+    },
+    "derivation": "722926.35 - 539583.15 = 183343.20.",
+    "grading": "Packet value within the tolerance; every named source cell must still hold its recorded value."
   }
 ]

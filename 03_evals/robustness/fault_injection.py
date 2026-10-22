@@ -108,6 +108,7 @@ class Fault:
     raw: Callable | None = None      # (path) -> None; writes the file itself (corrupt, formulas)
     lock: bool = False
     touches: tuple | None = None     # variants only: the detail accounts the fault itself changes; all others must equal the baseline
+    layout: str = "wide"             # "long": applied to the ABC workbook converted to long format (layout.type: long)
 
 
 def _drop_month(label):
@@ -342,6 +343,50 @@ FAULTS += [
 ]
 
 
+# Long format (layout.type: long). The base is the ABC workbook converted to one row per (account, month), whose
+# packet must equal the wide baseline (checked before any fault runs). Columns: A Account, B Month, C Amount, D Section.
+LONG_LAYOUT = {"type": "long", "month_format": "%Y-%m",
+               "columns": {"account": "Account", "month": "Month", "amount": "Amount", "section": "Section"}}
+
+
+def _long_row(ws, account, month):
+    return next(r for r in range(2, ws.max_row + 1) if ws.cell(r, 1).value == account and ws.cell(r, 2).value == month)
+
+
+def _long_duplicate(wb, ctx):
+    ws = wb[IS]
+    r = _long_row(ws, "Bonus", "2026-06")
+    ws.append([ws.cell(r, c).value for c in range(1, 5)])
+
+
+def _long_missing_month(wb, ctx):
+    """Delete one zero-amount row (an account with no row for a month the others have), outside Jun/May 2026."""
+    ws = wb[IS]
+    r = next(r for r in range(2, ws.max_row + 1) if ws.cell(r, 3).value == 0 and ws.cell(r, 4).value
+             and ws.cell(r, 2).value not in ("2026-06", "2026-05") and not str(ws.cell(r, 1).value).startswith("Total"))
+    ctx["cell"] = f"{ws.cell(r, 1).value} {ws.cell(r, 2).value}"
+    ws.delete_rows(r)
+
+
+def _long_extra_column(wb, ctx):
+    ws = wb[IS]
+    ws.cell(1, 5, "Memo")
+    for r in range(2, ws.max_row + 1):
+        ws.cell(r, 5, "")
+
+
+def _long_rename_column(wb, ctx):
+    wb[IS].cell(1, 3).value = "Amt"
+
+
+FAULTS += [
+    Fault("F33", "Long format", "Duplicate (account, month) row (Bonus, 2026-06 twice)", "STOP", "'Bonus' Jun 2026 appears twice", _long_duplicate, layout="long"),
+    Fault("F34", "Long format", "A month missing for one account (one zero-amount row deleted)", "WARN", "blank cell(s)", _long_missing_month, layout="long"),
+    Fault("F35", "Long format", "Unknown column 'Memo' added to the header", "STOP", "unknown column 'Memo' at E1", _long_extra_column, layout="long"),
+    Fault("F36", "Long format", "Amount column renamed to 'Amt'", "STOP", "column 'Amount' (amount) not found", _long_rename_column, layout="long"),
+]
+
+
 def _late_bind(ctx):
     """Faults whose target cell depends on the workbook's contents."""
     f15 = next(f for f in FAULTS if f.fid == "F15")
@@ -363,14 +408,20 @@ def snapshot(wb) -> list:
     return [(ws.title, [[c.value for c in row] for row in ws.iter_rows()]) for ws in wb.worksheets]
 
 
-def run_case(base_wb, fault: Fault | None, ctx: dict) -> dict:
+def run_case(base_wb, fault: Fault | None, ctx: dict, layout: str = "wide") -> dict:
     tmp = Path(tempfile.mkdtemp(prefix="re_fault_"))
     try:
         cdir = tmp / "clients" / CLIENT
         cdir.mkdir(parents=True)
-        cfg = CONFIG.read_text(encoding="utf-8").splitlines()
-        cfg = [("workbook: book.xlsx" if line.startswith("workbook:") else line) for line in cfg]
-        (cdir / "config.yaml").write_text("\n".join(cfg) + "\n", encoding="utf-8")
+        if layout == "long":
+            import yaml
+            cfg = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+            cfg.update(workbook="book.xlsx", layout=LONG_LAYOUT)
+            (cdir / "config.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False, allow_unicode=True), encoding="utf-8")
+        else:
+            cfg = CONFIG.read_text(encoding="utf-8").splitlines()
+            cfg = [("workbook: book.xlsx" if line.startswith("workbook:") else line) for line in cfg]
+            (cdir / "config.yaml").write_text("\n".join(cfg) + "\n", encoding="utf-8")
         book = cdir / "book.xlsx"
         local = dict(ctx)  # a mutation may record the cell it changed under "cell"
         if fault and fault.raw:
@@ -557,15 +608,29 @@ def main(argv=None) -> int:
     if base["skill"]["values"] != baseline["values"] or not baseline["values"]:
         print("Baseline analysis workbooks differ between the two paths; fix that first.")
         return 2
+    # Long-format base: the same workbook, one row per (account, month). Its numbers must equal the wide baseline.
+    buf = io.BytesIO()
+    engine.write_long_workbook({IS: am, BS: engine.parse_wide_income_statement(io.BytesIO(base_wb), engine.ABC_BS_LAYOUT)}, buf)
+    long_wb = buf.getvalue()
+    long_baseline = None
+    if any(f.layout == "long" for f in FAULTS if not argv or f.fid in argv):
+        print("Baseline (long format, no fault) ...", flush=True)
+        lb = run_case(long_wb, None, ctx, layout="long")
+        for kind in ("pipeline", "skill"):
+            if lb[kind]["status"] != "success" or core(lb[kind]["packet"]) != core(committed):
+                print(f"Long-format baseline ({kind}) does not reproduce the wide packet; fix that first.", lb[kind]["errors"] or lb[kind]["stderr_tail"])
+                return 2
+        long_baseline = lb["pipeline"]
 
     selected = [f for f in FAULTS if not argv or f.fid in argv]
     rows = []
     for f in selected:
-        r = run_case(base_wb, f, ctx)
+        r = run_case(long_wb if f.layout == "long" else base_wb, f, ctx, layout=f.layout)
+        base_for = long_baseline if f.layout == "long" else baseline
         if r.get("skipped"):
             row = {"actual": "SKIPPED", "skill_actual": "SKIPPED", "pass": None, "message": r["skipped"], "skill_message": ""}
         else:
-            jp, js = judge(f, r["pipeline"], r["cell"], baseline, ctx), judge(f, r["skill"], r["cell"], baseline, ctx)
+            jp, js = judge(f, r["pipeline"], r["cell"], base_for, ctx), judge(f, r["skill"], r["cell"], base_for, ctx)
             row = {"actual": jp["actual"], "skill_actual": js["actual"], "pass": jp["pass"] and js["pass"],
                    "message": jp["message"], "skill_message": js["message"],
                    "stricter": bool(jp.get("stricter") and js.get("stricter"))}
