@@ -1,16 +1,14 @@
 import streamlit as st
 
-import actions
-import data
 import ui
-from views._ctx import ctx, need_client
+from views._ctx import need_run
 
 
-def _workbook(client, period):
+def _workbook(run):
     st.subheader("Workbook")
-    i = data.load_intake(client, period)
+    i = run.json("intake")
     if not i.ok:
-        return ui.empty_state("intake result", i.path, i.error)
+        return ui.missing(i)
     d = i.data
     ui.table([
         {"Field": "Workbook", "Value": d.get("workbook")},
@@ -28,37 +26,28 @@ def _workbook(client, period):
     ui.source_note(i.path)
 
 
-def _quickbooks(client):
+def _quickbooks(run):
     st.subheader("QuickBooks")
-    s = data.load_qbo_status(client)
+    s = run.json("qbo_status")
     if not s.ok:
-        ui.empty_state("QuickBooks status", s.path, s.error)
-    else:
-        d = s.data
-        ui.table([
-            {"Field": "Method", "Value": d.get("method")},
-            {"Field": "Last successful retrieval", "Value": d.get("last_successful_retrieval") or "none on record"},
-            *[{"Field": k, "Value": v} for k, v in (d.get("flags") or {}).items()],
-        ])
-        if d.get("flags_source"):
-            st.caption(f"Flags: {d['flags_source']}")
-        t = d.get("last_test")
-        if t:
-            (st.success if t.get("ok") else st.error)(f"Last test {t.get('tested_at')}: {ui.scrub(t.get('message'))}")
-        ui.source_note(s.path)
-    if st.button("Test connection"):
-        with st.spinner("Running read-only CompanyInfo query..."):
-            ok, out = actions.test_qbo(client)
-        if not ok:
-            st.error("The test script could not run. Check that Python and Node.js are installed.")
-        st.rerun()
+        return ui.missing(s)
+    d = s.data
+    ui.table([
+        {"Field": "Method", "Value": d.get("method")},
+        {"Field": "Last successful retrieval", "Value": d.get("last_successful_retrieval") or "none on record"},
+        *[{"Field": k, "Value": v} for k, v in (d.get("flags") or {}).items()],
+    ])
+    if d.get("flags_source"):
+        st.caption(f"Flags: {d['flags_source']}")
+    t = d.get("last_test")
+    if t:
+        (st.success if t.get("ok") else st.error)(f"Last test {t.get('tested_at')}: {ui.scrub(t.get('message'))}")
+    ui.source_note(s.path)
 
 
 def render():
-    client = need_client()
-    if not client:
+    run = need_run("Data Sources")
+    if not run:
         return
-    _, period = ctx()
-    ui.title("Data Sources", f"{client} · period {period or 'n/a'}")
-    _workbook(client, period)
-    _quickbooks(client)
+    _workbook(run)
+    _quickbooks(run)

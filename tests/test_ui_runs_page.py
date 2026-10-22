@@ -1,7 +1,7 @@
-"""Runs page (05_review_workspace/app/views/runs.py): one list of Full (Claude) and Pipeline only runs, with everything for the selected run.
+"""Runs page (05_review_workspace/app/views/runs.py): one list of the run folders in demo_runs/, with everything for the selected run.
 
-Uses invented fixture runs in a temp folder; no model is called. The Claude button's subprocess is mocked.
-Also covers scripts/new_run.py `mark` (stage timings) and that no page imports engine modules.
+Uses invented fixture runs in a temp folder; no model is called. The Claude button's subprocess and the pipeline button's script are mocked.
+Also covers scripts/new_run.py `mark` / `finish` (stage timings) and that no page imports engine modules.
 """
 import ast
 import json
@@ -22,24 +22,16 @@ if APP.is_dir():
     from streamlit.testing.v1 import AppTest
     import actions
     import data
-    from test_ui_runs import FORBIDDEN, M, SECTIONS, TOKEN, allowed, make_run, packet, shown
+    from test_ui_runs import FORBIDDEN, M, SECTIONS, TOKEN, allowed, make_pipeline_run, make_run, packet, render_page, shown
 import new_run
 
-PIPE_NEW, PIPE_OLD = "20261022T070000Z-abc-2026-06", "20261014T073738Z-abc-2026-06"
-PIPE_ONLY_COMMENTARY = "Pipeline-only commentary must never be shown on the Runs page."
 TIMINGS = {name: {"started": "2026-10-22T05:49:00+00:00", "ended": "2026-10-22T05:49:12+00:00", "duration_s": 12.5, "status": "done"}
            for name in ("Intake", "Calculate", "Skill draft", "Grade attempt 1", "Grade attempt 2", "Review (first)", "Revise",
                         "Review (final)", "Final grade", "Package")}
 
 
-def manifest(run_id, started):
-    return {"run_id": run_id, "period": M, "started_at": started, "git_sha": "42bde44", "status": "success",
-            "source": {"workbook": "ABC.xlsx"}, "skill_version": "1",
-            "stages": [{"name": "Intake", "status": "done", "duration_s": 0.5}, {"name": "Calculate", "status": "done", "duration_s": 3.7}]}
-
-
 def build(tmp):
-    demo, outputs = Path(tmp) / "demo_runs", Path(tmp) / "outputs"
+    demo = Path(tmp) / "demo_runs"
     one = make_run(demo, 1)
     two = make_run(demo, 2, rev=111111.11, ni=-222222.22)
     for d, started in ((one, "2026-10-22T05:48:45+00:00"), (two, "2026-10-22T06:30:00+00:00")):
@@ -48,22 +40,8 @@ def build(tmp):
         r["started"] = {"utc": started, "ist": started}
         r["timings"] = TIMINGS
         f.write_text(json.dumps(r), encoding="utf-8")
-    out = outputs / "abc"
-    out.mkdir(parents=True)
-    for rid, started in ((PIPE_NEW, "2026-10-22T07:00:00+00:00"), (PIPE_OLD, "2026-10-14T07:37:38+00:00")):
-        (out / f"manifest_{rid}.json").write_text(json.dumps(manifest(rid, started)), encoding="utf-8")
-    (out / f"review_packet_{M}.json").write_text(json.dumps(packet(999999.99, -888888.88)), encoding="utf-8")
-    (out / f"commentary_{M}.md").write_text(f"## Headline\n1. {PIPE_ONLY_COMMENTARY}\n", encoding="utf-8")
-    return demo, outputs, one, two
-
-
-def render_page(demo, outputs, pick=None, claude="claude"):
-    src = (f"import sys; sys.path.insert(0, r'{APP}')\nimport streamlit as st\nfrom views import runs\n"
-           f"st.session_state['ctx'] = {{'client': 'abc', 'period': '{M}'}}\n"
-           + (f"st.session_state.setdefault('run_pick', {pick!r})\n" if pick else "") + "runs.render()\n")
-    with mock.patch.object(data, "DEMO_RUNS", demo), mock.patch.object(data, "OUTPUTS", outputs), \
-            mock.patch.object(actions, "claude_path", return_value=claude):
-        return AppTest.from_string(src, default_timeout=120).run()
+    pipe = make_pipeline_run(demo, 3)
+    return demo, one, two, pipe
 
 
 def runs_table(at):
@@ -97,23 +75,24 @@ class RunsPage(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmp = tempfile.TemporaryDirectory()
-        cls.demo, cls.outputs, cls.one, cls.two = build(cls.tmp.name)
-        cls.default = render_page(cls.demo, cls.outputs)
-        cls.full = render_page(cls.demo, cls.outputs, pick="demo:output_001")
-        cls.pipe = render_page(cls.demo, cls.outputs, pick=f"pipe:{PIPE_NEW}")
+        cls.demo, cls.one, cls.two, cls.pipe_dir = build(cls.tmp.name)
+        cls.default = render_page("runs", cls.demo)  # newest run (the pipeline-only Output 003) is selected
+        cls.full = render_page("runs", cls.demo, pick="output_001")
+        cls.pipe = render_page("runs", cls.demo, pick="output_003")
 
     @classmethod
     def tearDownClass(cls):
         cls.tmp.cleanup()
 
-    def test_both_kinds_listed_newest_first(self):
+    def test_all_run_folders_listed_newest_first_and_nothing_else(self):
         df = runs_table(self.default)
-        self.assertEqual(list(df.columns), ["Run", "Type", "Started (IST)", "Period", "Final grade", "Reviewer verdict", "Git SHA", "Status"])
-        self.assertEqual(list(df["Run"]), [PIPE_NEW, "Output 002", "Output 001", PIPE_OLD])
-        self.assertEqual(list(df["Type"]), ["Pipeline only", "Full (Claude)", "Full (Claude)", "Pipeline only"])
-        self.assertEqual(df.loc[1, "Final grade"], "PASS 2/2")
+        self.assertEqual(list(df.columns), ["Run", "Type", "Started (IST)", "Client", "Period", "Final grade", "Reviewer verdict", "Git SHA", "Status"])
+        self.assertEqual(list(df["Run"]), ["Output 003", "Output 002", "Output 001"])
+        self.assertEqual(list(df["Type"]), ["Pipeline only", "Full (Claude)", "Full (Claude)"])
+        self.assertEqual(df.loc[1, "Final grade"], "PASS")
         self.assertEqual(df.loc[1, "Reviewer verdict"], "approve")
         self.assertEqual(df.loc[1, "Git SHA"], "1b31efd")
+        self.assertEqual(df.loc[0, "Final grade"], "not run")
 
     def test_full_run_shows_everything(self):
         at = self.full
@@ -137,64 +116,70 @@ class RunsPage(unittest.TestCase):
         self.assertEqual(set(tl["Status"]), {"done"})
 
     def test_failing_final_grade_shows_red_banner(self):
-        d = make_run(self.demo, 9, grade_passed=False)
-        at = render_page(self.demo, self.outputs, pick="demo:output_009")
-        try:
-            self.assertEqual([e.value for e in at.error], ["Code grader failed: not ready for sign-off"])
-        finally:
-            import shutil
-            shutil.rmtree(d)
+        with tempfile.TemporaryDirectory() as t:
+            make_run(Path(t), 9, grade_passed=False)
+            at = render_page("runs", t, pick="output_009")
+        self.assertEqual([e.value for e in at.error], ["Code grader failed: not ready for sign-off"])
 
-    def test_pipeline_only_run_has_note_timeline_packet_and_no_commentary(self):
+    def test_pipeline_only_run_has_note_not_run_stages_packet_and_no_commentary(self):
         at = self.pipe
         self.assertFalse(at.exception, [e.value for e in at.exception])
         self.assertIn("Claude stages were not run for this run. Use 'Run full analysis with Claude' or /demo-run.",
                       [w.value for w in at.warning])
         tl = next(d.value for d in at.dataframe if "Duration" in d.value.columns)
-        self.assertEqual(dict(zip(tl["Stage"], tl["Status"]))["Intake"], "done")
-        self.assertEqual(dict(zip(tl["Stage"], tl["Status"]))["Skill draft"], "not run")
+        status = dict(zip(tl["Stage"], tl["Status"]))
+        self.assertEqual(status["Intake"], "done")
+        for stage in data.CLAUDE_STAGES:
+            self.assertEqual(status[stage], "not run", stage)
         self.assertEqual(dict(zip(tl["Stage"], tl["Duration"]))["Calculate"], "3.7s")
-        self.assertEqual(len(at.get("json")), 1)  # the packet
-        self.assertEqual(json.loads(at.get("json")[0].value)["months"][M]["revenue"]["value"], 999999.99)  # this period's packet
+        self.assertEqual(len(at.get("json")), 1)  # the run's own packet
+        self.assertEqual(json.loads(at.get("json")[0].value)["months"][M]["revenue"]["value"], 987654.32)
         everything = shown(at) + " ".join(d.value.to_string() for d in at.dataframe)
-        self.assertNotIn(PIPE_ONLY_COMMENTARY, everything)
         self.assertNotIn("Revenue was $195,898.16", everything)
         self.assertFalse([h for h in at.header if h.value == "3. Commentary review"])
         self.assertEqual(len(at.get("download_button")), 0)
 
     def test_every_amount_shown_exists_in_that_runs_packet(self):
-        for at, d in ((self.full, self.one), (render_page(self.demo, self.outputs, pick="demo:output_002"), self.two)):
+        for at, d in ((self.full, self.one), (render_page("runs", self.demo, pick="output_002"), self.two)):
             ok = allowed(d)
             for kind, found in {k: set(rx.findall(shown(at))) for k, rx in TOKEN.items()}.items():
                 self.assertEqual(found - ok[kind], set(), f"{kind} not in this run's packet")
-        self.assertIn("$111,111", shown(render_page(self.demo, self.outputs, pick="demo:output_002")))
+        self.assertIn("$111,111", shown(render_page("runs", self.demo, pick="output_002")))
 
     def test_buttons_and_hint(self):
         labels = [b.label for b in self.default.button]
         self.assertEqual(labels, ["Run pipeline only (no Claude)", "Run full analysis with Claude"])
-        self.assertNotIn("Run analysis", labels)
-        at = render_page(self.demo, self.outputs, claude=None)
+        at = render_page("runs", self.demo, claude=None)
         self.assertEqual([b.label for b in at.button], ["Run pipeline only (no Claude)"])
         self.assertIn("/demo-run", " ".join(c.value for c in at.caption))
 
-    def test_claude_button_runs_mocked_subprocess_and_selects_new_run(self):
-        def fake_popen(cmd, **kw):
-            make_run(self.demo, 3)  # what /demo-run would leave behind
-            (self.demo / "output_003" / "run.json").write_text(json.dumps({"client": "abc", "month": M, "started": {"utc": "2026-10-22T08:00:00+00:00"}}))
-            return FakeProc(["working\n", "done\n"])
+    def test_pipeline_button_calls_new_run_and_selects_the_new_folder(self):
+        with mock.patch.object(actions.subprocess, "run") as run:
+            run.return_value = mock.Mock(returncode=0, stdout="C:\\x\\demo_runs\\output_004\n", stderr="")
+            at = render_page("runs", self.demo)
+            with mock.patch.object(data, "DEMO_RUNS", self.demo), mock.patch.object(actions, "claude_path", return_value="claude"):
+                next(b for b in at.button if b.label == "Run pipeline only (no Claude)").click()
+                at.run()
+        args = run.call_args.args[0]
+        self.assertEqual(args[1:], ["scripts/new_run.py", "abc", M])
+        self.assertEqual(at.session_state["run_pick_next"], "output_004")
 
-        try:
+    def test_claude_button_runs_mocked_subprocess_and_selects_new_run(self):
+        with tempfile.TemporaryDirectory() as t:
+            demo = Path(t)
+            make_run(demo, 1)
+
+            def fake_popen(cmd, **kw):
+                make_run(demo, 2)  # what /demo-run would leave behind
+                return FakeProc(["working\n", "done\n"])
+
             with mock.patch.object(actions.subprocess, "Popen", side_effect=fake_popen) as popen:
-                at = render_page(self.demo, self.outputs)
-                next(b for b in at.button if b.label == "Run full analysis with Claude").click()
-                with mock.patch.object(data, "DEMO_RUNS", self.demo), mock.patch.object(data, "OUTPUTS", self.outputs), \
-                        mock.patch.object(actions, "claude_path", return_value="claude"):
+                at = render_page("runs", demo)
+                with mock.patch.object(data, "DEMO_RUNS", demo), mock.patch.object(actions, "claude_path", return_value="claude"):
+                    next(b for b in at.button if b.label == "Run full analysis with Claude").click()
                     at.run()
             popen.assert_called_once()
-            self.assertEqual(at.session_state["run_pick"], "demo:output_003")
-        finally:
-            import shutil
-            shutil.rmtree(self.demo / "output_003", ignore_errors=True)
+            self.assertEqual(at.session_state["run_pick_next"], "output_002")
 
 
 class ClaudeCommand(unittest.TestCase):

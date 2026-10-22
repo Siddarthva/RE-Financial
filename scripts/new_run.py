@@ -94,6 +94,8 @@ def create(client: str, month: str, root: Path = DEMO_RUNS, clients_root: Path =
     stages = {s["name"]: s["status"] for s in (manifest or {}).get("stages", [])}
     if "Grade commentary" in stages and not (out / f"commentary_{month}.md").is_file():
         stages["Grade commentary"] = "skipped (no draft yet)"
+    for later in ("Commentary draft", "Review", "Package"):  # the Claude stages: a pipeline-only run says so; `finish` overwrites these
+        stages.setdefault(later, "not run")
     intake = read_json(out / f"intake_{month}.json") or {}
     timings, t = {}, started
     for st_ in (manifest or {}).get("stages", []):  # Intake and Calculate run back to back, so start = previous end

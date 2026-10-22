@@ -25,20 +25,19 @@ def _run(args: list[str], timeout: int = 180) -> tuple[bool, str]:
 
 
 def run_analysis(client: str, period: str) -> tuple[bool, str]:
-    return _run(["scripts/run_pipeline.py", client, period])
+    """Pipeline only (no Claude): scripts/new_run.py makes the next demo_runs/output_NNN/ folder and runs intake + calculate into it."""
+    return _run(["scripts/new_run.py", client, period])
 
 
-def decide(client: str, period: str, reviewer: str, reason: str, reject: bool) -> tuple[bool, str]:
-    args = ["scripts/approve.py", client, period, "--reviewer", reviewer, "--reason", reason]
-    return _run(args + (["--reject"] if reject else []))
+def new_run_folder(output: str) -> str | None:
+    """The run folder name (output_NNN) that new_run.py printed as its last line, or None."""
+    last = (output.strip().splitlines() or [""])[-1].strip()
+    name = Path(last.replace("\\", "/")).name
+    return name if re.match(r"^output_\d{3,}$", name) else None
 
 
 def run_golden_evals() -> tuple[bool, str]:
     return _run(["scripts/export_eval_results.py"], timeout=300)
-
-
-def test_qbo(client: str) -> tuple[bool, str]:
-    return _run(["01_connection/qbo_test_connection.py", client, "--test"], timeout=90)
 
 
 # ---- full analysis with Claude: `claude -p "/demo-run <client> <period>"` with exactly the command file's allowed tools ----

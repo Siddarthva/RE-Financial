@@ -62,6 +62,8 @@ class NumberedRuns(unittest.TestCase):
         self.assertEqual(len(run["workbook_sha256_16"]), 16)
         self.assertEqual(run["stages"]["Intake"], "done")
         self.assertEqual(run["stages"]["Calculate"], "done")
+        for stage in ("Commentary draft", "Review", "Package"):  # a pipeline-only run says its Claude stages were not run
+            self.assertEqual(run["stages"][stage], "not run")
 
     def test_finish_records_the_later_stages(self):
         folder = self.root / "output_002"

@@ -5,34 +5,21 @@ import re
 import pandas as pd
 import streamlit as st
 
-import data
 import ui
+from views._ctx import need_run
 
 STATEMENT = re.compile(r"^\s*(\d+)\.\s+(.*\S)\s*$")
 FAIL_BANNER = "Code grader failed: not ready for sign-off"
-EMPTY_HELP = ("No demo runs yet. In Claude Code run `/demo-run abc 2026-06`; each run creates its own folder "
-              "`demo_runs/output_NNN/` and appears here as its own page after a refresh.")
 
 
-def label(run_dir) -> str:
-    """'Output 001 — abc 2026-06 — 2026-10-22 11:18 IST' (text only, from run.json)."""
-    n = run_dir.name.removeprefix("output_")
-    run = data.load_demo_run(run_dir)
-    r = run["run"].data if run["run"].ok else {}
-    stamp = ((r.get("started") or {}).get("ist") or "")[:16].replace("T", " ")
-    parts = [f"Output {n}"]
-    if run["client"] and run["month"]:
-        parts.append(f"{run['client']} {run['month']}")
-    if stamp:
-        parts.append(f"{stamp} IST")
-    return " — ".join(parts)
+def _nf(run, key):
+    """The run does not contain this file. Shown as missing; never borrowed from elsewhere."""
+    name = run["files"][key] if key else "run.json"
+    ui.missing_name(name)
 
 
-def render_empty():
-    ui.title("Demo runs")
-    st.markdown(f'<div class="crw-empty"><strong>No demo runs</strong><br>{EMPTY_HELP.replace(chr(96), "")}</div>',
-                unsafe_allow_html=True)
-    st.code("/demo-run abc 2026-06", language=None)
+def _src(run, key):
+    ui.source_note(f"{run['dir'].name}/{run['client']}/{run['files'][key]}" if key else f"{run['dir'].name}/run.json")
 
 
 def _yn(v):
@@ -79,13 +66,14 @@ def _summary(run, r, passed):
         ui.table([{"Stage": k, "Status": v} for k, v in stages.items()])
     else:
         st.caption("No stage statuses recorded in run.json.")
+    _src(run, None) if run["run"].ok else _nf(run, None)
 
 
 def _headline(run):
     st.header("2. Headline numbers")
     p = run["packet"]
     if not p.ok:
-        return st.caption(f"Not available: {run['files']['packet']}")
+        return _nf(run, 'packet')
     m = p.data.get("months", {}).get(run["month"], {})
     gp, oi = m.get("gross_profit", {}), m.get("operating_income", {})
     cash = p.data.get("cash") or {}
@@ -120,7 +108,7 @@ def _commentary_table(run, r):
     st.header("3. Commentary review")
     cm = run["commentary"]
     if not cm.ok:
-        return st.caption(f"Not available: {run['files']['commentary']}")
+        return _nf(run, 'commentary')
     st.caption("Statement text is written by Claude, graded by code. Shown verbatim from the commentary file.")
     first, final = _notes(run["review_first"]), _notes(run["review"])
     rows = []
@@ -141,7 +129,9 @@ def _commentary_table(run, r):
     st.dataframe(df.style.apply(lambda row: ["background-color: #FBE3D6" if row["Flag"] else "" for _ in row], axis=1),
                  width="stretch", hide_index=True)
     if not run["review"].ok:
-        st.caption(f"Reviewer columns empty: {run['files']['review']} is missing.")
+        st.caption(f"Reviewer columns empty: {run['files']['review']} was not produced in this run.")
+    _src(run, "commentary")
+    _src(run, "review")
 
 
 def _grade_history(run, r, passed, numbers, mismatches):
@@ -159,18 +149,20 @@ def _grade_history(run, r, passed, numbers, mismatches):
         st.markdown(f"**Final grade: {'PASS' if passed else 'FAIL'}** — numbers matched {numbers}; mismatches {len(mismatches)}")
         for m_ in mismatches:
             st.write(f"- {m_}")
+    ui.source_note(f"{run['dir'].name}/run.json" + (f", {run['dir'].name}/{run['client']}/{run['files']['grade_record']}" if run["grade_record"].ok else ""))
 
 
 def _scores(run):
     st.header("5. Reviewer scores and open questions")
     rv = run["review"]
     if not rv.ok:
-        return st.caption(f"Not available: {run['files']['review']}")
+        return _nf(run, 'review')
     scores = rv.data.get("scores") or {}
     c = st.columns(4)
     for col, key in zip(c, ("numbers", "coverage", "causes", "tone")):
         s = scores.get(key) or {}
         col.metric(key.title(), f"{s['ok']} / {s['of']}" if "ok" in s and "of" in s else "n/a")
+    ui.source_note(rv.path)
     qs = rv.data.get("open_questions") or []
     st.markdown(f"**Open questions ({len(qs)})**")
     if not qs:
@@ -186,8 +178,9 @@ def _movements(run):
         mv = p.data.get("top_movements") or []
         st.markdown("**Top movements (month over month)**")
         ui.table([{"Account": x.get("account"), "Change": ui.money2(x.get("mom_change"))} for x in mv]) if mv else st.caption("None.")
+        ui.source_note(p.path)
     else:
-        st.caption(f"Top movements not available: {run['files']['packet']}")
+        _nf(run, 'packet')
     if fx.ok:
         items = fx.data.get("items") or []
         st.markdown(f"**Flux items ({len(items)})**")
@@ -195,16 +188,18 @@ def _movements(run):
                    "Severity": i.get("severity"), "Current": ui.money2(i.get("current")), "Prior": ui.money2(i.get("prior")),
                    "Change": ui.money2(i.get("dollar_change")), "Change %": ui.pct(i.get("pct_change")),
                    "Source cell": i.get("source_cell_current")} for i in items]) if items else st.caption("None flagged.")
+        ui.source_note(fx.path)
     else:
-        st.caption(f"Flux items not available: {run['files']['flux']}")
+        _nf(run, 'flux')
 
 
 def _memo(run):
     st.header("7. Owner memo")
     if run["memo"].ok:
         st.markdown(ui.scrub(run["memo"].data).replace("$", "\\$"))  # $ would start LaTeX
+        ui.source_note(run["memo"].path)
     else:
-        st.caption(f"Not available: {run['files']['memo']}")
+        _nf(run, 'memo')
 
 
 def _raw(run):
@@ -218,7 +213,7 @@ def _raw(run):
                 _json(loaded.data)
                 ui.source_note(loaded.path)
             else:
-                st.caption(f"Not available: {run['files'][key] if key else 'run.json'}")
+                _nf(run, key)
 
 
 def _download(run):
@@ -227,19 +222,20 @@ def _download(run):
         name, blob = run["pack"]
         st.download_button(f"Download {name}", data=blob, file_name=name,
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        _src(run, "pack")
     else:
-        st.caption(f"Not available: {run['files']['pack']}")
+        _nf(run, 'pack')
 
 
-def render_body(run_dir):
-    """Every section for one run folder (banner, summary, commentary review, grades, raw JSON, pack). Used by the run page and the Runs page."""
-    run = data.load_demo_run(run_dir)
+def render_body(run_obj):
+    """Every section for one run (banner, summary, commentary review, grades, raw JSON, pack). Used by the Demo runs and Runs pages."""
+    run = run_obj.bundle()
     r = run["run"].data if run["run"].ok else {}
     passed, numbers, mismatches = _grade_state(run)
     if passed is False:
         st.error(FAIL_BANNER)
     if run["missing"]:
-        st.warning("Missing files in this run: " + ", ".join(run["missing"]))
+        st.warning("Not produced in this run: " + ", ".join(run["missing"]))
     _summary(run, r, passed)
     _headline(run)
     _commentary_table(run, r)
@@ -251,6 +247,8 @@ def render_body(run_dir):
     _download(run)
 
 
-def render_run(run_dir):
-    ui.title(label(run_dir), "Demo run · read from the run folder only; nothing on this page is calculated")
-    render_body(run_dir)
+def render():
+    run = need_run("Demo runs")
+    if run:
+        st.caption("Read from the run folder only; nothing on this page is calculated.")
+        render_body(run)

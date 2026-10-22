@@ -1,21 +1,18 @@
 import streamlit as st
 
-import actions
-import data
 import ui
-from views._ctx import ctx, need_client
+from views._ctx import need_run
 
-SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2}
 REASON_LABEL = {"SIGN_FLIP": "Sign flip", "LARGE_MOVE": "Large move"}
 
 
-def _flux(client, period):
-    f = data.load_flux(client, period)
+def _flux(run):
+    f = run.json("flux")
     if not f.ok:
-        return ui.empty_state("flux table", f.path, f.error)
+        return ui.missing(f)
     items = sorted(f.data.get("items", []), key=lambda i: abs(i.get("dollar_change") or 0), reverse=True)
     st.subheader("Flagged items")
-    st.caption(f"{period} vs {f.data.get('prior_period')}, sorted by size of $ change. Severity comes from the reason code.")
+    st.caption(f"{run.month} vs {f.data.get('prior_period')}, sorted by size of $ change. Severity comes from the reason code.")
     if not items:
         st.caption("Nothing flagged under the current threshold rule.")
         return ui.source_note(f.path)
@@ -44,10 +41,10 @@ def _flux(client, period):
     ui.source_note(f.path)
 
 
-def _reviewer(client, period):
-    r = data.load_review(client, period)
+def _reviewer(run):
+    r = run.json("review")
     if not r.ok:
-        return ui.empty_state("finance-reviewer output", r.path, r.error), None
+        return ui.missing(r), None
     st.subheader("Reviewer questions")
     qs = r.data.get("open_questions") or []
     if qs:
@@ -67,53 +64,33 @@ def _reviewer(client, period):
     return None, r.data.get("verdict")
 
 
-def _approval(client, period, verdict):
+def _approval(run):
     st.subheader("Approval")
-    ap = data.load_approval(client, period)
-    rec = ap.data if ap.ok else None
-    locked = bool(rec and rec.get("status") == "approved")
-    if rec:
+    ap = run.json("approval")
+    if ap.ok:
+        rec = ap.data
+        locked = rec.get("status") == "approved"
         ui.table([{"Status": rec.get("status", "").title() + (" (locked)" if locked else ""),
                    "Reviewer": rec.get("reviewer"), "Reason": rec.get("reason"), "Decided at": rec.get("decided_at")}])
+        ui.source_note(ap.path)
     else:
-        st.caption("No decision recorded for this period.")
-    if not locked:
-        if verdict != "approve":
-            st.caption(f"Approve is blocked by the engine unless the finance-reviewer verdict is 'approve' (currently {verdict or 'n/a'}).")
-        with st.form("decision"):
-            name = st.text_input("Reviewer name")
-            reason = st.text_area("Reason")
-            c = st.columns(2)
-            approve = c[0].form_submit_button("Approve", type="primary")
-            reject = c[1].form_submit_button("Reject")
-        if approve or reject:
-            if not name.strip() or not reason.strip():
-                st.error("Reviewer name and reason are both required.")
-            else:
-                ok, msg = actions.decide(client, period, name.strip(), reason.strip(), reject=reject)
-                (st.success if ok else st.error)(ui.scrub(msg) or ("Recorded." if ok else "The decision was not recorded."))
-                if ok:
-                    st.rerun()
-    st.markdown("**Audit log entries for this period**")
-    a = data.load_audit_log(client)
+        ui.missing(ap)
+    st.markdown("**Audit log entries for this run**")
+    a = run.json("audit_log")
     if a.ok:
-        rows = [e for e in a.data if e.get("period") == period]
-        ui.table(rows) if rows else st.caption("No entries yet.")
+        rows = [e for e in a.data if e.get("period") == run.month]
+        ui.table(rows) if rows else st.caption("No entries for this period in the run's audit log.")
         ui.source_note(a.path)
     else:
-        ui.empty_state("audit log", a.path, a.error)
+        ui.missing(a)
 
 
 def render():
-    client = need_client()
-    if not client:
+    run = need_run("Insights & Review")
+    if not run:
         return
-    _, period = ctx()
-    ui.title("Insights & Review", f"{client} · period {period or 'n/a'}")
-    if not period:
-        return ui.empty_state("review packet", f"outputs/{client}/review_packet_<period>.json")
-    ap = data.load_approval(client, period)
+    ap = run.json("approval")
     ui.locked_banner(ap.data if ap.ok else None)
-    _flux(client, period)
-    _, verdict = _reviewer(client, period)
-    _approval(client, period, verdict)
+    _flux(run)
+    _reviewer(run)
+    _approval(run)

@@ -26,4 +26,4 @@ At the end of every task, report:
 3. **What is still unverified** — anything assumed, skipped, or not tested.
 
 ## UI rule
-- `app/` never calculates financial figures. It only reads engine outputs, manifests, eval results and the audit log. Every displayed number must come from a JSON file in `outputs/`.
+- `app/` never calculates financial figures: the UI shows only files inside the selected demo_runs run folder; project pages are labelled.

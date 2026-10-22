@@ -7,12 +7,12 @@
 <!-- counts:start evals-layers -->
 | Layer | Command | What it proves | Latest |
 |---|---|---|---|
-| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 186 run, 186 OK |
-| Golden cases | `python 03_evals/run_golden_evals.py` | Engine numbers and flags equal values derived by hand from source cells | 33 / 33 |
+| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 271 run, 271 OK |
+| Golden cases | `python 03_evals/run_golden_evals.py` | Engine numbers and flags equal values derived by hand from source cells | 47 / 47 |
 | Commentary grader | `python 03_evals/grade_commentary.py` | Every number in the text matches the engine JSON; top-3 movements named; cash and runway covered | engine, reviewed and saved-skill text PASS; flawed control FAILs as intended |
 | Mutation test | `python 03_evals/mutation_test.py` | The tests and golden cases above fail when a known bug is injected | 19 / 19 mutants caught |
 | Robustness | `python 03_evals/robustness/fault_injection.py` | 38 corrupted workbooks (32 + 6 WARN-path variants) each STOP, WARN or HANDLE as declared, on both entry points | 38 / 38; 0 silent wrong numbers |
-| UI number checks | `python -m unittest tests.test_ui_numbers` | Every number the review UI displays exists in an engine JSON file; no page imports calculation code | 15 tests OK |
+| UI number checks | `python -m unittest tests.test_ui_numbers` | Every number the review UI displays exists in an engine JSON file; no page imports calculation code | 26 tests OK |
 <!-- counts:end -->
 
 The 186 unit tests include the UI tests, the robustness tests and the workflow-failure tests ([`tests/test_robustness.py`](../tests/test_robustness.py)). Run records: [`FINAL_RUN.md`](FINAL_RUN.md). Scoring rules in full: [`GRADING.md`](GRADING.md).
@@ -27,6 +27,8 @@ The 186 unit tests include the UI tests, the robustness tests and the workflow-f
 | `workbook` | 12 | G01–G03, G06, G26–G33 | Real data already triggers the rule; no cell changed |
 | `workbook+perturbation` | 12 | G04, G05, G07, G08, G14, G19–G25 | One or two cells changed to trigger a rule (each case records the cell, original and new value, and purpose); the intake-gate cases write a perturbed copy to a temp file and require the gate to refuse it |
 | ABC cell-sourced | 9 | G09–G13, G15–G18 | Expected values computed by hand from cached source cells (listed in each case's `source.cells`), not by the adapter |
+| QuickBooks JSON (`qbo`) | 7 | G34–G40 | Live sandbox capture (Intuit sample company, not ABC); expected values worked out by hand from named report fields (`source.fields`: report, row, column) |
+| Long format (`long`) | 7 | G41–G47 | Synthetic long-format client c08; expected values worked out by hand from named cells (`source.cells`) |
 <!-- counts:end -->
 
 | Case | Pins |

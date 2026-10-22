@@ -3,7 +3,6 @@ import streamlit as st
 import actions
 import data
 import ui
-from views._ctx import need_client
 
 
 def _tile(col, label, passed, total):
@@ -50,17 +49,15 @@ def _golden(g):
 def _mutation(m):
     st.subheader("Mutation test")
     if not m:
-        return ui.empty_state("mutation results", "outputs/mutation_report.md")
+        return st.caption("No mutation results in outputs/eval_results.json.")
     ui.table([{"Mutation": r["mutation"], "Module": r["module"], "Caught": "Yes" if r["caught"] else "No - gap",
                "Caught by": ", ".join(r["caught_by"]) or "-"} for r in m["rows"]])
     ui.source_note(m["source"])
 
 
 def render():
-    client = need_client()
-    if not client:
-        return
     ui.title("Evaluations", "Deterministic checks on the engine and the commentary")
+    ui.project_banner(data.project_sources("evaluations"))
     if st.button("Run golden evals", type="primary",
                  help="Runs scripts/export_eval_results.py, which runs 03_evals/run_golden_evals.py unchanged."):
         with st.spinner("Running golden evals..."):
@@ -74,7 +71,8 @@ def render():
     r = data.load_eval_summary()
     cg = data.load_commentary_grade()
     if not r.ok:
-        ui.empty_state("eval results", r.path, "Press 'Run golden evals' to generate it. " + r.error)
+        ui.missing(r)
+        st.caption("Press 'Run golden evals' to generate it.")
     d = r.data or {}
     u, g, m = d.get("unit"), d.get("golden"), d.get("mutation")
     t = st.columns(4)
@@ -87,7 +85,7 @@ def render():
         _tile(t[3], "Commentary numbers", None, None)
     if r.ok:
         st.caption(f"Golden run exported {d.get('generated_at')}. Unit-test counts come from {u['source'] if u else 'n/a'} "
-                   "and are not re-run by the button. Commentary: outputs/commentary_grade.json.")
+                   "and are not re-run by the button. Commentary: outputs/commentary_grade.json (a project-level check, not a run's grade).")
         _golden(g)
         _mutation(m)
     if cg.ok:

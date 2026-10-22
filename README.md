@@ -74,8 +74,8 @@ From the post-submission full regress run on **2026-10-22** (`outputs/regress_re
 <!-- counts:start readme-results -->
 | Check | Command | Result |
 |---|---|---|
-| Unit tests (incl. UI number checks and robustness regressions) | `python -m unittest discover -s tests` | **186 / 186 pass** |
-| Golden cases | `python 03_evals/run_golden_evals.py` | **33 / 33 pass** |
+| Unit tests (incl. UI number checks and robustness regressions) | `python -m unittest discover -s tests` | **271 / 271 pass** |
+| Golden cases | `python 03_evals/run_golden_evals.py` | **47 / 47 pass** |
 | Mutation test | `python 03_evals/mutation_test.py` | **19 / 19 mutants caught**, 0 survived |
 | Commentary grader | `python 03_evals/grade_commentary.py` | **PASS** on engine text, reviewed text and saved skill output; **FAIL** on the deliberately flawed control, as intended |
 | Fault injection (broken workbooks) | `python 03_evals/robustness/fault_injection.py` | **38 / 38 faults handled correctly** on both entry points; 0 silent wrong |
@@ -214,7 +214,7 @@ python scripts/approve.py abc 2026-06 --reviewer "Your Name" --reason "Bad Debts
 
 Approval is refused unless the reviewer verdict is `approve`. Once approved, the period is **locked**: the pipeline won't re-run it, and every decision is appended to `outputs/abc/audit_log.jsonl`.
 
-### 6.6 Demo runs (one numbered folder and one UI page per analysis)
+### 6.6 Demo runs (one numbered folder per analysis; the UI shows only the selected run)
 
 `/demo-run <client> <YYYY-MM>` does what `/monthly-analysis` does (prepare, draft, grade with one retry, `finance-reviewer`, one revision, pack and owner memo), but every file goes into its own folder, `demo_runs/output_001/`, `output_002/`, ... (git-ignored, next free number, never reused). `outputs/` is not touched. It always grades the final text once more, records the result in `run.json`, and never runs `approve.py`.
 
@@ -225,7 +225,14 @@ Approval is refused unless the reviewer verdict is `approve`. Once approved, the
 streamlit run 05_review_workspace/app/Home.py
 ```
 
-Each run appears under "Demo runs" in the UI as its own page, newest first: run summary, headline numbers, commentary review table (first and final reviewer status, `change` rows highlighted), grade history, reviewer scores and open questions, movements and flux items, owner memo, raw JSON, and the Excel pack download. A failing final grade shows a red "Code grader failed: not ready for sign-off" banner. The pages only read files; the figures come from the run's own review packet. `python scripts/new_run.py abc 2026-06` creates the folder and runs intake and calculate without the model steps.
+The UI is strict: **it shows only files inside the selected run folder**. The sidebar has one selector, "Run" (`Output 003 · abc 2026-06 · 12:10 IST · Full (Claude) · PASS`, newest first); client and period come from that run's `run.json`. Every client-data page (Overview, Financial Analysis, Insights & Review, Data Sources, Runs, Demo runs) starts with "Showing: Output NNN (demo_runs/output_NNN)" and puts a small "from output_NNN/abc/<file>" caption under each number, table and text block. Nothing falls back to `outputs/<client>/`, `02_skill/sample_outputs/` or another run: a file the run lacks reads "Not produced in this run: <file name>" (for example no commentary in a pipeline-only run). With no `demo_runs/` folder (or an empty one) every client-data page shows only "No runs yet. Click 'Run full analysis with Claude' or run /demo-run abc 2026-06" and the run buttons, with no numbers.
+
+- **Run pipeline only (no Claude)** calls `scripts/new_run.py`, so it also gets its own `output_NNN/` folder; its `run.json` marks the Claude stages "not run". **Run full analysis with Claude** runs `/demo-run`. Either way the selector switches to the new run.
+- **Demo runs page**: run summary, headline numbers, commentary review table (first and final reviewer status, `change` rows highlighted), grade history, reviewer scores and open questions, movements and flux items, owner memo, raw JSON, and the Excel pack download. A failing final grade shows a red "Code grader failed: not ready for sign-off" banner.
+- **Project (not run data)** is a separate sidebar section with Evaluations and Architecture & Security. Each carries the banner "Project-level results, not from a run" with its source file and that file's date. Grades and reviews that belong to a run appear on the run's pages, not there.
+- The decision form is gone from the UI: sign-off stays in `scripts/approve.py` (§6.5), and an `approval_<month>.json` inside a run folder is shown (read-only, "Locked - approved").
+
+The pages only read files and never calculate or import engine modules; `tests/test_ui_numbers.py` patches file opening, renders every client-data page for fixture runs and fails if any data file outside the selected run folder is opened (the only exception is each run's `run.json`, read to build the selector and the Runs table). `python scripts/new_run.py abc 2026-06` creates a folder and runs intake and calculate without the model steps.
 
 ---
 
@@ -517,7 +524,7 @@ The full log, with fixes and regression tests: [`03_evals/evals_caught.md`](03_e
 | Add a golden case | Add an entry to `03_evals/golden_cases.json` with `source`, the cell references and the expected values; run the runner |
 | Add a metric or flag | Follow the G18 pattern ([§8.5](#85-extending-it-a-worked-example)): engine function → packet → golden case → unit test → log entry |
 | See results in a UI | `streamlit run 05_review_workspace/app/Home.py` |
-| Show a live analysis in the UI | `/demo-run abc 2026-06` in Claude Code, then refresh the Streamlit app ([§6.6](#66-demo-runs-one-numbered-folder-and-one-ui-page-per-analysis)) |
+| Show a live analysis in the UI | `/demo-run abc 2026-06` in Claude Code, then refresh the Streamlit app ([§6.6](#66-demo-runs-one-numbered-folder-per-analysis-the-ui-shows-only-the-selected-run)) |
 | Build the submission zip | `python scripts/package_submission.py` (scans for secrets first; includes only git-tracked files) |
 
 ---

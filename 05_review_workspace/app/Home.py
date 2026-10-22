@@ -1,4 +1,7 @@
-"""Close Review Workspace - entry point. Run: streamlit run 05_review_workspace/app/Home.py"""
+"""Close Review Workspace - entry point. Run: streamlit run 05_review_workspace/app/Home.py
+
+Client-data pages show only what is inside the run chosen in the sidebar (demo_runs/output_NNN/). The two project pages
+(Evaluations, Architecture & Security) are listed separately and are not run data."""
 import sys
 from pathlib import Path
 
@@ -16,38 +19,29 @@ ui.inject_css()
 
 with st.sidebar:
     st.markdown(f"### {ui.APP_NAME}")
-    clients = data.list_clients()
-    client = st.selectbox("Client", clients, key="client") if clients else None
-    periods = data.list_periods(client) if client else []
-    period = st.selectbox("Period", periods, key="period") if periods else None
-    if not clients:
-        st.caption("No clients found in outputs/.")
-    elif not periods:
-        st.caption("No review packets for this client.")
+    found = {r.name: r for r in data.list_runs()}  # newest first; re-read on every rerun, so new runs appear on refresh
+    nxt = st.session_state.pop("run_pick_next", None)  # set by the run buttons: switch to the run they just created
+    if nxt in found:
+        st.session_state["run_pick"] = nxt
+    if found:
+        if st.session_state.get("run_pick") not in found:
+            st.session_state.pop("run_pick", None)
+        st.selectbox("Run", list(found), key="run_pick", format_func=lambda n: found[n].label())
+    else:
+        st.caption("No runs yet.")
     st.divider()
 
-st.session_state["ctx"] = {"client": client, "period": period}
-
-pages = [
-    st.Page(overview.render, title="Overview", url_path="overview", default=True),
-    st.Page(analysis.render, title="Financial Analysis", url_path="analysis"),
-    st.Page(insights.render, title="Insights & Review", url_path="insights"),
-    st.Page(datasources.render, title="Data Sources", url_path="sources"),
-    st.Page(runs.render, title="Runs", url_path="runs"),
-    st.Page(evaluations.render, title="Evaluations", url_path="evaluations"),
-    st.Page(architecture.render, title="Architecture & Security", url_path="architecture"),
-]
-
-
-def _run_page(run_dir):
-    def render():
-        demo_run.render_run(run_dir)
-    render.__name__ = run_dir.name  # url_path is set explicitly; the name only keeps pages distinct
-    return st.Page(render, title=demo_run.label(run_dir), url_path=run_dir.name)
-
-
-# One page per demo_runs/output_NNN folder, newest first. Re-read on every rerun, so new runs appear on refresh.
-run_pages = [_run_page(d) for d in data.list_demo_runs()]
-if not run_pages:
-    run_pages = [st.Page(demo_run.render_empty, title="Demo runs", url_path="demo_runs")]
-st.navigation({"Workspace": pages, "Demo runs": run_pages}).run()
+st.navigation({
+    "Run data": [
+        st.Page(overview.render, title="Overview", url_path="overview", default=True),
+        st.Page(analysis.render, title="Financial Analysis", url_path="analysis"),
+        st.Page(insights.render, title="Insights & Review", url_path="insights"),
+        st.Page(datasources.render, title="Data Sources", url_path="sources"),
+        st.Page(runs.render, title="Runs", url_path="runs"),
+        st.Page(demo_run.render, title="Demo runs", url_path="demo_runs"),
+    ],
+    "Project (not run data)": [
+        st.Page(evaluations.render, title="Evaluations", url_path="evaluations"),
+        st.Page(architecture.render, title="Architecture & Security", url_path="architecture"),
+    ],
+}).run()

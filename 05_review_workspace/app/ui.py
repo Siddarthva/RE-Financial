@@ -46,18 +46,41 @@ def title(text: str, caption: str = "") -> None:
         st.markdown(f'<div class="crw-cap">{caption}</div>', unsafe_allow_html=True)
 
 
-def empty_state(what: str, path: str, detail: str = "") -> None:
-    extra = f"<br>{detail}" if detail else ""
-    st.markdown(
-        f'<div class="crw-empty"><strong>No data: {what}</strong><br>'
-        f"Expected <code>{path}</code>.{extra}<br>"
-        "Run the engine for this client and period, then reload.</div>",
-        unsafe_allow_html=True,
-    )
+NO_RUNS = "No runs yet. Click 'Run full analysis with Claude' or run /demo-run abc 2026-06"
+
+
+def no_runs() -> None:
+    st.markdown(f'<div class="crw-empty"><strong>{NO_RUNS}</strong></div>', unsafe_allow_html=True)
+
+
+def run_header(text: str, run) -> None:
+    """Page title plus the line that says which run folder every number on the page comes from."""
+    st.title(text)
+    st.markdown(f'<div class="crw-cap">Showing: Output {run.number} (<code>{run.folder}</code>)'
+                f"{f' · {run.client} {run.month}' if run.client and run.month else ''}</div>", unsafe_allow_html=True)
+
+
+def missing_name(name: str) -> None:
+    st.markdown(f'<div class="crw-empty">Not produced in this run: <code>{name}</code></div>', unsafe_allow_html=True)
+
+
+def missing(loaded) -> None:
+    """A file the run does not contain. Never filled from anywhere else."""
+    if loaded.missing:
+        missing_name(loaded.name)
+    else:
+        st.markdown(f'<div class="crw-empty">Could not read <code>{loaded.name}</code>: {scrub(loaded.error)}</div>', unsafe_allow_html=True)
 
 
 def source_note(path: str) -> None:
-    st.markdown(f'<div class="crw-cap">Source: <code>{path}</code></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="crw-cap">from <code>{path}</code></div>', unsafe_allow_html=True)
+
+
+def project_banner(sources: list[tuple[str, str]]) -> None:
+    """Evaluations and Architecture are project files, not run data: say so, with each source file and its date."""
+    files = "; ".join(f"<code>{p}</code> ({d})" for p, d in sources)
+    st.markdown(f'<div class="crw-empty"><strong>Project-level results, not from a run</strong><br>Source: {files}</div>',
+                unsafe_allow_html=True)
 
 
 def _missing(v: Any) -> bool:

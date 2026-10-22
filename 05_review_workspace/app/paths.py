@@ -6,3 +6,4 @@ PROJECT = APP.parents[1]
 OUTPUTS = PROJECT / "outputs"
 DEMO_RUNS = PROJECT / "demo_runs"
 DOCS = PROJECT / "04_architecture"
+CLIENTS = PROJECT / "clients"

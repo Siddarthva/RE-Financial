@@ -1,27 +1,27 @@
 {
-  "started": "2026-10-22T01:13:13+00:00",
-  "git_head": "ae4af5e",
+  "started": "2026-10-22T07:16:19+00:00",
+  "git_head": "5e9ed45",
   "mode": "fast",
   "all_held": true,
   "skipped": [
-    "mutation test (19 injected bugs)",
-    "fault injection (38 corrupted workbooks)"
+    "mutation test (25 injected bugs)",
+    "fault injection (42 corrupted workbooks)"
   ],
   "results": [
     {
       "layer": "unit",
       "check": "unit tests",
       "ok": true,
-      "detail": "186",
-      "seconds": 196.7,
+      "detail": "271",
+      "seconds": 461.3,
       "tail": ""
     },
     {
       "layer": "golden",
       "check": "golden cases",
       "ok": true,
-      "detail": "33/33",
-      "seconds": 17.6,
+      "detail": "47/47",
+      "seconds": 21.4,
       "tail": ""
     },
     {
@@ -29,7 +29,7 @@
       "check": "engine commentary",
       "ok": true,
       "detail": "PASS",
-      "seconds": 4.5,
+      "seconds": 2.7,
       "tail": ""
     },
     {
@@ -45,7 +45,7 @@
       "check": "saved skill output",
       "ok": true,
       "detail": "PASS",
-      "seconds": 3.2,
+      "seconds": 2.5,
       "tail": ""
     },
     {
@@ -53,7 +53,7 @@
       "check": "FLAWED CONTROL must fail",
       "ok": true,
       "detail": "FAIL (failed, as it must)",
-      "seconds": 3.0,
+      "seconds": 3.5,
       "tail": ""
     },
     {
@@ -69,7 +69,7 @@
       "check": "client-questions grader",
       "ok": true,
       "detail": "PASS",
-      "seconds": 0.2,
+      "seconds": 0.3,
       "tail": ""
     },
     {
@@ -84,16 +84,16 @@
       "layer": "guards",
       "check": "internal links",
       "ok": true,
-      "detail": "84 files, 184 links, 0 broken",
-      "seconds": 0.3,
+      "detail": "88 files, 211 links, 0 broken",
+      "seconds": 0.4,
       "tail": ""
     },
     {
       "layer": "guards",
       "check": "secret scan",
       "ok": true,
-      "detail": "251 tracked files, 0 findings",
-      "seconds": 1.2,
+      "detail": "314 tracked files, 0 findings",
+      "seconds": 1.5,
       "tail": ""
     },
     {

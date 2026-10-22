@@ -1,4 +1,4 @@
-"""Demo run pages (05_review_workspace/app/views/demo_run.py): one page per demo_runs/output_NNN folder.
+"""Demo runs page (05_review_workspace/app/views/demo_run.py): the full review of the run chosen in the sidebar selector.
 
 Uses small invented fixture runs in a temp folder, not model output. Checks one page per run (newest first), that every
 section renders, that every $ / % / pp outside the verbatim commentary and the raw JSON exists in THAT run's packet,
@@ -22,6 +22,7 @@ if APP.is_dir():
     sys.path.insert(0, str(APP))
     from streamlit.testing.v1 import AppTest
     import streamlit as st
+    import actions
     import data
     import ui
 
@@ -89,9 +90,48 @@ def make_run(root, n, *, grade_passed=True, drop=(), client="abc", rev=195898.16
     return d
 
 
+def make_pipeline_run(root, n, *, client="abc", rev=987654.32, ni=-888888.88, month=M, started="2026-10-22T07:00:00+00:00"):
+    """What scripts/new_run.py leaves behind: packet, flux, tables, intake, manifest, audit log, run.json with the Claude stages 'not run'."""
+    d = Path(root) / f"output_{n:03d}"
+    out = d / client
+    out.mkdir(parents=True)
+    pk = packet(rev, ni)
+    pk["latest_month"] = month
+    pk["months"] = {month: pk["months"][M]}
+    files = {f"review_packet_{month}.json": pk,
+             f"flux_{month}.json": {"prior_period": "2026-05", "items": []},
+             f"tables_{month}.json": {"months": [month], "revenue_by_stream": {"Subscriptions": {month: rev}},
+                                      "opex_by_category": {"Events": {month: 29294.58}}},
+             f"intake_{month}.json": {"status": "pass", "workbook": "ABC.xlsx", "sha256": "75da8d679a89551f" + "0" * 48,
+                                      "sheets_detected": ["Income Statement"], "period_start": "2026-01", "period_end": month,
+                                      "months": 6, "checks": [{"check": "BS balances", "passed": True, "cell_ref": "BS!B1"}]},
+             f"manifest_20261022T070000Z-{client}-{month}.json": {"run_id": f"20261022T070000Z-{client}-{month}", "skill_version": "1",
+                                                                  "source": {"sha256": "75da8d679a89551f" + "0" * 48}}}
+    for name, obj in files.items():
+        (out / name).write_text(json.dumps(obj), encoding="utf-8")
+    (out / "audit_log.jsonl").write_text(json.dumps({"period": month, "event": "pipeline", "at": "2026-10-22"}) + "\n", encoding="utf-8")
+    (d / "run.json").write_text(json.dumps({
+        "run_number": n, "run_id": d.name, "client": client, "month": month,
+        "started": {"utc": started, "ist": started}, "finished": {"utc": started, "ist": started},
+        "git_branch": "post-submission", "git_head": "42bde44" + "0" * 33, "workbook_sha256_16": "75da8d679a89551f", "pipeline_status": "success",
+        "stages": {"Intake": "done", "Calculate": "done", "Commentary draft": "not run", "Review": "not run", "Package": "not run"},
+        "timings": {"Intake": {"started": started, "ended": started, "duration_s": 0.5, "status": "done"},
+                    "Calculate": {"started": started, "ended": started, "duration_s": 3.7, "status": "done"}},
+        "grade_attempts": None, "retry_used": None, "reviewer_first_verdict": None, "reviewer_final_verdict": None,
+        "final_grade": None, "pack_path": None, "open_question_count": None}), encoding="utf-8")
+    return d
+
+
+def render_page(page, root, pick=None, claude="claude"):
+    """One views/<page>.py rendered headless against a demo_runs folder at `root`; `pick` is the selected run folder name."""
+    src = (f"import sys; sys.path.insert(0, r'{APP}')\nimport streamlit as st\nfrom views import {page} as v\n"
+           + (f"st.session_state['run_pick'] = {pick!r}\n" if pick else "") + "v.render()\n")
+    with mock.patch.object(data, "DEMO_RUNS", Path(root)), mock.patch.object(actions, "claude_path", return_value=claude):
+        return AppTest.from_string(src, default_timeout=120).run()
+
+
 def render(run_dir):
-    src = f"import sys; sys.path.insert(0, r'{APP}')\nfrom pathlib import Path\nfrom views import demo_run\ndemo_run.render_run(Path(r'{run_dir}'))\n"
-    return AppTest.from_string(src, default_timeout=60).run()
+    return render_page("demo_run", Path(run_dir).parent, pick=Path(run_dir).name)
 
 
 def shown(at, skip_statement_column=True):
@@ -155,22 +195,21 @@ class DemoRunPages(unittest.TestCase):
     def tearDownClass(cls):
         cls.tmp.cleanup()
 
-    def test_one_page_per_run_folder_newest_first(self):
+    def test_sidebar_selector_lists_runs_newest_first_and_drives_the_page(self):
         with mock.patch.object(data, "DEMO_RUNS", self.root):
-            self.assertEqual([p.name for p in data.list_demo_runs()], ["output_003", "output_002", "output_001"])
-            titles = []
-            real = st.Page
-
-            def spy(*a, **k):
-                titles.append(k.get("title"))
-                return real(*a, **k)
-
-            with mock.patch.object(st, "Page", side_effect=spy):
-                at = AppTest.from_file(str(APP / "Home.py"), default_timeout=120).run()
-        self.assertFalse(at.exception, [e.value for e in at.exception])
-        runs = [t for t in titles if t and t.startswith("Output ")]
-        self.assertEqual([t[:10] for t in runs], ["Output 003", "Output 002", "Output 001"])
-        self.assertEqual(runs[2], "Output 001 — abc 2026-06 — 2026-10-22 11:18 IST")
+            at = AppTest.from_file(str(APP / "Home.py"), default_timeout=120).run()
+            self.assertFalse(at.exception, [e.value for e in at.exception])
+            sel = at.sidebar.selectbox[0]
+            self.assertEqual(sel.label, "Run")
+            self.assertEqual(list(sel.options), [
+                "Output 003 · abc 2026-06 · Pipeline only · not graded",
+                "Output 002 · abc 2026-06 · 11:18 IST · Full (Claude) · FAIL",
+                "Output 001 · abc 2026-06 · 11:18 IST · Full (Claude) · PASS"])
+            self.assertIn("Showing: Output 003", " ".join(m.value for m in at.markdown))
+            at.sidebar.selectbox[0].select("Output 001 · abc 2026-06 · 11:18 IST · Full (Claude) · PASS").run()
+        self.assertIn("Showing: Output 001", " ".join(m.value for m in at.markdown))
+        self.assertIn("$195,898", shown(at))
+        self.assertEqual(set(sec.label for sec in at.sidebar.selectbox), {"Run"})  # no Client / Period selectors
 
     def test_every_section_renders(self):
         at = self.page["good"]
@@ -181,6 +220,7 @@ class DemoRunPages(unittest.TestCase):
         for needle in ("PASS", "post-submission", "75da8d679a89551f", "changes → approve", "Revenue", "Gross margin", "OPEX", "Net income",
                        "Cash", "Runway", "What drove Bad Debts?", "Events & Conferences", "changed in first review"):
             self.assertIn(needle, text)
+        self.assertIn("Showing: Output 001 (", " ".join(m.value for m in at.markdown))
         self.assertEqual(len(at.get("download_button")), 1)
         self.assertEqual(len(at.expander), 7)
         self.assertEqual(len(at.get("json")), 7)  # packet, review, review_first, grade record, final grade, flux, run.json
@@ -212,8 +252,10 @@ class DemoRunPages(unittest.TestCase):
         at = self.page["sparse"]
         self.assertFalse(at.exception, [e.value for e in at.exception])
         warn = " ".join(w.value for w in at.warning)
+        self.assertIn("Not produced in this run", warn)
         for name in ("run.json", f"flux_{M}.json", f"monthly_review_{M}.xlsx"):
             self.assertIn(name, warn)
+            self.assertIn(f"Not produced in this run: {name}", " ".join(m.value for m in at.markdown).replace("<code>", "").replace("</code>", ""))
         self.assertEqual(len(at.get("download_button")), 0)
         self.assertEqual([h.value for h in at.header], SECTIONS)
 
@@ -227,11 +269,12 @@ class DemoRunPages(unittest.TestCase):
         self.assertEqual(bad, [])
 
     def test_empty_state(self):
-        with tempfile.TemporaryDirectory() as t, mock.patch.object(data, "DEMO_RUNS", Path(t) / "nope"):
-            self.assertEqual(data.list_demo_runs(), [])
-            at = AppTest.from_string(f"import sys; sys.path.insert(0, r'{APP}')\nfrom views import demo_run\ndemo_run.render_empty()\n").run()
+        with tempfile.TemporaryDirectory() as t:
+            at = render_page("demo_run", Path(t) / "nope")
         self.assertFalse(at.exception)
-        self.assertIn("/demo-run abc 2026-06", shown(at) + " ".join(c.value for c in at.code) + " ".join(m.value for m in at.markdown))
+        text = shown(at) + " ".join(m.value for m in at.markdown)
+        self.assertIn("No runs yet. Click 'Run full analysis with Claude' or run /demo-run abc 2026-06", text)
+        self.assertEqual(len(at.header), 0)
 
 
 if __name__ == "__main__":

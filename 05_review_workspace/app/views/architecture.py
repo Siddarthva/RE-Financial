@@ -9,7 +9,7 @@ digraph G {
   wb [label="Source workbook\\n(read-only)"];
   qb [label="QuickBooks MCP\\n(stdio, read-only)", style="rounded,dashed"];
   engine [label="Python engine\\ncomputes every number"];
-  out [label="outputs/client/\\nJSON + Excel"];
+  out [label="demo_runs/output_NNN/\\nJSON + Excel"];
   skill [label="Skill draft\\ncommentary"];
   grader [label="Deterministic grader"];
   rev [label="finance-reviewer\\n(second model)"];
@@ -29,11 +29,12 @@ def _doc(name, title):
         st.markdown(d.data)
         ui.source_note(d.path)
     else:
-        ui.empty_state(title, d.path, "This document does not exist yet; the app does not generate it.")
+        ui.missing(d)
 
 
 def render():
     ui.title("Architecture & Security")
+    ui.project_banner(data.project_sources("architecture"))
     st.subheader("Data flow")
     st.graphviz_chart(FLOW)
     t = st.tabs(["Architecture", "Workflow", "Credentials", "Client isolation", "Traceability"])
