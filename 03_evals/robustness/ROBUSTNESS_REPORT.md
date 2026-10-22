@@ -6,7 +6,7 @@ Source workbook SHA-256 before `75da8d679a89551f…`, after `75da8d679a89551f…
 
 Required behaviour, fixed before running: **STOP** = intake refuses with a message naming the cell, sheet or cause, and no review packet is written; **WARN** = run continues and the warning is in the review packet (Open Questions in the sign-off pack) and in the analysis workbook's Data Quality sheet; **HANDLE** = run continues, no new warning, every review-packet number and every account amount in the analysis workbook (`Account Values` sheet) equals the baseline. **SILENT-WRONG** (success, different numbers, no warning) must never occur.
 
-**Result: 38/38 pass; SILENT-WRONG: 0.**
+**Result: 42/42 pass; SILENT-WRONG: 0.**
 
 **Stricter than declared:** a fault declared WARN that the Balance Sheet tie-out refuses (STOP) before the warning could happen. Passes because nothing wrong is accepted; the declarations were not edited. Before the tie-out existed (commit c8421e4) these ran as WARN. Rule: an expectation only moves toward stricter (HANDLE, WARN, STOP), never looser; no row moved looser. Rows moved to STOP: F02, F13, F16, F17, F21, F27. Per-fault reasons: `03_evals/evals_caught.md`.
 
@@ -52,3 +52,7 @@ Required behaviour, fixed before running: **STOP** = intake refuses with a messa
 | F17b | Values | Zero total revenue in Jun 2026 (division by zero) [Balance Sheet restated to tie out] | WARN | WARN | WARN | ✅ | Revenue is zero in Jun 2026; margins for that month are reported as not available. |
 | F21b | Labels | New unmapped account (Crypto Mining Costs, totals consistent) [Balance Sheet restated to tie out] | WARN | WARN | WARN | ✅ | Unmapped OPEX account (reported under 'Unmapped'): Crypto Mining Costs |
 | F27b | Coverage | Only 11 months (Aug 2025 - Jun 2026) [Balance Sheet restated to tie out] | WARN | WARN | WARN | ✅ | TTM not available: 11 months supplied, 12 consecutive required. |
+| F33 | Long format | Duplicate (account, month) row (Bonus, 2026-06 twice) | STOP | STOP | STOP | ✅ | ValueError: Intake refused the workbook: Income Statement: 'Bonus' Jun 2026 appears twice, in rows 379 and 1676. Remove the duplicate row. |
+| F34 | Long format | A month missing for one account (one zero-amount row deleted) | WARN | WARN | WARN | ✅ | 1 blank cell(s) inside rows that have values, treated as missing (not zero): Income Statement (no row) (Partnership Income, Jan 2025) |
+| F35 | Long format | Unknown column 'Memo' added to the header | STOP | STOP | STOP | ✅ | ValueError: Intake refused the workbook: Income Statement: unknown column 'Memo' at E1; the long layout expects only ['Account', 'Amount', 'Month', 'Section']. Rename it or add it to layout.columns. |
+| F36 | Long format | Amount column renamed to 'Amt' | STOP | STOP | STOP | ✅ | ValueError: Intake refused the workbook: Income Statement: column 'Amount' (amount) not found in header row 1; columns present: ['Account', 'Month', 'Amt', 'Section']. |
