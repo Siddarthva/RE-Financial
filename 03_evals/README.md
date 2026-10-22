@@ -7,7 +7,7 @@
 <!-- counts:start evals-layers -->
 | Layer | Command | What it proves | Latest |
 |---|---|---|---|
-| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 185 run, 185 OK |
+| Unit tests | `python -m unittest discover -s tests` | Individual bugs stay fixed; client isolation; redaction; workflow failure messages | 186 run, 186 OK |
 | Golden cases | `python 03_evals/run_golden_evals.py` | Engine numbers and flags equal values derived by hand from source cells | 33 / 33 |
 | Commentary grader | `python 03_evals/grade_commentary.py` | Every number in the text matches the engine JSON; top-3 movements named; cash and runway covered | engine, reviewed and saved-skill text PASS; flawed control FAILs as intended |
 | Mutation test | `python 03_evals/mutation_test.py` | The tests and golden cases above fail when a known bug is injected | 19 / 19 mutants caught |
@@ -15,7 +15,7 @@
 | UI number checks | `python -m unittest tests.test_ui_numbers` | Every number the review UI displays exists in an engine JSON file; no page imports calculation code | 15 tests OK |
 <!-- counts:end -->
 
-The 185 unit tests include the UI tests, the robustness tests and the workflow-failure tests ([`tests/test_robustness.py`](../tests/test_robustness.py)). Run records: [`FINAL_RUN.md`](FINAL_RUN.md). Scoring rules in full: [`GRADING.md`](GRADING.md).
+The 186 unit tests include the UI tests, the robustness tests and the workflow-failure tests ([`tests/test_robustness.py`](../tests/test_robustness.py)). Run records: [`FINAL_RUN.md`](FINAL_RUN.md). Scoring rules in full: [`GRADING.md`](GRADING.md).
 
 ## Golden cases by source
 
@@ -67,7 +67,7 @@ A change is blocked by any of: a golden case that passed now fails; any unit tes
 Run in this order from the repo root (PowerShell, except the secret scan, which is Git Bash). Skip mutation and robustness only if you changed nothing under `src/`, `scripts/` or `clients/`.
 
 ```powershell
-python -m unittest discover -s tests                                                          # expect OK (185)
+python -m unittest discover -s tests                                                          # expect OK (186)
 python 03_evals/run_golden_evals.py                                                           # expect Score: 33/33
 python 03_evals/grade_commentary.py                                                           # engine text: PASS
 python 03_evals/grade_commentary.py --commentary outputs/abc/commentary_2026-06.md            # reviewed text: PASS

@@ -17,6 +17,26 @@ python src/run_client.py xyz
 python scripts/scan_secrets.py . outputs
 ```
 
+## Result: post-submission run, 2026-10-22
+
+Full `python scripts/regress.py` on branch `post-submission` (`outputs/regress_results.json`: mode full, started 2026-10-22T00:00:52Z, `git_head` 4eeb966). Run on the working tree before the Phase 6 commit; the only uncommitted change was the `architecture.md` Cost row below. Source workbook SHA-256 `75da8d679a89...` unchanged before and after.
+
+| Check | Result | Counts |
+|---|---|---|
+| Unit tests | **PASS** | 186 run, 186 OK |
+| Golden cases | **PASS** | 33/33 (workbook 12, workbook+perturbation 12, ABC cell-sourced 9) |
+| Mutation test | **PASS** | 19/19 caught, 0 survived (1,754 s) |
+| Robustness (fault injection) | **PASS** | 38/38 pass, 0 SILENT-WRONG (6 stricter than declared), source workbook hash unchanged (450 s) |
+| Commentary graders | **PASS** | engine PASS, reviewed commentary PASS, saved skill output PASS; flux-explanations PASS, client-questions PASS; the flawed control FAILS, as it must |
+| Trigger cases (structure) | **PASS** | 11 entries, 0 problems |
+| Internal links | **PASS** | 83 files, 182 links, 0 broken |
+| Secret scan (git-tracked files) | **PASS** | 0 findings, 230 text files (250 tracked paths) |
+| Doc counts (`render_counts.py --check`) | **PASS after re-render** | The run reported 3 blocks, 2 stale: the unit count rose 185 → 186, so the README tables were out of date. `render_counts.py` rewrote them and `--check` then passed (3 blocks, 0 stale). The JSON record keeps the run as it happened (14/15 held). |
+
+Two regressions came before this run, both fixed in docs, not expectations. (1) A first full run (same day) failed `test_ui_numbers`: the new Cost row in `04_architecture/architecture.md` showed a `$5.60` estimate, and the review UI displays that page, so every amount on it must exist in engine JSON (CLAUDE.md UI rule). The dollar figures moved to `cost_and_time.md`, which the UI does not display. (2) The doc-count staleness above.
+
+Why 186: `test_corrupt_and_locked_files_stop_with_a_cause` was split so the Windows-only locked-file case (F31) skips with a reason on Linux CI instead of passing silently.
+
 ## Result: v3.0 WARN-path coverage, 2026-10-15
 
 Full `python scripts/regress.py` (not `--fast`; `outputs/regress_results.json`: mode full, all_held true, 14/14 checks held), run on the working tree before the commit that contains these changes. Source workbook SHA-256 `75da8d679a89...` unchanged.

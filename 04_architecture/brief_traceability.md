@@ -37,7 +37,7 @@ Source: "Build Exercise — AI Solutions Builder" (RE Financial Services), the P
 
 | Requirement | Where | Status | Reason |
 |---|---|---|---|
-| Project structure: files, skills, memory | `04_architecture/architecture.md` | **Done** | Covers structure and a Memory section. The note is 474 words (46 Markdown lines, some long; `wc -w`, 2026-10-22). Not checked as a printed page. |
+| Project structure: files, skills, memory | `04_architecture/architecture.md` | **Done** | Covers structure and a Memory section. The note is 464 words (46 Markdown lines, some long; `wc -w`, 2026-10-22). Not checked as a printed page. |
 | Hosting choices | `04_architecture/architecture.md` ("Hosting") | **Done** | One Windows machine, implemented; shared hosting is Proposed. |
 | What changes at ten clients, and keeping each client's data separate | `04_architecture/architecture.md` ("Ten-client isolation") | **Partial** | Per-client config and output folders with an in-process audit hook are implemented and tested with three clients (`abc`, `xyz`, `lmn`; `tests/test_lmn_isolation.py`). Per-client OAuth grants, processes and OS accounts are Proposed. The hook covers this Python process only, not Claude's own tools. |
 

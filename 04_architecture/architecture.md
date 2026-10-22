@@ -25,7 +25,7 @@ Workbook → intake gate (stops, names the cell) → Python engine → review pa
 | Runs | seconds offline | 10 in one week | Batch runner (Proposed) |
 | Review capacity | 1 human per pack, unmeasured | the bottleneck | Severity ranking (Implemented) |
 | Monitoring | files in `outputs/` | stale months, token age | Manifest dashboard (Proposed) |
-| Cost | $0.56, 124 s per live run (Sonnet, 1.06M input / 13.2k output tokens, 2026-10-22) | about $5.60 (estimate) | [`cost_and_time.md`](cost_and_time.md) (Implemented) |
+| Cost | 124 s per run (measured) | about 10× (estimate) | [`cost_and_time.md`](cost_and_time.md) |
 
 ## Data separation
 | Layer | Status |
