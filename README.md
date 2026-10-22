@@ -214,6 +214,19 @@ python scripts/approve.py abc 2026-06 --reviewer "Your Name" --reason "Bad Debts
 
 Approval is refused unless the reviewer verdict is `approve`. Once approved, the period is **locked**: the pipeline won't re-run it, and every decision is appended to `outputs/abc/audit_log.jsonl`.
 
+### 6.6 Demo runs (one numbered folder and one UI page per analysis)
+
+`/demo-run <client> <YYYY-MM>` does what `/monthly-analysis` does (prepare, draft, grade with one retry, `finance-reviewer`, one revision, pack and owner memo), but every file goes into its own folder, `demo_runs/output_001/`, `output_002/`, ... (git-ignored, next free number, never reused). `outputs/` is not touched. It always grades the final text once more, records the result in `run.json`, and never runs `approve.py`.
+
+```powershell
+# in Claude Code
+/demo-run abc 2026-06
+# in PowerShell, then refresh the browser after each run
+streamlit run 05_review_workspace/app/Home.py
+```
+
+Each run appears under "Demo runs" in the UI as its own page, newest first: run summary, headline numbers, commentary review table (first and final reviewer status, `change` rows highlighted), grade history, reviewer scores and open questions, movements and flux items, owner memo, raw JSON, and the Excel pack download. A failing final grade shows a red "Code grader failed: not ready for sign-off" banner. The pages only read files; the figures come from the run's own review packet. `python scripts/new_run.py abc 2026-06` creates the folder and runs intake and calculate without the model steps.
+
 ---
 
 ## 7. Part 1: QuickBooks sandbox connection
@@ -504,6 +517,7 @@ The full log, with fixes and regression tests: [`03_evals/evals_caught.md`](03_e
 | Add a golden case | Add an entry to `03_evals/golden_cases.json` with `source`, the cell references and the expected values; run the runner |
 | Add a metric or flag | Follow the G18 pattern ([§8.5](#85-extending-it-a-worked-example)): engine function → packet → golden case → unit test → log entry |
 | See results in a UI | `streamlit run 05_review_workspace/app/Home.py` |
+| Show a live analysis in the UI | `/demo-run abc 2026-06` in Claude Code, then refresh the Streamlit app ([§6.6](#66-demo-runs-one-numbered-folder-and-one-ui-page-per-analysis)) |
 | Build the submission zip | `python scripts/package_submission.py` (scans for secrets first; includes only git-tracked files) |
 
 ---
