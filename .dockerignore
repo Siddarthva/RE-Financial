@@ -1,0 +1,7 @@
+# Only the files the Dockerfile COPYs are needed; keep secrets, data and outputs out of the build context.
+**
+!src/**
+!scripts/run_pipeline.py
+!03_evals/grade_commentary.py
+!.claude/skills/monthly-financial-analysis/SKILL.md
+**/__pycache__

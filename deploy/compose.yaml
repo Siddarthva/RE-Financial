@@ -1,0 +1,37 @@
+# One client per container, offline. Usage (from the repo root):
+#   CLIENT=abc MONTH=2026-06 DATA_DIR=../data docker compose -f deploy/compose.yaml run --rm engine
+#   CLIENT=xyz MONTH=2026-05 docker compose -f deploy/compose.yaml run --rm engine
+#   CLIENT=qbo_sandbox MONTH=2026-09 DATA_DIR=../01_connection/evidence/quickbooks/2026-10-22
+#     DATA_TARGET=/app/01_connection/evidence/quickbooks/2026-10-22 docker compose -f deploy/compose.yaml run --rm engine
+# Relative paths resolve from this deploy/ folder. Create outputs/<client>/ first.
+# The container sees: its own client folder (read-only), its own source data (read-only) and outputs/<client> (writable).
+# It cannot see another client's folder or outputs because they are not mounted, and it has no network.
+name: re-close-${CLIENT:?set CLIENT to one client id}
+services:
+  engine:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: re-close-engine:local
+    command: ["${CLIENT:?set CLIENT}", "${MONTH:?set MONTH like 2026-06}"]
+    network_mode: none            # the engine never needs the network; QuickBooks data arrives as saved JSON
+    read_only: true               # root filesystem read-only; the only writable places are below
+    tmpfs:
+      - /tmp
+    user: "10001:10001"
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - type: bind
+        source: ../clients/${CLIENT:?set CLIENT}
+        target: /app/clients/${CLIENT:?set CLIENT}
+        read_only: true
+      - type: bind                # this client's own source data (abc: ./data; workbook clients: their own folder)
+        source: ${DATA_DIR:-../clients/${CLIENT}}
+        target: ${DATA_TARGET:-/app/data}
+        read_only: true
+      - type: bind
+        source: ../outputs/${CLIENT:?set CLIENT}
+        target: /app/outputs/${CLIENT:?set CLIENT}
+        read_only: false

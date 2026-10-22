@@ -89,7 +89,7 @@ Verified by `tests/test_qbo_diagnose.py` (message mapping) and `tests/test_qbo_r
 
 Not covered: automatic retry (the script never retries; a human reruns) and a live expired-token run (needs a deliberately revoked grant; **not done**). Exit code is 1 on any failure so callers can gate on it.
 
-## 8. Team hosting (Proposed, nothing built)
+## 8. Team hosting (Phase 1 partly implemented 2026-10-22; network service Proposed)
 
 ```text
  Analyst (Claude Code) --SSO--> Gateway: authN, per-user/per-client authZ, audit log
@@ -108,10 +108,12 @@ Not covered: automatic retry (the script never retries; a human reruns) and a li
 | Phase | What | Gate to move on |
 |---|---|---|
 | 0 Laptop (**Implemented today**) | One developer, stdio, sandbox, secrets on local disk | Done |
-| 1 Shared host | One small VM or container for 2-3 trusted users; a wrapper exposes the server over authenticated HTTPS; still sandbox; disk encryption | Wrapper written and tested; tokens rotate unattended for 30 days |
+| 1 Shared host (**partly implemented: per-client process and container separation**) | Implemented: [`scripts/mcp_per_client.py`](../scripts/mcp_per_client.py) starts one stdio MCP process per client, each with its own credential path (passed by name, never read by the launcher), working dir and token store, no inherited `QUICKBOOKS_*` variables and the three disable flags forced true ([`tests/test_deploy.py`](../tests/test_deploy.py), fake server). [`Dockerfile`](../Dockerfile) + [`deploy/compose.yaml`](../deploy/compose.yaml) run the offline engine for one client per container: client folder and data read-only, only `outputs/<client>` writable, `network_mode: none`. **Proposed, not built:** the authenticated HTTPS wrapper for 2-3 users; disk encryption; 30-day unattended token rotation | Wrapper written, security-reviewed and tested; tokens rotate unattended for 30 days |
 | 2 Production-grade | Per-client grant, token store and process; secrets manager mounted per process; realm check at connect; central audit log of every tool call; alerts on refresh failure and token age; revoke-and-reauthorize runbook; named owner for dependency upgrades; runtime npm findings fixed | Security review; a revoke drill actually run |
 
-Why one process per client: two processes refreshing one rotating token can invalidate it. Open questions: whether the official server's logging is enough for audit, and whether a hosted connector (option A) makes phases 1-2 unnecessary.
+Why one process per client: two processes refreshing one rotating token can invalidate it.
+
+**Why no network-exposed wrapper was built (2026-10-22).** Putting the MCP server behind HTTP turns a local stdio process that only its own user can reach into a service anyone on the network can call with the firm's QuickBooks grant. Doing that safely needs, at minimum: authentication of every caller (SSO, not a shared key), per-user and per-client authorization, TLS with managed certificates, rate limits, an audit log of every tool call, and a security review of the wrapper and the server's dependencies (3 moderate runtime npm findings remain, [`dependency_risk.md`](dependency_risk.md)). None of that can be shown working in this repo, so building a half-protected listener would be worse than none. What was built is the part that is safe offline: process-per-client for the MCP server and container-per-client for the engine. Docker was not installed on the build machine, so the container was checked by structure (compose parsed, mounts and network asserted) and by running the pipeline in a copy of exactly the image's files plus one client's mounts; the abc 2026-06 packet was identical to the local run. A real `docker build`/`run` has not been done. Open questions: whether the official server's logging is enough for audit, and whether a hosted connector (option A) makes phases 1-2 unnecessary.
 
 ## 9. Limits
 
