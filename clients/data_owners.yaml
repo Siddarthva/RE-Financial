@@ -1,0 +1,4 @@
+# Source data kept OUTSIDE clients/<id>/ and the one client allowed to read it. src/client_sandbox.py enforces this:
+# any other client's run that tries to read these folders gets PermissionError (tests/test_ten_client_isolation.py).
+data: abc
+01_connection/evidence/quickbooks: qbo_sandbox

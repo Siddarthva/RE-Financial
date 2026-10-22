@@ -7,8 +7,11 @@ While a ClientSandbox is active, every file open / mkdir / rename / remove in th
 - reads under outputs/ are allowed only inside outputs/<client>/;
 - writes are allowed only inside outputs/<client>/ (including the run's private temp dir, outputs/<client>/.tmp).
 
-Anything else raises PermissionError. Paths outside clients/ and outputs/ (Python, installed libraries,
-a shared source workbook declared in the client's config) stay readable.
+- reads under a source-data folder listed in clients/data_owners.yaml (e.g. data/ -> abc) are allowed only for
+  the client that owns it, so one client's config cannot be pointed at another client's data kept outside clients/.
+
+Anything else raises PermissionError. Other paths outside clients/ and outputs/ (Python, installed libraries)
+stay readable.
 """
 from __future__ import annotations
 import contextlib
@@ -50,6 +53,7 @@ class ClientSandbox:
         self.own_client_dir = _norm(Path(clients_root) / client)
         self.own_output_dir = _norm(Path(outputs_root) / client)
         self.accessed: list[tuple[str, str]] = []  # (mode, path) for audit/tests
+        self.owned = _data_owners(clients_root)  # [(normalised folder, owner client)], read before the sandbox is active
 
     def check(self, path, write: bool):
         p = _norm(path)
@@ -62,6 +66,20 @@ class ClientSandbox:
             raise PermissionError(f"[{self.client}] read of another client's folder blocked: {path}")
         if _inside(p, self.outputs_root) and not _inside(p, self.own_output_dir) and p != self.outputs_root:
             raise PermissionError(f"[{self.client}] read of another client's outputs blocked: {path}")
+        for root, owner in self.owned:
+            if owner != self.client and _inside(p, root):
+                raise PermissionError(f"[{self.client}] read of {owner}'s source data blocked: {path}")
+
+
+def _data_owners(clients_root) -> list[tuple[str, str]]:
+    """clients/data_owners.yaml: {folder (relative to the project, or absolute): owning client}. Absent file = no entries."""
+    path = Path(clients_root) / "data_owners.yaml"
+    if not path.is_file():
+        return []
+    import yaml
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    base = Path(clients_root).parent
+    return [(_norm(Path(folder) if Path(folder).is_absolute() else base / folder), str(owner)) for folder, owner in raw.items()]
 
 
 def _audit(event, args):

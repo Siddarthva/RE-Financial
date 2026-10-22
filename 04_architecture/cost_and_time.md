@@ -24,7 +24,18 @@
 
 The same command without `--allowedTools` stopped after 2 turns: in `-p` mode the `Skill` call was permission-denied, and the model asked what to do instead of improvising. 12 s wall, 57,243 input (4 uncached, 14,455 cache writes, 42,784 cache reads), 620 output tokens, **$0.068**. Headless runs need the command's tools pre-approved; the measured run above is the retry with exactly the command's declared `allowed-tools` plus `Skill`.
 
-## Ten clients: estimate
+## Ten clients: deterministic batch, measured (2026-10-22)
+
+`python scripts/run_batch.py` runs every client in [`clients/batch.yaml`](../clients/batch.yaml) (abc, xyz, lmn, qbo_sandbox and the seven synthetic clients c04-c10: 11 clients), each in its own subprocess with its own outputs root and temp dir, no model calls. Measured on the build laptop:
+
+| Run | Clients | Result | Wall time |
+|---|---|---|---|
+| `--jobs 1` (sequential) | 11 | 11/11 as declared (c07 warns about its missing month, as declared) | **75.8 s** (slowest: qbo_sandbox 22.4 s, c08 13.3 s, c09 10.9 s; wide workbooks 2.6-6.0 s) |
+| `--jobs 4` | 11 | 11/11 as declared | **36.9 s** |
+
+This is the offline engine stage only (intake, calculation, flux, packet). The model stages are the estimate below.
+
+## Ten clients: model stages, estimate
 
 Labelled **estimate**: one measured run, one client, one month, scaled linearly. Not measured.
 

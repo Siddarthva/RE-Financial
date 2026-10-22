@@ -26,3 +26,6 @@ scripts/.pdf_cache/
 
 # scratch runs (removed after use)
 .tmp/
+
+# batch runs (scripts/run_batch.py)
+outputs/_batch/

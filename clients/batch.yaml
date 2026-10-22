@@ -1,0 +1,13 @@
+# Every client the batch runs (scripts/run_batch.py), the month to run, and the DECLARED outcome.
+# expect: success (exit 0) | refused (intake must stop). warn: a warning that must appear (substring).
+abc:         {month: 2026-06, expect: success}
+xyz:         {month: 2026-05, expect: success}
+lmn:         {month: 2026-08, expect: success}
+qbo_sandbox: {month: 2026-09, expect: success}
+c04:         {month: 2026-06, expect: success}
+c05:         {month: 2026-07, expect: success}
+c06:         {month: 2026-08, expect: success}
+c07:         {month: 2026-06, expect: success, warn: "Months missing from the source: Nov 2025"}
+c08:         {month: 2026-06, expect: success}
+c09:         {month: 2026-05, expect: success}
+c10:         {month: 2026-07, expect: success}
