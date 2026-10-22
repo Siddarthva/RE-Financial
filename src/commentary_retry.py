@@ -2,6 +2,9 @@
 
     python src/commentary_retry.py grade   <client> <YYYY-MM>   # attempt 1: grades outputs/<client>/commentary_<month>.md
     python src/commentary_retry.py regrade <client> <YYYY-MM>   # attempt 2, only after a failed attempt 1 and one revision
+    python src/commentary_retry.py final   <client> <YYYY-MM>   # grades the final text once more into commentary_final_grade_<month>.json;
+                                                                 # not an attempt, the attempt record is left alone
+Every action takes --outputs-root DIR (default outputs/).
 
 Both write outputs/<client>/commentary_grade_<month>.json and print the mismatches. Outcomes:
   passed_first        attempt 1 passed (no retry);
@@ -80,7 +83,7 @@ def record_path(out_dir: Path, month: str) -> Path:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("action", choices=["grade", "regrade"])
+    ap.add_argument("action", choices=["grade", "regrade", "final"])
     ap.add_argument("client"), ap.add_argument("month")
     ap.add_argument("--outputs-root", type=Path, default=run_client.OUTPUTS_ROOT)
     args = ap.parse_args(argv)
@@ -90,6 +93,15 @@ def main(argv=None) -> int:
         out_dir = Path(args.outputs_root) / args.client
         packet = json.loads((out_dir / f"review_packet_{args.month}.json").read_text(encoding="utf-8"))
         text = (out_dir / f"commentary_{args.month}.md").read_text(encoding="utf-8")
+        if args.action == "final":
+            last = attempt(text, packet)
+            (out_dir / f"commentary_final_grade_{args.month}.json").write_text(json.dumps(
+                {"client": args.client, "period": args.month, "graded_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), **last},
+                indent=2), encoding="utf-8")
+            print(f"Final grade: {'PASS' if last['passed'] else 'FAIL'} (numbers {last['numbers']})")
+            for m in last["mismatches"]:
+                print(f"  - {m}")
+            return 0 if last["passed"] else 1
         rec_path = record_path(out_dir, args.month)
         prior = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file() else None
         if args.action == "grade":

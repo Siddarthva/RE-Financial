@@ -29,3 +29,6 @@ scripts/.pdf_cache/
 
 # batch runs (scripts/run_batch.py)
 outputs/_batch/
+
+# demo runs (scripts/new_run.py): one numbered folder per run
+demo_runs/
