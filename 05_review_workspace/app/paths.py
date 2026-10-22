@@ -4,4 +4,5 @@ from pathlib import Path
 APP = Path(__file__).resolve().parent
 PROJECT = APP.parents[1]
 OUTPUTS = PROJECT / "outputs"
+DEMO_RUNS = PROJECT / "demo_runs"
 DOCS = PROJECT / "04_architecture"

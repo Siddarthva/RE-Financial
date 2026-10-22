@@ -8,7 +8,7 @@ import streamlit as st  # noqa: E402
 
 import data  # noqa: E402
 import ui  # noqa: E402
-from views import (analysis, architecture, datasources, evaluations,  # noqa: E402
+from views import (analysis, architecture, datasources, demo_run, evaluations,  # noqa: E402
                    insights, overview, runs)
 
 st.set_page_config(page_title=ui.APP_NAME, page_icon=None, layout="wide")
@@ -37,4 +37,17 @@ pages = [
     st.Page(evaluations.render, title="Evaluations", url_path="evaluations"),
     st.Page(architecture.render, title="Architecture & Security", url_path="architecture"),
 ]
-st.navigation(pages).run()
+
+
+def _run_page(run_dir):
+    def render():
+        demo_run.render_run(run_dir)
+    render.__name__ = run_dir.name  # url_path is set explicitly; the name only keeps pages distinct
+    return st.Page(render, title=demo_run.label(run_dir), url_path=run_dir.name)
+
+
+# One page per demo_runs/output_NNN folder, newest first. Re-read on every rerun, so new runs appear on refresh.
+run_pages = [_run_page(d) for d in data.list_demo_runs()]
+if not run_pages:
+    run_pages = [st.Page(demo_run.render_empty, title="Demo runs", url_path="demo_runs")]
+st.navigation({"Workspace": pages, "Demo runs": run_pages}).run()

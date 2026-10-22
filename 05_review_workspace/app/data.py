@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from paths import DOCS, OUTPUTS  # noqa: E402
+from paths import DEMO_RUNS, DOCS, OUTPUTS  # noqa: E402
 _PERIOD_RE = re.compile(r"review_packet_(\d{4}-\d{2})\.json$")
 
 
@@ -221,3 +221,63 @@ def reviewer_excel(client: str, period: str | None) -> tuple[str, bytes] | None:
         return None
     p = OUTPUTS / client / f"monthly_review_{period}.xlsx"
     return (p.name, p.read_bytes()) if p.is_file() else None
+
+
+# ---- demo runs: demo_runs/output_NNN/{run.json, <client>/...}, written by scripts/new_run.py and the /demo-run command ----
+_RUN_DIR = re.compile(r"^output_(\d{3,})$")
+
+
+def list_demo_runs() -> list[Path]:
+    """Run folders, newest (highest number) first. Empty when demo_runs/ does not exist."""
+    if not DEMO_RUNS.is_dir():
+        return []
+    found = [(int(m.group(1)), p) for p in DEMO_RUNS.iterdir() if p.is_dir() and (m := _RUN_DIR.match(p.name))]
+    return [p for _, p in sorted(found, reverse=True)]
+
+
+def _read_text(p: Path) -> Loaded:
+    if not p.is_file():
+        return Loaded(path=_rel(p), error="File not found")
+    try:
+        return Loaded(data=p.read_text(encoding="utf-8"), path=_rel(p))
+    except OSError as exc:
+        return Loaded(path=_rel(p), error=f"Could not read file: {exc}")
+
+
+def load_demo_run(run_dir: Path) -> dict:
+    """Every file of one run, as Loaded objects, plus the names of the files that are missing. Client and month come
+    from run.json; if that is absent they are taken from the folder contents so the page still opens."""
+    run_dir = Path(run_dir)
+    run = _read_json(run_dir / "run.json")
+    client = month = None
+    if run.ok:
+        client, month = run.data.get("client"), run.data.get("month")
+    if not (client and month):
+        for sub in sorted(p for p in run_dir.iterdir() if p.is_dir()) if run_dir.is_dir() else []:
+            hit = next(iter(sorted(sub.glob("review_packet_*.json"))), None)
+            if hit:
+                client, month = sub.name, hit.stem.removeprefix("review_packet_")
+                break
+    out = run_dir / client if client else run_dir
+    names = {
+        "packet": f"review_packet_{month}.json", "review": f"review_{month}.json", "review_first": f"review_{month}_first.json",
+        "grade_record": f"commentary_grade_{month}.json", "final_grade": f"commentary_final_grade_{month}.json",
+        "flux": f"flux_{month}.json", "commentary": f"commentary_{month}.md", "memo": f"owner_memo_{month}.md",
+        "pack": f"monthly_review_{month}.xlsx",
+    }
+    res = {"dir": run_dir, "client": client, "month": month, "run": run, "files": {}, "missing": []}
+    if not run.ok:
+        res["missing"].append("run.json")
+    for key, name in names.items():
+        p = out / name
+        res["files"][key] = name
+        if key in ("commentary", "memo"):
+            res[key] = _read_text(p)
+        elif key == "pack":
+            res[key] = (name, p.read_bytes()) if p.is_file() else None
+        else:
+            res[key] = _read_json(p)
+        got = res[key]
+        if got is None or (isinstance(got, Loaded) and not got.ok):
+            res["missing"].append(f"{client}/{name}" if client else name)
+    return res
