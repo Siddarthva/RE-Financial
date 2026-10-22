@@ -67,6 +67,8 @@ Without your own sandbox you can still read the saved evidence (no credentials n
 
 [`load_workbook_to_sandbox.py`](load_workbook_to_sandbox.py) is a separate, sandbox-only write path. `--dry-run` (default) prints 18 journal entries (`ABC-YYYY-MM`) and writes `outputs/abc/qbo_load_plan.json`; no credentials needed. `--apply` needs a write-scoped env file outside the repo ([`qbo_write.env.example`](qbo_write.env.example), real file in `.secrets/`), refuses production, and is idempotent. Tested only against an in-memory fake ([`tests/test_qbo_load.py`](../tests/test_qbo_load.py)). **No live write has been made.**
 
+2026-10-22 re-check (path existence only, file never opened): `.secrets/qbo_write.env` is absent. **Not done: write credential not provided.** The `--compare` step would use the new `qbo_adapter` at total level per month (revenue, COGS, OPEX, net income); it has not run live.
+
 ## Troubleshooting
 
 `qbo_test_connection.py --test` prints a fixed, secret-free message for the first matching cause. Full message and recovery for each: `connection_decision.md` section 7.
