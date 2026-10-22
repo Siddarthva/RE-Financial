@@ -26,6 +26,7 @@ import close_artifacts  # noqa: E402
 import excel_layout  # noqa: E402
 import owner_memo  # noqa: E402
 import run_client  # noqa: E402
+import sources  # noqa: E402
 from client_sandbox import client_sandbox  # noqa: E402
 from grade_commentary import grade, grade_memo  # noqa: E402
 
@@ -160,16 +161,13 @@ def prepare(client, month_text, clients_root=run_client.CLIENTS_ROOT, outputs_ro
     paths = run_client.run(client, clients_root, outputs_root)  # writes analysis.xlsx, summary.json, commentary.md
     with client_sandbox(client, clients_root, outputs_root):
         cfg = run_client.load_config(client, clients_root)
-        layout = {"sheet": cfg["sheets"]["income_statement"], "header_label": cfg["layout"]["header_label"],
-                  "month_format": cfg["layout"]["month_format"],
-                  "sections": {sid: (v["header"], v["total"]) for sid, v in cfg["sections"].items()}}
-        am = engine.parse_wide_income_statement(cfg["workbook_path"], layout)
+        am = sources.income_statement(cfg)
         monthly = engine.build_monthly_summary(am, cfg["totals"])
         cash = None
         build_computed(am, monthly.set_index("month"), month)  # fail early, with a clear message, if the month has no prior month
         if cfg["sheets"].get("balance_sheet"):
-            bs = engine.parse_wide_income_statement(cfg["workbook_path"], {**engine.ABC_BS_LAYOUT, "sheet": cfg["sheets"]["balance_sheet"]})
-            cash = engine.cash_position(bs.loc[:, bs.columns <= month])
+            bs = sources.balance_sheet(cfg)
+            cash = engine.cash_position(bs.loc[:, bs.columns <= month], sources.cash_row(cfg))
         categories = rollup_categories(am, cfg)
         packet = build_computed(am, monthly.set_index("month"), month, cash,
                                 gross_margin_drop_pp=cfg.get("thresholds", {}).get("gross_margin_drop_pp"), categories=categories)

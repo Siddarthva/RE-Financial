@@ -60,6 +60,9 @@ def to_number(value):
 
 def cell_name(account_month, account, month):
     """'Income Statement!C14' for a parsed value, or None if the parser did not record the position."""
+    cell_of = account_month.attrs.get("cell_of")
+    if cell_of is not None:  # long-format and QuickBooks sources record each value's position directly
+        return cell_of.get((account, month))
     rows, cols = account_month.attrs.get("row_of", {}), account_month.attrs.get("col_of", {})
     if account not in rows or month not in cols:
         return None
@@ -139,6 +142,96 @@ def parse_wide_income_statement(path, layout=None):
     data.attrs.update(sections=sections, sheet=sheet, row_of=row_of, bad_cells=bad_cells, blank_cells=blank_cells,
                       col_of={m: get_column_letter(j + 1) for j, m in date_cols})
     return data
+
+LONG_ROLES = ("account", "month", "amount", "section")  # section is optional (a Balance Sheet has none)
+
+
+def long_header(headers, columns, sheet, header_row):
+    """{role: column index} for a long-format header row. Raises ValueError naming any configured column that is
+    missing and any column that is not configured (an unknown column is a STOP, not something to skip silently)."""
+    names = [None if h is None or (isinstance(h, float) and np.isnan(h)) else str(h).strip() for h in headers]
+    unknown_roles = sorted(set(columns) - set(LONG_ROLES))
+    if unknown_roles:
+        raise ValueError(f"layout.columns has unknown role(s) {unknown_roles}; use {list(LONG_ROLES)}.")
+    missing = [f"{columns[r]!r} ({r})" for r in ("account", "month", "amount") if columns.get(r) not in names]
+    if missing:
+        raise ValueError(f"{sheet}: column {', '.join(missing)} not found in header row {header_row}; columns present: "
+                         f"{[n for n in names if n]}.")
+    expected = {v for v in columns.values()}
+    unknown = [(n, f"{get_column_letter(j + 1)}{header_row}") for j, n in enumerate(names) if n and n not in expected]
+    if unknown:
+        raise ValueError(f"{sheet}: unknown column {unknown[0][0]!r} at {unknown[0][1]}"
+                         + (f" (and {len(unknown) - 1} more)" if len(unknown) > 1 else "")
+                         + f"; the long layout expects only {sorted(expected)}. Rename it or add it to layout.columns.")
+    return {r: names.index(columns[r]) for r in LONG_ROLES if columns.get(r) in names}
+
+
+def parse_long_income_statement(path, layout):
+    """Long format: one row per (account, month) with the columns named in layout['columns']
+    (account, month, amount and optionally section). Returns the same frame and attrs as the wide parser.
+
+    STOP (ValueError): a configured column missing, an unknown column, a month that cannot be read, an unknown section
+    label, an account given two sections, or the same (account, month) twice. WARN (blank_cells): an account with no
+    row for a month that other accounts have, kept as missing (not zero)."""
+    sheet, columns, fmt = layout["sheet"], layout["columns"], layout["month_format"]
+    raw = pd.read_excel(path, sheet_name=sheet, header=None, keep_default_na=False)
+    raw = raw.mask(raw.eq(""))
+    header_row = next((i for i in range(min(15, len(raw))) if columns["account"] in raw.iloc[i].astype(str).str.strip().tolist()), None)
+    if header_row is None:
+        raise ValueError(f"Could not find the '{columns['account']}' header row in {sheet}.")
+    col = long_header(raw.iloc[header_row].tolist(), columns, sheet, header_row + 1)
+    to_section = {h.casefold(): sid for sid, (h, _) in layout.get("sections", {}).items()}
+    amount_letter = get_column_letter(col["amount"] + 1)
+    values, sections, row_of, cell_of, seen, bad_cells, order = {}, {}, {}, {}, {}, [], []
+    for i in range(header_row + 1, len(raw)):
+        account = raw.iloc[i, col["account"]]
+        if pd.isna(account):
+            continue
+        account, excel_row = str(account).strip(), i + 1
+        m = raw.iloc[i, col["month"]]
+        month = (pd.Timestamp(m) if isinstance(m, (pd.Timestamp, np.datetime64)) or hasattr(m, "year")
+                 else pd.to_datetime(str(m).strip(), format=fmt, errors="coerce"))
+        if pd.isna(month):
+            raise ValueError(f"{sheet}!{get_column_letter(col['month'] + 1)}{excel_row}: month {m!r} does not match format {fmt!r}.")
+        month = month.to_period("M").to_timestamp()
+        label = raw.iloc[i, col["section"]] if "section" in col else None
+        section = None
+        if label is not None and not pd.isna(label) and str(label).strip():
+            section = to_section.get(str(label).strip().casefold())
+            if section is None:
+                raise ValueError(f"{sheet}!{get_column_letter(col['section'] + 1)}{excel_row}: unknown section {str(label).strip()!r}; "
+                                 f"expected one of {[h for h, _ in layout.get('sections', {}).values()]} or blank.")
+        if account in sections and sections[account] != section:
+            raise ValueError(f"{sheet}: account {account!r} is in section {sections[account]!r} at row {row_of[account]} "
+                             f"but {section!r} at row {excel_row}.")
+        if (account, month) in seen:
+            raise ValueError(f"{sheet}: {account!r} {month:%b %Y} appears twice, in rows {seen[(account, month)]} and {excel_row}. "
+                             "Remove the duplicate row.")
+        seen[(account, month)] = excel_row
+        if account not in sections:
+            order.append(account)
+            sections[account], row_of[account] = section, excel_row
+        ref = f"{sheet}!{amount_letter}{excel_row}"
+        cell_of[(account, month)] = ref
+        value, problem = to_number(raw.iloc[i, col["amount"]])
+        if problem and problem != "blank":
+            bad_cells.append((ref, account, f"{month:%b %Y}", problem))
+        values.setdefault(account, {})[month] = np.nan if value is None else value
+    months = sorted({m for _, m in seen})
+    if len(months) < 2:
+        raise ValueError(f"Expected at least two months in {sheet}.")
+    blank_cells = []
+    for account in order:
+        blanks = [(cell_of.get((account, m), f"{sheet} (no row)"), account, f"{m:%b %Y}") for m in months
+                  if pd.isna(values[account].get(m, np.nan))]
+        if len(blanks) < len(months):  # an account with no amount in any month is a block header, as in the wide parser
+            blank_cells += blanks
+    data = pd.DataFrame([[values[a].get(m, np.nan) for m in months] for a in order], index=pd.Index(order, name="account"),
+                        columns=pd.Index(months, name="month"))
+    data.attrs.update(sections=sections, sheet=sheet, row_of=row_of, col_of={}, cell_of=cell_of, bad_cells=bad_cells,
+                      blank_cells=blank_cells, header_row=header_row + 1, account_col=col["account"], source="long")
+    return data
+
 
 def build_monthly_summary(account_month, totals=None):
     def find_row(name):

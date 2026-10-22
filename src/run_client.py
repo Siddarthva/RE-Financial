@@ -19,6 +19,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import abc_workbook_adapter as engine  # noqa: E402
 import excel_layout  # noqa: E402
+import sources  # noqa: E402
 from client_sandbox import client_sandbox  # noqa: E402
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -64,7 +65,21 @@ def load_config(client: str, clients_root: Path = CLIENTS_ROOT) -> dict:
     drop = (cfg.get("thresholds") or {}).get("gross_margin_drop_pp")
     if drop is not None and (isinstance(drop, bool) or not isinstance(drop, (int, float)) or drop < 0):
         raise ValueError(f"{path}: thresholds.gross_margin_drop_pp must be a non-negative number of percentage points")
+    source = cfg.get("source", "workbook")
+    if source not in sources.SOURCES:
+        raise ValueError(f"{path}: source must be one of {list(sources.SOURCES)}, got {source!r}")
+    kind = cfg["layout"].get("type", "wide")
+    if kind not in sources.LAYOUT_TYPES:
+        raise ValueError(f"{path}: layout.type must be one of {list(sources.LAYOUT_TYPES)}, got {kind!r}")
+    if kind == "long":
+        cols = cfg["layout"].get("columns")
+        if not isinstance(cols, dict) or not all(isinstance(cols.get(r), str) for r in ("account", "month", "amount")):
+            raise ValueError(f"{path}: layout.type long needs layout.columns with account, month and amount column names")
+    if source == "qbo" and cfg["sheets"].get("balance_sheet") and not isinstance(cfg.get("balance_sheet_file"), str):
+        raise ValueError(f"{path}: source qbo with a balance_sheet needs balance_sheet_file (the BalanceSheet report JSON)")
     cfg["workbook_path"] = (path.parent / cfg["workbook"]).resolve()
+    if cfg.get("balance_sheet_file"):
+        cfg["balance_sheet_path"] = (path.parent / cfg["balance_sheet_file"]).resolve()
     return cfg
 
 
@@ -91,6 +106,7 @@ def data_quality(cfg, account_month, monthly, expense_trends, rollup) -> list[st
                         "with gaps, and no month-over-month change is reported across a gap.")
     if monthly["revenue_ttm"].isna().all():
         warnings.append(f"TTM not available: {len(monthly)} months supplied, 12 consecutive required.")
+    warnings += account_month.attrs.get("source_notes", [])  # e.g. QuickBooks months or groups left out, by name
     warnings += cell_warnings(account_month)
     for m, r in monthly.set_index("month")["revenue"].items():
         if r == 0:
@@ -133,13 +149,7 @@ def run(client: str, clients_root: Path = CLIENTS_ROOT, outputs_root: Path = OUT
     """Run one client's analysis inside its sandbox and return the written output paths."""
     with client_sandbox(client, clients_root, outputs_root):
         cfg = load_config(client, clients_root)
-        layout = {
-            "sheet": cfg["sheets"]["income_statement"],
-            "header_label": cfg["layout"]["header_label"],
-            "month_format": cfg["layout"]["month_format"],
-            "sections": {sid: (v["header"], v["total"]) for sid, v in cfg["sections"].items()},
-        }
-        account_month = engine.parse_wide_income_statement(cfg["workbook_path"], layout)
+        account_month = sources.income_statement(cfg)
         monthly = engine.build_monthly_summary(account_month, cfg["totals"])
         monthly = engine.add_fiscal_year(monthly, cfg["fiscal_year"]["start_month"])
         expense_trends = engine.build_expense_category_trends(account_month, cfg["subtotal_rows"])
@@ -147,8 +157,7 @@ def run(client: str, clients_root: Path = CLIENTS_ROOT, outputs_root: Path = OUT
         one_offs = engine.find_one_off_items(account_month)
         cash = None
         if cfg["sheets"].get("balance_sheet"):
-            bs = engine.parse_wide_income_statement(cfg["workbook_path"], {**engine.ABC_BS_LAYOUT, "sheet": cfg["sheets"]["balance_sheet"]})
-            cash = engine.cash_position(bs)
+            cash = engine.cash_position(sources.balance_sheet(cfg), sources.cash_row(cfg))
         commentary = engine.generate_commentary(monthly, account_month, cash)
         warnings = data_quality(cfg, account_month, monthly, expense_trends, rollup)
 

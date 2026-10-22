@@ -1,0 +1,140 @@
+{
+  "workbook": "01_pnl_monthly_accrual.response.redacted.json",
+  "sha256": "609f6eea8fe4734dae95cadac886327d993e65b9d54f5b60c253fcccd3905677",
+  "sheets_detected": [
+    "ProfitAndLoss",
+    "BalanceSheet"
+  ],
+  "period_start": "2026-05",
+  "period_end": "2026-10",
+  "months": 6,
+  "checks": [
+    {
+      "check": "Income statement sheet present",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": ""
+    },
+    {
+      "check": "Header row found",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss!A1",
+      "detail": ""
+    },
+    {
+      "check": "Months read",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": "6 months (2026-05 to 2026-10)"
+    },
+    {
+      "check": "Total row present: Total Income",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss!Total Income[Oct 2026]",
+      "detail": "revenue"
+    },
+    {
+      "check": "Total row present: Total Cost of Goods Sold",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss!Total Cost of Goods Sold[Oct 2026]",
+      "detail": "cost_of_goods_sold"
+    },
+    {
+      "check": "Total row present: Gross Profit",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss!Gross Profit[Oct 2026]",
+      "detail": "gross_profit"
+    },
+    {
+      "check": "Total row present: Total Expenses",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss!Total Expenses[Oct 2026]",
+      "detail": "operating_expenses"
+    },
+    {
+      "check": "Total row present: Net Operating Income",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss!Net Operating Income[Oct 2026]",
+      "detail": "operating_income"
+    },
+    {
+      "check": "Total row present: Net Income",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss!Net Income[Oct 2026]",
+      "detail": "net_income"
+    },
+    {
+      "check": "Every amount is a number",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": ""
+    },
+    {
+      "check": "Gross profit = revenue - COGS (every month)",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": ""
+    },
+    {
+      "check": "Operating income = gross profit - opex (every month)",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": ""
+    },
+    {
+      "check": "Section header matched: Income",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": "11 lines under it"
+    },
+    {
+      "check": "Total Income foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": ""
+    },
+    {
+      "check": "Section header matched: Cost of Goods Sold",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": "1 lines under it"
+    },
+    {
+      "check": "Total Cost of Goods Sold foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": ""
+    },
+    {
+      "check": "Section header matched: Expenses",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": "20 lines under it"
+    },
+    {
+      "check": "Total Expenses foots to its lines (every month)",
+      "passed": true,
+      "cell_ref": "ProfitAndLoss",
+      "detail": ""
+    },
+    {
+      "check": "Balance Sheet rows present",
+      "passed": true,
+      "cell_ref": "BalanceSheet",
+      "detail": "TOTAL ASSETS, TOTAL LIABILITIES AND EQUITY, Net Income"
+    },
+    {
+      "check": "Balance Sheet balances (assets = liabilities + equity, every month)",
+      "passed": true,
+      "cell_ref": "BalanceSheet",
+      "detail": ""
+    },
+    {
+      "check": "Current Year Earnings = year-to-date net income (every month)",
+      "passed": true,
+      "cell_ref": "BalanceSheet",
+      "detail": ""
+    }
+  ],
+  "status": "pass"
+}

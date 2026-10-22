@@ -1,0 +1,45 @@
+{
+  "client": "qbo_sandbox",
+  "display_name": "QuickBooks sandbox (Intuit sample company, not ABC)",
+  "source": "../../01_connection/evidence/quickbooks/2026-10-22/01_pnl_monthly_accrual.response.redacted.json",
+  "months": 6,
+  "period": "May 2026 - Oct 2026",
+  "fiscal_year_start_month": 1,
+  "latest_fiscal_year": "FY2026",
+  "latest": {
+    "revenue": 0.0,
+    "cost_of_goods_sold": 0.0,
+    "gross_profit": 0.0,
+    "operating_expenses": 34.0,
+    "operating_income": -34.0,
+    "net_income": -34.0,
+    "revenue_mom_change": -6641.38,
+    "revenue_mom_pct": -1.0,
+    "gross_margin_pct": null,
+    "operating_margin_pct": null,
+    "net_margin_pct": null,
+    "revenue_ttm": null,
+    "cost_of_goods_sold_ttm": null,
+    "gross_profit_ttm": null,
+    "operating_expenses_ttm": null,
+    "operating_income_ttm": null,
+    "net_income_ttm": null,
+    "revenue_fytd": 10200.77,
+    "gross_profit_fytd": 9795.77,
+    "operating_expenses_fytd": 5237.31,
+    "net_income_fytd": 1642.46
+  },
+  "categories_latest": {
+    "General & Administrative": 0.0,
+    "Job Costs": 0.0,
+    "Occupancy & Utilities": 0.0,
+    "Professional Services": 0.0,
+    "Sales & Marketing": 0.0,
+    "Vehicles & Equipment": 34.0
+  },
+  "warnings": [
+    "TTM not available: 6 months supplied, 12 consecutive required.",
+    "QuickBooks returned 18 month(s) before May 2026 (Nov 2024 - Apr 2026) with no activity on any line; they are left out, not analysed as zero months.",
+    "Revenue is zero in Oct 2026; margins for that month are reported as not available."
+  ]
+}

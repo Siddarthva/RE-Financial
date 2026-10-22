@@ -1,0 +1,562 @@
+{
+  "latest_month": "2026-10",
+  "prior_month": "2026-09",
+  "months": {
+    "2026-05": {
+      "revenue": {
+        "value": 391.25,
+        "ttm": null
+      },
+      "cost_of_goods_sold": {
+        "value": 0.0,
+        "ttm": null
+      },
+      "gross_profit": {
+        "value": 391.25,
+        "ttm": null,
+        "margin": 1.0
+      },
+      "operating_expenses": {
+        "value": 300.0,
+        "ttm": null
+      },
+      "operating_income": {
+        "value": 91.25,
+        "ttm": null,
+        "margin": 0.233227
+      },
+      "net_income": {
+        "value": 91.25,
+        "ttm": null,
+        "margin": 0.233227
+      }
+    },
+    "2026-06": {
+      "revenue": {
+        "value": 365.0,
+        "ttm": null,
+        "mom_change": -26.25,
+        "mom_pct": -0.067093
+      },
+      "cost_of_goods_sold": {
+        "value": 0.0,
+        "ttm": null,
+        "mom_change": 0.0,
+        "mom_pct": null
+      },
+      "gross_profit": {
+        "value": 365.0,
+        "ttm": null,
+        "mom_change": -26.25,
+        "mom_pct": -0.067093,
+        "margin": 1.0,
+        "margin_change_pp": 0.0
+      },
+      "operating_expenses": {
+        "value": 0.0,
+        "ttm": null,
+        "mom_change": -300.0,
+        "mom_pct": -1.0
+      },
+      "operating_income": {
+        "value": 365.0,
+        "ttm": null,
+        "mom_change": 273.75,
+        "mom_pct": 3.0,
+        "margin": 1.0,
+        "margin_change_pp": 76.677316
+      },
+      "net_income": {
+        "value": 365.0,
+        "ttm": null,
+        "mom_change": 273.75,
+        "mom_pct": 3.0,
+        "margin": 1.0,
+        "margin_change_pp": 76.677316
+      }
+    },
+    "2026-07": {
+      "revenue": {
+        "value": 1018.0,
+        "ttm": null,
+        "mom_change": 653.0,
+        "mom_pct": 1.789041
+      },
+      "cost_of_goods_sold": {
+        "value": 0.0,
+        "ttm": null,
+        "mom_change": 0.0,
+        "mom_pct": null
+      },
+      "gross_profit": {
+        "value": 1018.0,
+        "ttm": null,
+        "mom_change": 653.0,
+        "mom_pct": 1.789041,
+        "margin": 1.0,
+        "margin_change_pp": 0.0
+      },
+      "operating_expenses": {
+        "value": 605.57,
+        "ttm": null,
+        "mom_change": 605.57,
+        "mom_pct": null
+      },
+      "operating_income": {
+        "value": 412.43,
+        "ttm": null,
+        "mom_change": 47.43,
+        "mom_pct": 0.129945,
+        "margin": 0.405138,
+        "margin_change_pp": -59.486248
+      },
+      "net_income": {
+        "value": 412.43,
+        "ttm": null,
+        "mom_change": 47.43,
+        "mom_pct": 0.129945,
+        "margin": 0.405138,
+        "margin_change_pp": -59.486248
+      }
+    },
+    "2026-08": {
+      "revenue": {
+        "value": 1785.14,
+        "ttm": null,
+        "mom_change": 767.14,
+        "mom_pct": 0.753576
+      },
+      "cost_of_goods_sold": {
+        "value": 0.0,
+        "ttm": null,
+        "mom_change": 0.0,
+        "mom_pct": null
+      },
+      "gross_profit": {
+        "value": 1785.14,
+        "ttm": null,
+        "mom_change": 767.14,
+        "mom_pct": 0.753576,
+        "margin": 1.0,
+        "margin_change_pp": 0.0
+      },
+      "operating_expenses": {
+        "value": 1542.64,
+        "ttm": null,
+        "mom_change": 937.07,
+        "mom_pct": 1.547418
+      },
+      "operating_income": {
+        "value": 242.5,
+        "ttm": null,
+        "mom_change": -169.93,
+        "mom_pct": -0.412021,
+        "margin": 0.135844,
+        "margin_change_pp": -26.929384
+      },
+      "net_income": {
+        "value": -673.5,
+        "ttm": null,
+        "mom_change": -1085.93,
+        "mom_pct": -2.633004,
+        "margin": -0.377281,
+        "margin_change_pp": -78.241886
+      }
+    },
+    "2026-09": {
+      "revenue": {
+        "value": 6641.38,
+        "ttm": null,
+        "mom_change": 4856.24,
+        "mom_pct": 2.720369
+      },
+      "cost_of_goods_sold": {
+        "value": 405.0,
+        "ttm": null,
+        "mom_change": 405.0,
+        "mom_pct": null
+      },
+      "gross_profit": {
+        "value": 6236.38,
+        "ttm": null,
+        "mom_change": 4451.24,
+        "mom_pct": 2.493496,
+        "margin": 0.939019,
+        "margin_change_pp": -6.09813
+      },
+      "operating_expenses": {
+        "value": 2755.1,
+        "ttm": null,
+        "mom_change": 1212.46,
+        "mom_pct": 0.785964
+      },
+      "operating_income": {
+        "value": 3481.28,
+        "ttm": null,
+        "mom_change": 3238.78,
+        "mom_pct": 13.355794,
+        "margin": 0.52418,
+        "margin_change_pp": 38.833653
+      },
+      "net_income": {
+        "value": 1481.28,
+        "ttm": null,
+        "mom_change": 2154.78,
+        "mom_pct": 3.199376,
+        "margin": 0.223038,
+        "margin_change_pp": 60.031932
+      }
+    },
+    "2026-10": {
+      "revenue": {
+        "value": 0.0,
+        "ttm": null,
+        "mom_change": -6641.38,
+        "mom_pct": -1.0
+      },
+      "cost_of_goods_sold": {
+        "value": 0.0,
+        "ttm": null,
+        "mom_change": -405.0,
+        "mom_pct": -1.0
+      },
+      "gross_profit": {
+        "value": 0.0,
+        "ttm": null,
+        "mom_change": -6236.38,
+        "mom_pct": -1.0,
+        "margin": null,
+        "margin_change_pp": null
+      },
+      "operating_expenses": {
+        "value": 34.0,
+        "ttm": null,
+        "mom_change": -2721.1,
+        "mom_pct": -0.987659
+      },
+      "operating_income": {
+        "value": -34.0,
+        "ttm": null,
+        "mom_change": -3515.28,
+        "mom_pct": -1.009767,
+        "margin": null,
+        "margin_change_pp": null
+      },
+      "net_income": {
+        "value": -34.0,
+        "ttm": null,
+        "mom_change": -1515.28,
+        "mom_pct": -1.022953,
+        "margin": null,
+        "margin_change_pp": null
+      }
+    }
+  },
+  "line_items": {
+    "Design income": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 1275.0,
+      "mom_change": -1275.0,
+      "mom_pct": -1.0
+    },
+    "Discounts given": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": -59.0,
+      "mom_change": 59.0,
+      "mom_pct": 1.0
+    },
+    "Landscaping Services": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 642.5,
+      "mom_change": -642.5,
+      "mom_pct": -1.0
+    },
+    "Landscaping Services:Job Materials:Fountains and Garden Lighting": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 951.5,
+      "mom_change": -951.5,
+      "mom_pct": -1.0
+    },
+    "Landscaping Services:Job Materials:Plants and Soil": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 2095.08,
+      "mom_change": -2095.08,
+      "mom_pct": -1.0
+    },
+    "Landscaping Services:Job Materials:Sprinklers and Drip Systems": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null
+    },
+    "Landscaping Services:Labor:Installation": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 250.0,
+      "mom_change": -250.0,
+      "mom_pct": -1.0
+    },
+    "Landscaping Services:Labor:Maintenance and Repair": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null
+    },
+    "Pest Control Services": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 70.0,
+      "mom_change": -70.0,
+      "mom_pct": -1.0
+    },
+    "Sales of Product Income": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 912.75,
+      "mom_change": -912.75,
+      "mom_pct": -1.0
+    },
+    "Services": {
+      "section": "income",
+      "value": 0.0,
+      "prior_value": 503.55,
+      "mom_change": -503.55,
+      "mom_pct": -1.0
+    },
+    "Cost of Goods Sold": {
+      "section": "cost of goods sold",
+      "value": 0.0,
+      "prior_value": 405.0,
+      "mom_change": -405.0,
+      "mom_pct": -1.0
+    },
+    "Advertising": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 74.86,
+      "mom_change": -74.86,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Automobile": {
+      "section": "operating expenses",
+      "value": 34.0,
+      "prior_value": 79.96,
+      "mom_change": -45.96,
+      "mom_pct": -0.574787,
+      "share_of_opex": 1.0
+    },
+    "Automobile:Fuel": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 167.85,
+      "mom_change": -167.85,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Equipment Rental": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 112.0,
+      "mom_change": -112.0,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Insurance": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 241.23,
+      "mom_change": -241.23,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Job Expenses": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 46.98,
+      "mom_change": -46.98,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Job Expenses:Job Materials:Decks and Patios": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 234.04,
+      "mom_change": -234.04,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Job Expenses:Job Materials:Plants and Soil": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 105.95,
+      "mom_change": -105.95,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Job Expenses:Job Materials:Sprinklers and Drip Systems": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 215.66,
+      "mom_change": -215.66,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Legal & Professional Fees": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 75.0,
+      "mom_change": -75.0,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Legal & Professional Fees:Accounting": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 315.0,
+      "mom_change": -315.0,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Legal & Professional Fees:Bookkeeper": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Legal & Professional Fees:Lawyer": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 100.0,
+      "mom_change": -100.0,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Maintenance and Repair": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 185.0,
+      "mom_change": -185.0,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Maintenance and Repair:Equipment Repairs": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 755.0,
+      "mom_change": -755.0,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Meals and Entertainment": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 28.49,
+      "mom_change": -28.49,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Office Expenses": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 18.08,
+      "mom_change": -18.08,
+      "mom_pct": -1.0,
+      "share_of_opex": 0.0
+    },
+    "Rent or Lease": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Utilities:Gas and Electric": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    },
+    "Utilities:Telephone": {
+      "section": "operating expenses",
+      "value": 0.0,
+      "prior_value": 0.0,
+      "mom_change": 0.0,
+      "mom_pct": null,
+      "share_of_opex": 0.0
+    }
+  },
+  "yoy": {
+    "available": false,
+    "month": "2026-10",
+    "prior_year_month": "2025-10",
+    "reason": "No data for 2025-10, so there is no same-month comparison."
+  },
+  "top_movements": [
+    {
+      "account": "Landscaping Services:Job Materials:Plants and Soil",
+      "mom_change": -2095.08
+    },
+    {
+      "account": "Design income",
+      "mom_change": -1275.0
+    },
+    {
+      "account": "Landscaping Services:Job Materials:Fountains and Garden Lighting",
+      "mom_change": -951.5
+    }
+  ],
+  "gross_margin_drop_threshold_pp": 5,
+  "gross_margin_flags": [
+    {
+      "month": "2026-09",
+      "gross_margin_pct": 0.9390186979212152,
+      "change_pp": -6.098130207878483
+    }
+  ],
+  "cash": {
+    "month": "2026-10",
+    "value": 2001.0,
+    "prior_value": 2001.0,
+    "mom_change": 0.0,
+    "mom_pct": 0.0,
+    "burn": {
+      "1m": 0.0,
+      "3m": 856.483333,
+      "6m": null
+    },
+    "runway_months": {
+      "1m": null,
+      "3m": 2.336298,
+      "6m": null
+    },
+    "primary_window": "3m"
+  },
+  "client": "qbo_sandbox",
+  "display_name": "QuickBooks sandbox (Intuit sample company, not ABC)",
+  "one_offs": [],
+  "adjusted_net_income": {
+    "month": "2026-10",
+    "net_income": -34.0,
+    "one_off_effect_on_net_income": 0.0,
+    "adjusted_net_income": -34.0,
+    "items": {}
+  },
+  "warnings": [
+    "TTM not available: 6 months supplied, 12 consecutive required.",
+    "QuickBooks returned 18 month(s) before May 2026 (Nov 2024 - Apr 2026) with no activity on any line; they are left out, not analysed as zero months.",
+    "Revenue is zero in Oct 2026; margins for that month are reported as not available."
+  ]
+}

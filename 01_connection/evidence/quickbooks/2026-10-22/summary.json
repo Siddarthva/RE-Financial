@@ -1,0 +1,30 @@
+{
+  "captured_at": "2026-10-22T01:19:58+00:00",
+  "range": [
+    "2024-11-01",
+    "2026-10-31"
+  ],
+  "redaction_counts": {},
+  "checks": [
+    {
+      "claim": "Read-only: no create/update/delete tool is registered with the disable flags true",
+      "pass": true,
+      "detail": "71 tools registered; write-verb tools: none"
+    },
+    {
+      "claim": "get_profit_and_loss returned a monthly report",
+      "pass": true,
+      "detail": "called_at 2026-10-22T01:19:49+00:00; 26 columns"
+    },
+    {
+      "claim": "get_balance_sheet returned a monthly report",
+      "pass": true,
+      "detail": "called_at 2026-10-22T01:19:57+00:00; 25 columns"
+    },
+    {
+      "claim": "No secret-like pattern survives redaction (redact_and_verify.residual)",
+      "pass": true,
+      "detail": "residual patterns: none"
+    }
+  ]
+}

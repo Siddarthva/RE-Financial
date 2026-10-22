@@ -11,6 +11,8 @@ import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 
+import sources
+
 # Flux rule: a line item is flagged when it moves by at least FLUX_MIN_DOLLARS *and* FLUX_MIN_PCT
 # (or has no % because the prior month was zero). Sign flips use a lower dollar floor.
 FLUX_MIN_DOLLARS = 5000.0
@@ -34,13 +36,13 @@ def sha256_file(path: Path) -> str:
 
 
 def _layout(cfg: dict) -> dict:
-    return {"sheet": cfg["sheets"]["income_statement"], "header_label": cfg["layout"]["header_label"],
-            "month_format": cfg["layout"]["month_format"],
-            "sections": {sid: (v["header"], v["total"]) for sid, v in cfg["sections"].items()}}
+    return sources.layout(cfg)
 
 
 def locate(cfg: dict) -> dict:
     """Scan the income-statement sheet and return header/month/account cell positions (read-only)."""
+    if sources.kind(cfg) != "wide":  # long-format and QuickBooks parsers record each value's position themselves
+        return sources.locate_frame(sources.income_statement(cfg))
     lay = _layout(cfg)
     wb = load_workbook(cfg["workbook_path"], read_only=True, data_only=True)
     try:
@@ -82,6 +84,8 @@ def locate(cfg: dict) -> dict:
 
 
 def cell_ref(loc: dict, account: str, section: str | None, month: str) -> str | None:
+    if "refs" in loc:
+        return loc["refs"].get((account, month))
     row = loc["accounts"].get((account, section)) or next(
         (r for (a, _), r in loc["accounts"].items() if a == account), None)
     col = loc["month_cols"].get(month)
@@ -150,6 +154,8 @@ def _first(refs: list[str], n: int = 5) -> str:
 def preflight(cfg: dict, month: str | None = None) -> list[str]:
     """Checks that must pass before the workbook is parsed. Returns plain-language problems naming the file,
     sheet or cell; an empty list means the engine may read the workbook. Never modifies the file."""
+    if sources.kind(cfg) == "qbo":  # report JSON: the adapter's shape checks are the preflight (STOP with a named cause)
+        return sources.frame_preflight(cfg, month)
     path = Path(cfg["workbook_path"])
     try:
         with open(path, "rb") as f:
@@ -180,6 +186,10 @@ def preflight(cfg: dict, month: str | None = None) -> list[str]:
         errors = [f"{c.coordinate} {c.value}" for row in values[s].iter_rows() for c in row if c.data_type == "e"]
         if errors:  # pandas reads Excel error values as blanks, so they must be caught here
             problems.append(f"{s}: {len(errors)} cells hold an Excel error value ({_first(errors)}). Fix the formula and re-run.")
+    if sources.kind(cfg) == "long":  # header, unknown columns, duplicate rows, months and totals: the long parser's checks
+        values.close()
+        formulas.close()
+        return problems + sources.frame_preflight(cfg, month)
     ws = values[lay["sheet"]]
     rows = [list(r) for r in ws.iter_rows(max_row=15, values_only=True)]
     hr = next((i for i, r in enumerate(rows) if lay["header_label"] in [str(v) for v in r]), None)
@@ -221,9 +231,9 @@ def intake_gate(cfg: dict, month: str, engine) -> tuple[dict, pd.DataFrame, dict
     problems = preflight(cfg, month)
     if problems:
         raise ValueError("Intake refused the workbook: " + " | ".join(problems))
-    am = engine.parse_wide_income_statement(cfg["workbook_path"], _layout(cfg))
+    am = sources.income_statement(cfg)
     monthly = engine.build_monthly_summary(am, cfg["totals"])
-    loc = locate(cfg)
+    loc = sources.locate_frame(am) if sources.kind(cfg) != "wide" else locate(cfg)
     return build_intake(cfg, loc, monthly, am), am, loc
 
 
@@ -272,11 +282,14 @@ def balance_sheet_checks(cfg: dict, monthly: pd.DataFrame, account_month: pd.Dat
     bs_sheet = cfg["sheets"].get("balance_sheet")
     if not bs_sheet:
         return []
-    from abc_workbook_adapter import ABC_BS_LAYOUT, parse_wide_income_statement
+    from abc_workbook_adapter import ABC_BS_LAYOUT
     rows = {**BS_ROWS, **cfg.get("balance_sheet_rows", {})}
-    bs = parse_wide_income_statement(cfg["workbook_path"], {**ABC_BS_LAYOUT, "sheet": bs_sheet})
-    bs_loc = locate({**cfg, "sections": {}, "sheets": {**cfg["sheets"], "income_statement": bs_sheet},
-                     "layout": {"header_label": ABC_BS_LAYOUT["header_label"], "month_format": ABC_BS_LAYOUT["month_format"]}})
+    bs = sources.balance_sheet(cfg)
+    if sources.kind(cfg) == "wide":
+        bs_loc = locate({**cfg, "sections": {}, "sheets": {**cfg["sheets"], "income_statement": bs_sheet},
+                         "layout": {"header_label": ABC_BS_LAYOUT["header_label"], "month_format": ABC_BS_LAYOUT["month_format"]}})
+    else:
+        bs_loc = sources.locate_frame(bs)
     out = []
 
     def add(name, ok, ref, detail=""):
@@ -318,9 +331,7 @@ def balance_sheet_checks(cfg: dict, monthly: pd.DataFrame, account_month: pd.Dat
 def build_intake(cfg: dict, loc: dict, monthly: pd.DataFrame, account_month: pd.DataFrame) -> dict:
     """Workbook card data: sheets, period range, hash, and pass/fail checks with cell refs."""
     path = Path(cfg["workbook_path"])
-    wb = load_workbook(path, read_only=True)
-    sheets = list(wb.sheetnames)
-    wb.close()
+    sheets = sources.sheet_names(cfg)
     checks = []
 
     def add(name, ok, ref, detail=""):
@@ -330,12 +341,15 @@ def build_intake(cfg: dict, loc: dict, monthly: pd.DataFrame, account_month: pd.
     add("Income statement sheet present", sheet in sheets, sheet)
     hr = loc["header_row"]
     add("Header row found", hr is not None, f"{sheet}!{get_column_letter(loc['account_col'] + 1)}{hr}" if hr else sheet,
-        cfg["layout"]["header_label"])
+        sources.layout(cfg)["header_label"] or "")
     cols = sorted(loc["month_cols"].values())
-    contiguous = bool(cols) and cols == list(range(cols[0], cols[-1] + 1))
-    add("Month columns contiguous", contiguous,
-        f"{sheet}!{get_column_letter(cols[0] + 1)}{hr}:{get_column_letter(cols[-1] + 1)}{hr}" if cols and hr else sheet,
-        f"{len(cols)} month columns")
+    if "refs" in loc:  # long-format / QuickBooks: months are values, not column positions (a gap is a data-quality warning)
+        add("Months read", len(cols) >= 2, sheet, f"{len(cols)} months ({min(loc['month_cols'])} to {max(loc['month_cols'])})")
+    else:
+        contiguous = bool(cols) and cols == list(range(cols[0], cols[-1] + 1))
+        add("Month columns contiguous", contiguous,
+            f"{sheet}!{get_column_letter(cols[0] + 1)}{hr}:{get_column_letter(cols[-1] + 1)}{hr}" if cols and hr else sheet,
+            f"{len(cols)} month columns")
     latest = f"{monthly['month'].iloc[-1]:%Y-%m}"
     for key, label in cfg["totals"].items():
         ref = cell_ref(loc, label, None, latest)

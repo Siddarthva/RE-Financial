@@ -1,0 +1,86 @@
+# QuickBooks Online SANDBOX — Intuit's sample company ("Sandbox Company US", landscaping sample data). NOT ABC.
+# ABC still comes from the workbook in data/. This client proves the analysis runs on live QuickBooks report data.
+# Source: read-only MCP calls (QUICKBOOKS_DISABLE_WRITE/UPDATE/DELETE=true) saved and redacted by
+#   python 01_connection/evidence/quickbooks/capture_monthly.py      (writes evidence/quickbooks/<date>/)
+# To refresh: re-run the capture and point the two paths below at the new dated folder.
+client: qbo_sandbox
+display_name: QuickBooks sandbox (Intuit sample company, not ABC)
+source: qbo
+workbook: ../../01_connection/evidence/quickbooks/2026-10-22/01_pnl_monthly_accrual.response.redacted.json         # ProfitAndLoss, summarize_column_by=Month
+balance_sheet_file: ../../01_connection/evidence/quickbooks/2026-10-22/02_balance_sheet_monthly_accrual.response.redacted.json  # BalanceSheet by month
+
+sheets:                       # QuickBooks Header.ReportName of each report
+  income_statement: ProfitAndLoss
+  balance_sheet: BalanceSheet
+
+layout:
+  month_format: "%b %Y"       # QuickBooks ColTitle; months are taken from each column's StartDate/EndDate
+
+qbo:
+  # Top-level groups expected outside the three sections; they reach the analysis through Net Income only.
+  other_groups: [Other Income, Other Expenses]
+  # QuickBooks returns every requested month; months before the first activity are left out (named in warnings).
+  trim_leading_zero_months: true
+
+# canonical section -> QuickBooks group header / its Summary row
+sections:
+  income:             {header: Income,             total: Total Income}
+  cost of goods sold: {header: Cost of Goods Sold, total: Total Cost of Goods Sold}
+  operating expenses: {header: Expenses,           total: Total Expenses}
+
+totals:
+  revenue: Total Income
+  cost_of_goods_sold: Total Cost of Goods Sold
+  gross_profit: Gross Profit
+  operating_expenses: Total Expenses
+  operating_income: Net Operating Income
+  net_income: Net Income                # = Net Operating Income + Net Other Income
+
+# Parent-account subtotals are checked by the adapter and not emitted (a parent's own postings are emitted as
+# 'Parent'), so nothing to exclude here.
+subtotal_rows: []
+
+cash_row: Total Bank Accounts           # BalanceSheet Summary row
+balance_sheet_rows:
+  total_assets: TOTAL ASSETS
+  total_liabilities_equity: TOTAL LIABILITIES AND EQUITY
+  current_year_earnings: Net Income     # Equity line: year-to-date net income
+
+thresholds:
+  gross_margin_drop_pp: 5
+  materiality: {min_dollars: 250, min_pct: 0.10, sign_flip_dollars: 100}   # sample company is small
+
+fiscal_year:
+  start_month: 1   # Evidence: BalanceSheet equity 'Net Income' equals P&L Net Income summed from January (intake check).
+
+categories:
+  - Sales & Marketing
+  - Job Costs
+  - Vehicles & Equipment
+  - Professional Services
+  - Occupancy & Utilities
+  - General & Administrative
+
+# Keys are QuickBooks fully qualified account names (Parent:Child), as qbo_adapter emits them.
+account_to_category:
+  # Parent accounts with postings of their own (QuickBooks shows these on the parent's header row)
+  Automobile: Vehicles & Equipment
+  Job Expenses: Job Costs
+  Legal & Professional Fees: Professional Services
+  Maintenance and Repair: Vehicles & Equipment
+  Advertising: Sales & Marketing
+  Meals and Entertainment: Sales & Marketing
+  "Job Expenses:Job Materials:Decks and Patios": Job Costs
+  "Job Expenses:Job Materials:Plants and Soil": Job Costs
+  "Job Expenses:Job Materials:Sprinklers and Drip Systems": Job Costs
+  "Automobile:Fuel": Vehicles & Equipment
+  Equipment Rental: Vehicles & Equipment
+  "Maintenance and Repair:Equipment Repairs": Vehicles & Equipment
+  "Legal & Professional Fees:Accounting": Professional Services
+  "Legal & Professional Fees:Bookkeeper": Professional Services
+  "Legal & Professional Fees:Lawyer": Professional Services
+  Rent or Lease: Occupancy & Utilities
+  "Utilities:Gas and Electric": Occupancy & Utilities
+  "Utilities:Telephone": Occupancy & Utilities
+  Insurance: General & Administrative
+  Office Expenses: General & Administrative

@@ -45,6 +45,7 @@ Without your own sandbox you can still read the saved evidence (no credentials n
 | [`evidence/quickbooks/README.md`](evidence/quickbooks/README.md) + 8 request/response pairs | Live read-only P&L (accrual, cash), GL, invoices, Balance Sheet, CompanyInfo through the MCP server | 2026-10-12 (two reports re-run 2026-10-13, same figures) |
 | [`evidence/quickbooks/2026-10-14/README.md`](evidence/quickbooks/2026-10-14/README.md), `summary.json` | Checks a-d: CompanyInfo `ok`; monthly P&L Jan-Jun 2026; Balance Sheet 5,488.75 = 5,488.75; missing-server message | 2026-10-14 04:34-04:36 |
 | [`evidence/quickbooks/2026-10-14/01_tools_list.response.json`](evidence/quickbooks/2026-10-14/01_tools_list.response.json) | 71 tools registered with the 3 flags `true`; none is create/update/delete | 2026-10-14 04:35 |
+| [`evidence/quickbooks/2026-10-22/`](evidence/quickbooks/2026-10-22/summary.json) via [`capture_monthly.py`](evidence/quickbooks/capture_monthly.py) | Monthly P&L and monthly Balance Sheet Nov 2024 - Oct 2026 (`summarize_column_by=Month`), redacted with `redact_and_verify.redact`, residual scan 0; first attempt timed out at MCP start-up, retry passed. These two files are the input of client `qbo_sandbox` | 2026-10-22 01:19 |
 | `outputs/abc/qbo_status.json` | Last connection test result | latest run |
 | [`evidence/quickbooks/checks.json`](evidence/quickbooks/checks.json), [`redaction_log.json`](evidence/quickbooks/redaction_log.json), [`redact_and_verify.py`](evidence/quickbooks/redact_and_verify.py) | Pass/fail checks; what was redacted; residual-secret scan | 2026-10-12 |
 | [`../tests/test_qbo_reliability.py`](../tests/test_qbo_reliability.py), [`../tests/test_qbo_diagnose.py`](../tests/test_qbo_diagnose.py) | 12 failure modes behave as the reliability table says (fake server, no network) | run 2026-10-15 |
@@ -52,7 +53,15 @@ Without your own sandbox you can still read the saved evidence (no credentials n
 | [`dependency_risk.md`](dependency_risk.md) | 51 → 23 after `npm audit fix` (0 critical/high), runtime 3 moderate left | 2026-10-22 |
 | [`part1-quickbooks-mcp.md`](part1-quickbooks-mcp.md) | Setup record (steps taken; some paragraphs predate the fix and say so) | 2026-10-12 to 14 |
 
-**Limit:** the sandbox holds Intuit's sample data, not ABC's. The monthly analysis reads the supplied workbook; **QuickBooks data is not an input to it.**
+## QuickBooks data feeds the analysis (Implemented 2026-10-22)
+
+**The analysis can now run on live QuickBooks sandbox data (Intuit sample company); ABC still comes from the workbook.**
+
+- [`src/qbo_adapter.py`](../src/qbo_adapter.py) turns the saved ProfitAndLoss and BalanceSheet JSON (monthly columns) into the same account x month frames the workbook parser produces. Sections and totals come from [`clients/qbo_sandbox/config.yaml`](../clients/qbo_sandbox/config.yaml); OPEX accounts map to categories by QuickBooks fully qualified name (`Parent:Child`).
+- The same intake gate runs: section footing, gross profit = revenue - COGS, operating income identity, Balance Sheet balances, equity Net Income = YTD net income. A report-shape change (other report, not monthly, partial-month column, wrong cell count, duplicate name, a parent subtotal that does not foot) is a STOP with the cause named. An unmapped account or group is a WARN.
+- Found while building it: QuickBooks puts a parent account's own postings on the parent's header row. The first adapter version ignored them; the gate refused (`'Total Landscaping Services' in May 2026 is off by 190.00`) instead of guessing, and the adapter was fixed.
+- Run: `python scripts/run_pipeline.py qbo_sandbox 2026-09` (latest complete month; Oct 2026 was month-to-date at capture and has zero revenue, which the run reports as a warning). Tests: [`tests/test_qbo_adapter.py`](../tests/test_qbo_adapter.py); golden cases G34-G40 (hand-derived from named JSON fields).
+- Limits: the data is Intuit's sample company with 5 active months (May - Sep 2026), so TTM and year-over-year are reported as not available. Refreshing needs a new read-only capture and the two paths in the config updated.
 
 ## Loading ABC totals into the sandbox (stretch, Not done)
 

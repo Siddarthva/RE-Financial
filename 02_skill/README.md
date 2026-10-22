@@ -33,6 +33,7 @@ A model asked to do arithmetic can be fluent and wrong. Here the model never see
 |---|---|---|
 | In Claude Code (full flow) | `/monthly-analysis abc 2026-06` | Commentary, reviewer verdict, `outputs/abc/monthly_review_2026-06.xlsx` |
 | Pipeline, no model | `python scripts/run_pipeline.py abc 2026-06` | Intake gate, calculation, flux, packet, manifest in `outputs/abc/`. The month is the reporting month; TTM needs 12 consecutive months ending there. Optional `--clients-root DIR` and `--outputs-root DIR` point at other folders (tests and experiments use them so `outputs/` is untouched) |
+| QuickBooks sandbox | `python scripts/run_pipeline.py qbo_sandbox 2026-09` | Same stages on live QuickBooks sandbox data (Intuit sample company, not ABC) read by [`src/qbo_adapter.py`](../src/qbo_adapter.py) from the redacted capture in `01_connection/evidence/quickbooks/2026-10-22/` |
 | Engine only | `python src/run_client.py abc` | `analysis.xlsx`, `summary.json`, `commentary.md` |
 
 Then approve with `python scripts/approve.py abc 2026-06 --reviewer NAME --reason TEXT`. To run all six close stages in order and stop at the first failed gate, use `/close-review abc 2026-06` ([`.claude/commands/close-review.md`](../.claude/commands/close-review.md)); it applies the `month-end-close-review` workflow and never approves.
@@ -88,5 +89,5 @@ The engine run also writes `outputs/abc/analysis.xlsx` (Monthly Trends, Expense 
 - **Account mapping** is a first pass that a reviewer must approve. Unmapped accounts are reported, not guessed.
 - **Causes:** the model may not invent them. Whether the reviewer catches every unsupported claim is not code-checked.
 - **Live run:** the saved skill output was graded as saved; the skill was not re-run live on 2026-10-14 ([`verification_matrix.md`](../04_architecture/verification_matrix.md)).
-- **Not sourced from QuickBooks:** the skill reads the workbook, not the sandbox.
+- **QuickBooks:** the analysis can now run on live QuickBooks sandbox data (Intuit sample company, client `qbo_sandbox`); ABC still comes from the workbook. The sandbox has 5 active months, so TTM and YoY are not available there.
 - **Engine caveat:** `financial_analysis.category_summary` `expense_mom_pct` has no zero-denominator guard and can return `inf`; treat as undefined.

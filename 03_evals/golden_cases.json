@@ -1116,5 +1116,252 @@
     },
     "derivation": "The grader looks for a heading for each section in the fixed order; it computes no numbers.",
     "grading": "All seven found, none missing, order kept."
+  },
+  {
+    "id": "G34",
+    "name": "QuickBooks sandbox: Sep 2026 revenue",
+    "type": "source_fields",
+    "source": {
+      "kind": "qbo",
+      "fields": [
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/01_pnl_monthly_accrual.response.redacted.json",
+          "row": "Total Income",
+          "column": "Sep 2026",
+          "value": 6641.38
+        }
+      ]
+    },
+    "input": {
+      "client": "qbo_sandbox",
+      "month": "2026-09",
+      "packet_path": "months.2026-09.revenue.value"
+    },
+    "expected": {
+      "value": 6641.38,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+    },
+    "derivation": "Read by hand: ProfitAndLoss Summary 'Total Income', column 'Sep 2026' = 6641.38.",
+    "grading": "Packet value within the tolerance; every named source field must still hold its recorded value."
+  },
+  {
+    "id": "G35",
+    "name": "QuickBooks sandbox: Sep 2026 revenue MoM change",
+    "type": "source_fields",
+    "source": {
+      "kind": "qbo",
+      "fields": [
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/01_pnl_monthly_accrual.response.redacted.json",
+          "row": "Total Income",
+          "column": "Sep 2026",
+          "value": 6641.38
+        },
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/01_pnl_monthly_accrual.response.redacted.json",
+          "row": "Total Income",
+          "column": "Aug 2026",
+          "value": 1785.14
+        }
+      ]
+    },
+    "input": {
+      "client": "qbo_sandbox",
+      "month": "2026-09",
+      "packet_path": "months.2026-09.revenue.mom_change"
+    },
+    "expected": {
+      "value": 4856.24,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+    },
+    "derivation": "6641.38 - 1785.14 = 4856.24 (Total Income Sep 2026 minus Aug 2026).",
+    "grading": "Packet value within the tolerance; every named source field must still hold its recorded value."
+  },
+  {
+    "id": "G36",
+    "name": "QuickBooks sandbox: Sep 2026 revenue MoM %",
+    "type": "source_fields",
+    "source": {
+      "kind": "qbo",
+      "fields": [
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/01_pnl_monthly_accrual.response.redacted.json",
+          "row": "Total Income",
+          "column": "Sep 2026",
+          "value": 6641.38
+        },
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/01_pnl_monthly_accrual.response.redacted.json",
+          "row": "Total Income",
+          "column": "Aug 2026",
+          "value": 1785.14
+        }
+      ]
+    },
+    "input": {
+      "client": "qbo_sandbox",
+      "month": "2026-09",
+      "packet_path": "months.2026-09.revenue.mom_pct"
+    },
+    "expected": {
+      "value": 2.720369,
+      "tol": 1e-06
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+    },
+    "derivation": "4856.24 / 1785.14 = 2.720369 (+272.0%); packet rounds to 6 decimals.",
+    "grading": "Packet value within the tolerance; every named source field must still hold its recorded value."
+  },
+  {
+    "id": "G37",
+    "name": "QuickBooks sandbox: Sep 2026 gross margin",
+    "type": "source_fields",
+    "source": {
+      "kind": "qbo",
+      "fields": [
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/01_pnl_monthly_accrual.response.redacted.json",
+          "row": "Gross Profit",
+          "column": "Sep 2026",
+          "value": 6236.38
+        },
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/01_pnl_monthly_accrual.response.redacted.json",
+          "row": "Total Income",
+          "column": "Sep 2026",
+          "value": 6641.38
+        }
+      ]
+    },
+    "input": {
+      "client": "qbo_sandbox",
+      "month": "2026-09",
+      "packet_path": "months.2026-09.gross_profit.margin"
+    },
+    "expected": {
+      "value": 0.939019,
+      "tol": 1e-06
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+    },
+    "derivation": "Gross Profit / Total Income = 6236.38 / 6641.38 = 0.939019 (93.9%); 6641.38 - 405.00 COGS = 6236.38.",
+    "grading": "Packet value within the tolerance; every named source field must still hold its recorded value."
+  },
+  {
+    "id": "G38",
+    "name": "QuickBooks sandbox: Sep 2026 month-end cash",
+    "type": "source_fields",
+    "source": {
+      "kind": "qbo",
+      "fields": [
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/02_balance_sheet_monthly_accrual.response.redacted.json",
+          "row": "Total Bank Accounts",
+          "column": "Sep 2026",
+          "value": 2001.0
+        }
+      ]
+    },
+    "input": {
+      "client": "qbo_sandbox",
+      "month": "2026-09",
+      "packet_path": "cash.value"
+    },
+    "expected": {
+      "value": 2001.0,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+    },
+    "derivation": "BalanceSheet Summary 'Total Bank Accounts' (cash_row in clients/qbo_sandbox/config.yaml), column 'Sep 2026' = 2001.00.",
+    "grading": "Packet value within the tolerance; every named source field must still hold its recorded value."
+  },
+  {
+    "id": "G39",
+    "name": "QuickBooks sandbox: Sep 2026 cash MoM change",
+    "type": "source_fields",
+    "source": {
+      "kind": "qbo",
+      "fields": [
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/02_balance_sheet_monthly_accrual.response.redacted.json",
+          "row": "Total Bank Accounts",
+          "column": "Sep 2026",
+          "value": 2001.0
+        },
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/02_balance_sheet_monthly_accrual.response.redacted.json",
+          "row": "Total Bank Accounts",
+          "column": "Aug 2026",
+          "value": 4321.4
+        }
+      ]
+    },
+    "input": {
+      "client": "qbo_sandbox",
+      "month": "2026-09",
+      "packet_path": "cash.mom_change"
+    },
+    "expected": {
+      "value": -2320.4,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+    },
+    "derivation": "2001.00 - 4321.40 = -2320.40.",
+    "grading": "Packet value within the tolerance; every named source field must still hold its recorded value."
+  },
+  {
+    "id": "G40",
+    "name": "QuickBooks sandbox: 3-month cash burn to Sep 2026",
+    "type": "source_fields",
+    "source": {
+      "kind": "qbo",
+      "fields": [
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/02_balance_sheet_monthly_accrual.response.redacted.json",
+          "row": "Total Bank Accounts",
+          "column": "Sep 2026",
+          "value": 2001.0
+        },
+        {
+          "file": "01_connection/evidence/quickbooks/2026-10-22/02_balance_sheet_monthly_accrual.response.redacted.json",
+          "row": "Total Bank Accounts",
+          "column": "Jun 2026",
+          "value": 4875.0
+        }
+      ]
+    },
+    "input": {
+      "client": "qbo_sandbox",
+      "month": "2026-09",
+      "packet_path": "cash.burn.3m"
+    },
+    "expected": {
+      "value": 958.0,
+      "tol": 0.005
+    },
+    "perturbation": {
+      "cells_changed": [],
+      "purpose": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+    },
+    "derivation": "(Jun 2026 4875.00 - Sep 2026 2001.00) / 3 = 2874.00 / 3 = 958.00 per month.",
+    "grading": "Packet value within the tolerance; every named source field must still hold its recorded value."
   }
 ]

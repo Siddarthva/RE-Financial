@@ -1,0 +1,11 @@
+{
+  "server": "quickbooks (local MCP, read-only: QUICKBOOKS_DISABLE_WRITE/UPDATE/DELETE=true)",
+  "tool": "get_balance_sheet",
+  "params": {
+    "start_date": "2024-11-01",
+    "end_date": "2026-10-31",
+    "summarize_column_by": "Month",
+    "accounting_method": "Accrual"
+  },
+  "called_at": "2026-10-22T01:19:57+00:00"
+}

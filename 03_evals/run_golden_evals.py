@@ -345,7 +345,70 @@ def run_sections_case(case):
     return r["passed"] == case["expected"]["passed"] and r["found"] == case["expected"]["sections"], f"found {r['found']}, missing {r['missing']}"
 
 
+_packets = {}
+
+
+def _report_field(f):
+    """Value of one named field in a saved QuickBooks report JSON: the row whose first cell is f['row'], column f['column']."""
+    rep = json.loads((ROOT / f["file"]).read_text(encoding="utf-8"))
+    titles = [c.get("ColTitle") for c in rep["Columns"]["Column"]]
+
+    def walk(rows):
+        for x in rows.get("Row", []):
+            for part in ("Header", "Summary"):
+                if part in x:
+                    yield x[part]["ColData"]
+            if "ColData" in x:
+                yield x["ColData"]
+            if "Rows" in x:
+                yield from walk(x["Rows"])
+    cd = next(c for c in walk(rep["Rows"]) if c[0].get("value") == f["row"])
+    return float(cd[titles.index(f["column"])]["value"] or 0)
+
+
+def _long_cell(f):
+    """Value of one cell in a client's long-format workbook (read-only)."""
+    wb = openpyxl.load_workbook(ROOT / f["file"], data_only=True, read_only=True)
+    try:
+        return wb[f["sheet"]][f["cell"]].value
+    finally:
+        wb.close()
+
+
+def packet_for(client, month):
+    """The review packet's numbers for a client month, computed in memory through the same source path as the pipeline."""
+    key = (client, month)
+    if key not in _packets:
+        import monthly_review
+        import run_client
+        import sources
+        cfg = run_client.load_config(client)
+        ts = pd.Timestamp(f"{month}-01")
+        am = sources.income_statement(cfg)
+        monthly = abc.build_monthly_summary(am, cfg["totals"]).set_index("month")
+        bs = sources.balance_sheet(cfg)
+        cash = abc.cash_position(bs.loc[:, bs.columns <= ts], sources.cash_row(cfg)) if bs is not None else None
+        _packets[key] = monthly_review.build_computed(am, monthly, ts, cash, categories=monthly_review.rollup_categories(am, cfg))
+    return _packets[key]
+
+
+def run_source_fields_case(case):
+    """G34+: a packet number for a non-workbook-wide source (QuickBooks JSON or a long-format sheet) equals the value
+    worked out by hand from the named source fields/cells, which are re-read here and must still hold the recorded value."""
+    for f in case["source"].get("fields", []) + case["source"].get("cells", []):
+        got = _report_field(f) if "row" in f else _long_cell(f)
+        if not close(got, f["value"]):
+            return False, f"source {f} now reads {got!r}"
+    node = packet_for(case["input"]["client"], case["input"]["month"])
+    for k in case["input"]["packet_path"].split("."):
+        node = node[k]
+    want = case["expected"]["value"]
+    return close(node, want, case["expected"].get("tol", CENT)), f"packet {case['input']['packet_path']} = {node} (expected {want})"
+
+
 def run_case(case):
+    if case["type"] == "source_fields":
+        return run_source_fields_case(case)
     if case["type"] == "yoy_view":
         return run_yoy_case(case)
     if case["type"] == "adjusted_net_income":

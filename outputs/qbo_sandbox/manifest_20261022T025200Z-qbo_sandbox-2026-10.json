@@ -1,0 +1,32 @@
+{
+  "run_id": "20261022T025200Z-qbo_sandbox-2026-10",
+  "client": "qbo_sandbox",
+  "period": "2026-10",
+  "started_at": "2026-10-22T02:52:00+00:00",
+  "finished_at": "2026-10-22T02:52:15+00:00",
+  "source": {
+    "workbook": "01_pnl_monthly_accrual.response.redacted.json",
+    "sha256": "609f6eea8fe4734dae95cadac886327d993e65b9d54f5b60c253fcccd3905677"
+  },
+  "skill_version": "monthly-financial-analysis@91a575527347",
+  "git_sha": "ae4af5e",
+  "status": "success",
+  "stages": [
+    {
+      "name": "Intake",
+      "status": "done",
+      "duration_s": 2.549
+    },
+    {
+      "name": "Calculate",
+      "status": "done",
+      "duration_s": 11.963
+    },
+    {
+      "name": "Grade commentary",
+      "status": "done",
+      "duration_s": 0.0
+    }
+  ],
+  "diff_vs_previous": null
+}

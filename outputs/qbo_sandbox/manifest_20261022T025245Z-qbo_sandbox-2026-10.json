@@ -1,0 +1,71 @@
+{
+  "run_id": "20261022T025245Z-qbo_sandbox-2026-10",
+  "client": "qbo_sandbox",
+  "period": "2026-10",
+  "started_at": "2026-10-22T02:52:45+00:00",
+  "finished_at": "2026-10-22T02:53:00+00:00",
+  "source": {
+    "workbook": "01_pnl_monthly_accrual.response.redacted.json",
+    "sha256": "609f6eea8fe4734dae95cadac886327d993e65b9d54f5b60c253fcccd3905677"
+  },
+  "skill_version": "monthly-financial-analysis@91a575527347",
+  "git_sha": "ae4af5e",
+  "status": "success",
+  "stages": [
+    {
+      "name": "Intake",
+      "status": "done",
+      "duration_s": 2.773
+    },
+    {
+      "name": "Calculate",
+      "status": "done",
+      "duration_s": 11.947
+    },
+    {
+      "name": "Grade commentary",
+      "status": "done",
+      "duration_s": 0.0
+    }
+  ],
+  "diff_vs_previous": {
+    "previous_run_id": "20261022T025200Z-qbo_sandbox-2026-10",
+    "changed": [
+      {
+        "path": "warnings.0",
+        "old": "Unmapped OPEX account (reported under 'Unmapped'): Automobile",
+        "new": "TTM not available: 6 months supplied, 12 consecutive required."
+      },
+      {
+        "path": "warnings.1",
+        "old": "Unmapped OPEX account (reported under 'Unmapped'): Job Expenses",
+        "new": "QuickBooks returned 18 month(s) before May 2026 (Nov 2024 - Apr 2026) with no activity on any line; they are left out, not analysed as zero months."
+      },
+      {
+        "path": "warnings.2",
+        "old": "Unmapped OPEX account (reported under 'Unmapped'): Legal & Professional Fees",
+        "new": "Revenue is zero in Oct 2026; margins for that month are reported as not available."
+      },
+      {
+        "path": "warnings.3",
+        "old": "Unmapped OPEX account (reported under 'Unmapped'): Maintenance and Repair",
+        "new": null
+      },
+      {
+        "path": "warnings.4",
+        "old": "TTM not available: 6 months supplied, 12 consecutive required.",
+        "new": null
+      },
+      {
+        "path": "warnings.5",
+        "old": "QuickBooks returned 18 month(s) before May 2026 (Nov 2024 - Apr 2026) with no activity on any line; they are left out, not analysed as zero months.",
+        "new": null
+      },
+      {
+        "path": "warnings.6",
+        "old": "Revenue is zero in Oct 2026; margins for that month are reported as not available.",
+        "new": null
+      }
+    ]
+  }
+}
