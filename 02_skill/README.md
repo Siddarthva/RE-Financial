@@ -88,6 +88,7 @@ The engine run also writes `outputs/abc/analysis.xlsx` (Monthly Trends, Expense 
 - **Layout:** one wide sheet with a column per month. Other exports fail intake or need code.
 - **Account mapping** is a first pass that a reviewer must approve. Unmapped accounts are reported, not guessed.
 - **Causes:** the model may not invent them. Whether the reviewer catches every unsupported claim is not code-checked.
+- **Grade and retry (2026-10-22):** `/monthly-analysis` grades the draft with [`src/commentary_retry.py`](../src/commentary_retry.py); on failure the grader's exact mismatches go back to the skill once, then it re-grades. A second failure marks the pack `NOT APPROVED - needs human` with the reasons; nothing is auto-approved ([`tests/test_commentary_retry.py`](../tests/test_commentary_retry.py)).
 - **Live run:** the saved skill output was graded as saved; the skill was not re-run live on 2026-10-14 ([`verification_matrix.md`](../04_architecture/verification_matrix.md)).
 - **QuickBooks:** the analysis can now run on live QuickBooks sandbox data (Intuit sample company, client `qbo_sandbox`); ABC still comes from the workbook. The sandbox has 5 active months, so TTM and YoY are not available there.
 - **Engine caveat:** `financial_analysis.category_summary` `expense_mom_pct` has no zero-denominator guard and can return `inf`; treat as undefined.

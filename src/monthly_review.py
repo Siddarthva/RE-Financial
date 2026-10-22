@@ -327,7 +327,13 @@ def build(client, month_text, commentary_path, review_path, clients_root=run_cli
             ok = not misses and note.get("status", "ok") == "ok"
             rows.append((n, line, auto, note.get("status", "not reviewed"), note.get("note", ""), "OK" if ok else "CHANGE", ""))
             number_rows += [(n, x["token"], x["kind"], "yes" if x["matched"] else "NO", x["fact"]) for x in g["numbers"]]
-        approved = review.get("verdict") == "approve" and overall["passed"] and not review_problems
+        # Grade-and-retry record (src/commentary_retry.py): a failed retry forces NOT APPROVED with the reasons; never approves.
+        retry = _read(out_dir / f"commentary_grade_{month_text}.json", "Commentary grade record", "", as_json=True, optional=True)
+        approved = review.get("verdict") == "approve" and overall["passed"] and not review_problems \
+            and (not retry or retry.get("status") in ("passed_first", "passed_after_retry"))
+        verdict = "APPROVED" if approved else "CHANGES REQUIRED"
+        if retry and retry.get("needs_human"):
+            verdict = "NOT APPROVED - needs human: " + "; ".join(retry.get("reasons", []))[:500]
         questions = [(q["source"] if isinstance(q, dict) and "source" in q else "Reviewer", q["question"], q.get("why", "")) for q in review.get("open_questions", [])]
         questions += auto_questions(packet)
         memo_path = out_dir / f"owner_memo_{month_text}.md"
@@ -343,7 +349,9 @@ def build(client, month_text, commentary_path, review_path, clients_root=run_cli
         cover.title = "Cover"
         _facts_sheet(cover, [
             ("Client", packet["display_name"]), ("Month", packet["latest_month"]),
-            ("Verdict", "APPROVED" if approved else "CHANGES REQUIRED"),
+            ("Verdict", verdict),
+            ("Commentary grade", (f"{retry['status']} (retry used: {'yes' if retry.get('retry_used') else 'no'})" if retry
+                                  else "no grade record (src/commentary_retry.py not run)")),
             ("Sign-off status", _signoff_status(out_dir, month_text)),
             ("Revenue", _usd(cur["revenue"]["value"])),
             ("Revenue vs same month last year", f"{yoy['revenue']['yoy_pct']:+.1%} vs {yoy['prior_year_month']}"
@@ -365,7 +373,7 @@ def build(client, month_text, commentary_path, review_path, clients_root=run_cli
         ws = wb.create_sheet("Summary")
         _facts_sheet(ws, [
             ("Client", packet["display_name"]), ("Month", packet["latest_month"]),
-            ("Verdict", "APPROVED" if approved else "CHANGES REQUIRED"),
+            ("Verdict", verdict),
             ("Reviewer verdict", review.get("verdict", "missing")),
             ("Automatic number check", f"{overall['numbers_matched']}/{overall['numbers_checked']} numbers match the JSON"),
             ("Top 3 movements named", f"{sum(m['mentioned'] for m in overall['top_movements'])}/3"),
