@@ -23,6 +23,7 @@ FAULTS = ROOT / "outputs" / "robustness_results.json"
 OUT = ROOT / "03_evals" / "CASE_INDEX.md"
 
 WHY = {
+    "source_fields": "A non-wide source (QuickBooks JSON or a long-format sheet) must give the same packet number as the hand calculation from its named fields/cells",
     "revenue_mom": "The headline movement an owner reads first; a wrong sign or base misleads every sentence built on it.",
     "gross_margin": "Margin is the ratio most often quoted; the denominator must be revenue, not cost.",
     "ttm": "A trailing-twelve-month figure over fewer or gapped months looks valid and is not.",
@@ -52,6 +53,11 @@ WHY = {
 
 def source_text(c: dict) -> str:
     src, cells = c["source"], None
+    if isinstance(src, dict) and src.get("kind") in ("qbo", "long"):
+        items = src.get("fields") or src.get("cells") or []
+        label = "QuickBooks JSON, hand-computed" if src["kind"] == "qbo" else "Long-format workbook (c08), hand-computed"
+        refs = [f"{f['row']} {f['column']}" if "row" in f else f"{f['sheet']}!{f['cell']}" for f in items]
+        return label + f" ({', '.join(refs)})"
     if isinstance(src, dict):
         label = f"{src.get('sheet', 'workbook')}, hand-computed"
         cells = src.get("cells")

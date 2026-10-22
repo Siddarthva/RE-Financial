@@ -26,7 +26,7 @@ def source_kind(src) -> str:
     if isinstance(src, str) and "perturb" in src:
         return "perturbed"
     if isinstance(src, dict):
-        return "abc_cells"
+        return {"qbo": "qbo_fields", "long": "long_cells"}.get(src.get("kind"), "abc_cells")
     return "workbook"
 
 

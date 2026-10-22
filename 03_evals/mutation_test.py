@@ -20,6 +20,7 @@ WORKBOOK = "data/ABC Inc - Financial Statements.xlsx"
 REPORT = ROOT / "outputs" / "mutation_report.md"
 FA, AD = "src/financial_analysis.py", "src/abc_workbook_adapter.py"
 CA, MR = "src/close_artifacts.py", "src/monthly_review.py"
+QB = "src/qbo_adapter.py"
 
 # (mutation, file, original text, mutated text). Each original must occur exactly once.
 MUTANTS = [
@@ -83,13 +84,33 @@ MUTANTS = [
     ("Prior-month column no longer required", CA,
      'for m, role in ((month, "the requested month"), (prior, f"the prior month of {month}")):',
      'for m, role in ((month, "the requested month"),):'),
+    # --- Added 2026-10-22: the QuickBooks adapter and the long-format parser.
+    ("QuickBooks: parent account's own postings ignored", QB,
+     "if isinstance(head_cols, list) and any(",
+     "if False and isinstance(head_cols, list) and any("),
+    ("QuickBooks: section total kept inside its section (double count)", QB,
+     "emit(s_label, s_vals, None if depth == 0 else section)",
+     "emit(s_label, s_vals, group_section if depth == 0 else section)"),
+    ("QuickBooks: empty cell read as missing instead of zero", QB,
+     "        return 0.0, None  # QuickBooks leaves",
+     "        return None, 'blank'  # QuickBooks leaves"),
+    ("Long format: duplicate (account, month) check removed", AD,
+     "if (account, month) in seen:",
+     "if False:"),
+    ("Long format: months shifted by one", AD,
+     'month = month.to_period("M").to_timestamp()',
+     'month = (month.to_period("M") + 1).to_timestamp()'),
+    ("Long format: missing (account, month) read as zero", AD,
+     "values[a].get(m, np.nan) for m in months] for a in order]",
+     "values[a].get(m, 0.0) for m in months] for a in order]"),
 ]
 
 def make_copy(dest: Path):
-    for name in ("src", "tests", "03_evals", "clients", "01_connection", "scripts", "02_skill", ".claude"):  # tests import from 01_connection/, scripts/ and 02_skill/; hook and skill tests read .claude/
+    for name in ("src", "tests", "03_evals", "clients", "01_connection", "scripts", "02_skill", ".claude", "deploy"):  # tests import from 01_connection/, scripts/ and 02_skill/; hook and skill tests read .claude/
         shutil.copytree(ROOT / name, dest / name, ignore=shutil.ignore_patterns("__pycache__", "settings.local.json"))
     # Saved skill outputs (commentary, flux notes, client questions, review) that tests and golden cases G29-G33 read.
     shutil.copytree(ROOT / "outputs" / "abc", dest / "outputs" / "abc", ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copy2(ROOT / "Dockerfile", dest / "Dockerfile")  # tests/test_deploy.py reads it
     (dest / "data").mkdir()
     shutil.copy2(ROOT / WORKBOOK, dest / WORKBOOK)  # tests read the copy; the original is never opened for write
 
@@ -98,7 +119,7 @@ def run_evals(project: Path, fail_fast: bool = False):
     """Return (failing unit tests, failing golden case ids). With fail_fast the unit run stops at the first failing test:
     enough to call a mutant caught, and it keeps the whole run to minutes. The baseline always runs in full."""
     unit = subprocess.run([sys.executable, "-X", "utf8", "-m", "unittest", "discover", "-s", "tests", "-v"] + (["-f"] if fail_fast else []),
-                          cwd=project, capture_output=True, text=True, encoding="utf-8", timeout=600)
+                          cwd=project, capture_output=True, text=True, encoding="utf-8", timeout=1800)
     # Inline "test_x (...) ... FAIL" is replaced by the docstring's first line for a test that has one, so also read the
     # "FAIL: test_x (...)" / "ERROR: test_x (...)" summary lines; otherwise a failing documented test looks like no failure.
     failed_tests = sorted(set(re.findall(r"^(test_\w+) \(.*?\) \.\.\. (?:FAIL|ERROR)", unit.stderr, re.M))

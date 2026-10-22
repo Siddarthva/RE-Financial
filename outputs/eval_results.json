@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-15T15:42:24+00:00",
+  "generated_at": "2026-10-22T04:03:40+00:00",
   "golden": {
     "cases": [
       {
@@ -770,10 +770,262 @@
         "actual": "found ['Headline', 'Revenue', 'Margins', 'Opex', 'Cash & runway', 'One-offs', 'Questions'], missing []",
         "tolerance": "All seven found, none missing, order kept.",
         "perturbation": "No change; grades the saved commentary. Missing and swapped headings are tested in tests/test_monthly_review.py."
+      },
+      {
+        "id": "G34",
+        "name": "QuickBooks sandbox: Sep 2026 revenue",
+        "source": "qbo_fields",
+        "passed": true,
+        "input": {
+          "client": "qbo_sandbox",
+          "month": "2026-09",
+          "packet_path": "months.2026-09.revenue.value"
+        },
+        "expected": {
+          "value": 6641.38,
+          "tol": 0.005
+        },
+        "actual": "Sep 2026 revenue: packet months.2026-09.revenue.value = 6641.38 (expected 6641.38)",
+        "tolerance": "Packet value within the tolerance; every named source field must still hold its recorded value.",
+        "perturbation": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+      },
+      {
+        "id": "G35",
+        "name": "QuickBooks sandbox: Sep 2026 revenue MoM change",
+        "source": "qbo_fields",
+        "passed": true,
+        "input": {
+          "client": "qbo_sandbox",
+          "month": "2026-09",
+          "packet_path": "months.2026-09.revenue.mom_change"
+        },
+        "expected": {
+          "value": 4856.24,
+          "tol": 0.005
+        },
+        "actual": "Sep 2026 revenue MoM change: packet months.2026-09.revenue.mom_change = 4856.24 (expected 4856.24)",
+        "tolerance": "Packet value within the tolerance; every named source field must still hold its recorded value.",
+        "perturbation": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+      },
+      {
+        "id": "G36",
+        "name": "QuickBooks sandbox: Sep 2026 revenue MoM %",
+        "source": "qbo_fields",
+        "passed": true,
+        "input": {
+          "client": "qbo_sandbox",
+          "month": "2026-09",
+          "packet_path": "months.2026-09.revenue.mom_pct"
+        },
+        "expected": {
+          "value": 2.720369,
+          "tol": 1e-06
+        },
+        "actual": "Sep 2026 revenue MoM %: packet months.2026-09.revenue.mom_pct = 2.720369 (expected 2.720369)",
+        "tolerance": "Packet value within the tolerance; every named source field must still hold its recorded value.",
+        "perturbation": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+      },
+      {
+        "id": "G37",
+        "name": "QuickBooks sandbox: Sep 2026 gross margin",
+        "source": "qbo_fields",
+        "passed": true,
+        "input": {
+          "client": "qbo_sandbox",
+          "month": "2026-09",
+          "packet_path": "months.2026-09.gross_profit.margin"
+        },
+        "expected": {
+          "value": 0.939019,
+          "tol": 1e-06
+        },
+        "actual": "Sep 2026 gross margin: packet months.2026-09.gross_profit.margin = 0.939019 (expected 0.939019)",
+        "tolerance": "Packet value within the tolerance; every named source field must still hold its recorded value.",
+        "perturbation": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+      },
+      {
+        "id": "G38",
+        "name": "QuickBooks sandbox: Sep 2026 month-end cash",
+        "source": "qbo_fields",
+        "passed": true,
+        "input": {
+          "client": "qbo_sandbox",
+          "month": "2026-09",
+          "packet_path": "cash.value"
+        },
+        "expected": {
+          "value": 2001.0,
+          "tol": 0.005
+        },
+        "actual": "Sep 2026 month-end cash: packet cash.value = 2001.0 (expected 2001.0)",
+        "tolerance": "Packet value within the tolerance; every named source field must still hold its recorded value.",
+        "perturbation": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+      },
+      {
+        "id": "G39",
+        "name": "QuickBooks sandbox: Sep 2026 cash MoM change",
+        "source": "qbo_fields",
+        "passed": true,
+        "input": {
+          "client": "qbo_sandbox",
+          "month": "2026-09",
+          "packet_path": "cash.mom_change"
+        },
+        "expected": {
+          "value": -2320.4,
+          "tol": 0.005
+        },
+        "actual": "Sep 2026 cash MoM change: packet cash.mom_change = -2320.4 (expected -2320.4)",
+        "tolerance": "Packet value within the tolerance; every named source field must still hold its recorded value.",
+        "perturbation": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+      },
+      {
+        "id": "G40",
+        "name": "QuickBooks sandbox: 3-month cash burn to Sep 2026",
+        "source": "qbo_fields",
+        "passed": true,
+        "input": {
+          "client": "qbo_sandbox",
+          "month": "2026-09",
+          "packet_path": "cash.burn.3m"
+        },
+        "expected": {
+          "value": 958.0,
+          "tol": 0.005
+        },
+        "actual": "3-month cash burn to Sep 2026: packet cash.burn.3m = 958.0 (expected 958.0)",
+        "tolerance": "Packet value within the tolerance; every named source field must still hold its recorded value.",
+        "perturbation": "No change; live QuickBooks sandbox data (Intuit sample company, not ABC), captured read-only 2026-10-22."
+      },
+      {
+        "id": "G41",
+        "name": "Long format (c08): Jun 2026 revenue",
+        "source": "long_cells",
+        "passed": true,
+        "input": {
+          "client": "c08",
+          "month": "2026-06",
+          "packet_path": "months.2026-06.revenue.value"
+        },
+        "expected": {
+          "value": 370574.72,
+          "tol": 0.005
+        },
+        "actual": "Jun 2026 revenue: packet months.2026-06.revenue.value = 370574.72 (expected 370574.72)",
+        "tolerance": "Packet value within the tolerance; every named source cell must still hold its recorded value.",
+        "perturbation": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+      },
+      {
+        "id": "G42",
+        "name": "Long format (c08): Jun 2026 revenue MoM change",
+        "source": "long_cells",
+        "passed": true,
+        "input": {
+          "client": "c08",
+          "month": "2026-06",
+          "packet_path": "months.2026-06.revenue.mom_change"
+        },
+        "expected": {
+          "value": 3539.94,
+          "tol": 0.005
+        },
+        "actual": "Jun 2026 revenue MoM change: packet months.2026-06.revenue.mom_change = 3539.94 (expected 3539.94)",
+        "tolerance": "Packet value within the tolerance; every named source cell must still hold its recorded value.",
+        "perturbation": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+      },
+      {
+        "id": "G43",
+        "name": "Long format (c08): Jun 2026 revenue MoM %",
+        "source": "long_cells",
+        "passed": true,
+        "input": {
+          "client": "c08",
+          "month": "2026-06",
+          "packet_path": "months.2026-06.revenue.mom_pct"
+        },
+        "expected": {
+          "value": 0.009645,
+          "tol": 1e-06
+        },
+        "actual": "Jun 2026 revenue MoM %: packet months.2026-06.revenue.mom_pct = 0.009645 (expected 0.009645)",
+        "tolerance": "Packet value within the tolerance; every named source cell must still hold its recorded value.",
+        "perturbation": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+      },
+      {
+        "id": "G44",
+        "name": "Long format (c08): Jun 2026 gross margin",
+        "source": "long_cells",
+        "passed": true,
+        "input": {
+          "client": "c08",
+          "month": "2026-06",
+          "packet_path": "months.2026-06.gross_profit.margin"
+        },
+        "expected": {
+          "value": 0.647993,
+          "tol": 1e-06
+        },
+        "actual": "Jun 2026 gross margin: packet months.2026-06.gross_profit.margin = 0.647993 (expected 0.647993)",
+        "tolerance": "Packet value within the tolerance; every named source cell must still hold its recorded value.",
+        "perturbation": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+      },
+      {
+        "id": "G45",
+        "name": "Long format (c08): Salaries line-item MoM change",
+        "source": "long_cells",
+        "passed": true,
+        "input": {
+          "client": "c08",
+          "month": "2026-06",
+          "packet_path": "line_items.Salaries.mom_change"
+        },
+        "expected": {
+          "value": -11799.52,
+          "tol": 0.005
+        },
+        "actual": "Salaries line-item MoM change: packet line_items.Salaries.mom_change = -11799.52 (expected -11799.52)",
+        "tolerance": "Packet value within the tolerance; every named source cell must still hold its recorded value.",
+        "perturbation": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+      },
+      {
+        "id": "G46",
+        "name": "Long format (c08): Jun 2026 month-end cash",
+        "source": "long_cells",
+        "passed": true,
+        "input": {
+          "client": "c08",
+          "month": "2026-06",
+          "packet_path": "cash.value"
+        },
+        "expected": {
+          "value": 722926.35,
+          "tol": 0.005
+        },
+        "actual": "Jun 2026 month-end cash: packet cash.value = 722926.35 (expected 722926.35)",
+        "tolerance": "Packet value within the tolerance; every named source cell must still hold its recorded value.",
+        "perturbation": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
+      },
+      {
+        "id": "G47",
+        "name": "Long format (c08): cash MoM change",
+        "source": "long_cells",
+        "passed": true,
+        "input": {
+          "client": "c08",
+          "month": "2026-06",
+          "packet_path": "cash.mom_change"
+        },
+        "expected": {
+          "value": 183343.2,
+          "tol": 0.005
+        },
+        "actual": "cash MoM change: packet cash.mom_change = 183343.2 (expected 183343.2)",
+        "tolerance": "Packet value within the tolerance; every named source cell must still hold its recorded value.",
+        "perturbation": "No change; synthetic long-format client c08 (layout.type: long; Account/Month/Amount/Section)."
       }
     ],
-    "total": 33,
-    "passed": 33
+    "total": 47,
+    "passed": 47
   },
   "mutation": {
     "rows": [
@@ -996,8 +1248,8 @@
     "source": "outputs/mutation_report.md"
   },
   "unit": {
-    "total": 185,
-    "passed": 185,
+    "total": 186,
+    "passed": 186,
     "source": "03_evals/FINAL_RUN.md"
   }
 }

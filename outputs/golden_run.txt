@@ -1,4 +1,4 @@
-Running 33 golden cases
+Running 47 golden cases
 PASS G01 — Month-over-month revenue change: change=9063.690000000002, pct=0.054083329603938246
 PASS G02 — Gross margin: gross_margin=0.7795149399567389
 PASS G03 — TTM requires twelve consecutive months: ttm_after_11=nan, ttm_after_12=2145316.28
@@ -32,5 +32,19 @@ PASS G30 — client-questions output for ABC 2026-06 passes its grader: grader p
 PASS G31 — Year-over-year view for Jun 2026 vs Jun 2025 (revenue and gross margin): revenue 195898.16 vs 190555.65 (+2.8036%); gross margin change -4.1709 pp
 PASS G32 — Net income excluding one-offs for Dec 2025 (two one-offs in the month): net income 534,551.41, one-off effect +909,769.31, adjusted -375,217.90
 PASS G33 — ABC 2026-06 commentary has all seven sections in order: found ['Headline', 'Revenue', 'Margins', 'Opex', 'Cash & runway', 'One-offs', 'Questions'], missing []
+PASS G34 — QuickBooks sandbox: Sep 2026 revenue: packet months.2026-09.revenue.value = 6641.38 (expected 6641.38)
+PASS G35 — QuickBooks sandbox: Sep 2026 revenue MoM change: packet months.2026-09.revenue.mom_change = 4856.24 (expected 4856.24)
+PASS G36 — QuickBooks sandbox: Sep 2026 revenue MoM %: packet months.2026-09.revenue.mom_pct = 2.720369 (expected 2.720369)
+PASS G37 — QuickBooks sandbox: Sep 2026 gross margin: packet months.2026-09.gross_profit.margin = 0.939019 (expected 0.939019)
+PASS G38 — QuickBooks sandbox: Sep 2026 month-end cash: packet cash.value = 2001.0 (expected 2001.0)
+PASS G39 — QuickBooks sandbox: Sep 2026 cash MoM change: packet cash.mom_change = -2320.4 (expected -2320.4)
+PASS G40 — QuickBooks sandbox: 3-month cash burn to Sep 2026: packet cash.burn.3m = 958.0 (expected 958.0)
+PASS G41 — Long format (c08): Jun 2026 revenue: packet months.2026-06.revenue.value = 370574.72 (expected 370574.72)
+PASS G42 — Long format (c08): Jun 2026 revenue MoM change: packet months.2026-06.revenue.mom_change = 3539.94 (expected 3539.94)
+PASS G43 — Long format (c08): Jun 2026 revenue MoM %: packet months.2026-06.revenue.mom_pct = 0.009645 (expected 0.009645)
+PASS G44 — Long format (c08): Jun 2026 gross margin: packet months.2026-06.gross_profit.margin = 0.647993 (expected 0.647993)
+PASS G45 — Long format (c08): Salaries line-item MoM change: packet line_items.Salaries.mom_change = -11799.52 (expected -11799.52)
+PASS G46 — Long format (c08): Jun 2026 month-end cash: packet cash.value = 722926.35 (expected 722926.35)
+PASS G47 — Long format (c08): cash MoM change: packet cash.mom_change = 183343.2 (expected 183343.2)
 
-Score: 33/33 (100%)
+Score: 47/47 (100%)

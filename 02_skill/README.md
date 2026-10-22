@@ -46,7 +46,7 @@ Every field is explained, with what breaks if it is wrong, in [`CONFIG_REFERENCE
 2. **Workbook.** Put the client's workbook where the config says. Never edit a source workbook. Its shape must match the grid in [`CONFIG_REFERENCE.md`](CONFIG_REFERENCE.md#workbook-shape-the-config-describes); `clients/xyz/generate_dataset.py` and `clients/lmn/generate_dataset.py` are copyable templates.
 3. **Run.** `python scripts/run_pipeline.py <id> <YYYY-MM>` (the intake gate names any label it cannot find, with the sheet and rows searched), then `/monthly-analysis <id> <YYYY-MM>`. Read `warnings` in `outputs/<id>/summary.json` first: unmapped accounts, missing categories and rollup mismatches are reported there, and a missing category is "not available", never zero.
 
-Proof: `python scripts/run_pipeline.py xyz 2026-05` exits 0 (14 months, 1 warning: no Sales & Marketing accounts), and [`tests/test_client_isolation.py`](../tests/test_client_isolation.py) checks that a run cannot read another client's folder. Limit: the parser expects a wide sheet with one column per month. A different layout needs code.
+Proof: `python scripts/run_pipeline.py xyz 2026-05` exits 0 (14 months, 1 warning: no Sales & Marketing accounts), and [`tests/test_client_isolation.py`](../tests/test_client_isolation.py) checks that a run cannot read another client's folder. Layouts: wide (default) or long (`layout.type: long`, e.g. `clients/c08`); QuickBooks JSON with `source: qbo` (`clients/qbo_sandbox`). Seven synthetic clients (c04-c10, `python clients/generate_synthetic.py`) and `python scripts/run_batch.py` run all 11 clients.
 
 ## Extend it: worked example, the G18 gross-margin-drop flag
 
@@ -85,7 +85,7 @@ The engine run also writes `outputs/abc/analysis.xlsx` (Monthly Trends, Expense 
 
 ## Known limits
 
-- **Layout:** one wide sheet with a column per month. Other exports fail intake or need code.
+- **Layout:** wide sheets, long-format sheets (`layout.type: long`, proved equal to wide on ABC) and QuickBooks report JSON. Other exports fail intake or need code.
 - **Account mapping** is a first pass that a reviewer must approve. Unmapped accounts are reported, not guessed.
 - **Causes:** the model may not invent them. Whether the reviewer catches every unsupported claim is not code-checked.
 - **Grade and retry (2026-10-22):** `/monthly-analysis` grades the draft with [`src/commentary_retry.py`](../src/commentary_retry.py); on failure the grader's exact mismatches go back to the skill once, then it re-grades. A second failure marks the pack `NOT APPROVED - needs human` with the reasons; nothing is auto-approved ([`tests/test_commentary_retry.py`](../tests/test_commentary_retry.py)).

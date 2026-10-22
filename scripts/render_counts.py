@@ -53,7 +53,7 @@ def counts() -> dict:
     cases = json.loads(GOLDEN.read_text(encoding="utf-8"))
     groups: dict[str, list[str]] = {}
     for c in cases:
-        key = c["source"] if isinstance(c["source"], str) else "cell-sourced"
+        key = c["source"] if isinstance(c["source"], str) else c["source"].get("kind", "cell-sourced")
         groups.setdefault(key, []).append(c["id"])
     rows = [ln for ln in MUTATION.read_text(encoding="utf-8").splitlines() if ln.startswith("|") and ("✅" in ln or "❌" in ln)]
     faults = json.loads(FAULTS.read_text(encoding="utf-8"))["results"]
@@ -97,6 +97,8 @@ def render(name: str, c: dict) -> str:
 | `workbook` | {len(g["workbook"])} | {id_range(g["workbook"])} | Real data already triggers the rule; no cell changed |
 | `workbook+perturbation` | {len(g["workbook+perturbation"])} | {id_range(g["workbook+perturbation"])} | One or two cells changed to trigger a rule (each case records the cell, original and new value, and purpose); the intake-gate cases write a perturbed copy to a temp file and require the gate to refuse it |
 | ABC cell-sourced | {len(g["cell-sourced"])} | {id_range(g["cell-sourced"])} | Expected values computed by hand from cached source cells (listed in each case's `source.cells`), not by the adapter |
+| QuickBooks JSON (`qbo`) | {len(g.get("qbo", []))} | {id_range(g["qbo"]) if g.get("qbo") else "-"} | Live sandbox capture (Intuit sample company, not ABC); expected values worked out by hand from named report fields (`source.fields`: report, row, column) |
+| Long format (`long`) | {len(g.get("long", []))} | {id_range(g["long"]) if g.get("long") else "-"} | Synthetic long-format client c08; expected values worked out by hand from named cells (`source.cells`) |
 """
     if name == "readme-results":
         return f"""

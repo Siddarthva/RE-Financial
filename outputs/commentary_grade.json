@@ -1,5 +1,5 @@
 {
-  "passed": false,
+  "passed": true,
   "sections": {
     "required": [
       "Headline",
@@ -10,8 +10,7 @@
       "One-offs",
       "Questions"
     ],
-    "found": [],
-    "missing": [
+    "found": [
       "Headline",
       "Revenue",
       "Margins",
@@ -20,78 +19,15 @@
       "One-offs",
       "Questions"
     ],
+    "missing": [],
     "in_order": true,
-    "passed": false
+    "passed": true
   },
-  "numbers_checked": 12,
-  "numbers_matched": 11,
+  "numbers_checked": 66,
+  "numbers_matched": 66,
   "numbers": [
     {
-      "token": "$195,898.16",
-      "kind": "amount",
-      "value": 195898.16,
-      "tol": 0.0050000010000000004,
-      "matched": true,
-      "fact": 195898.16
-    },
-    {
-      "token": "$12,452.80",
-      "kind": "amount",
-      "value": 12452.8,
-      "tol": 0.0050000010000000004,
-      "matched": true,
-      "fact": 12452.8
-    },
-    {
-      "token": "-6.0%",
-      "kind": "percent",
-      "value": 6.0,
-      "tol": 0.050000001,
-      "matched": true,
-      "fact": 5.9768
-    },
-    {
-      "token": "$137,425.72",
-      "kind": "amount",
-      "value": 137425.72,
-      "tol": 0.0050000010000000004,
-      "matched": true,
-      "fact": 137425.72
-    },
-    {
-      "token": "71.2%",
-      "kind": "percent",
-      "value": 71.2,
-      "tol": 0.050000001,
-      "matched": false,
-      "fact": null
-    },
-    {
-      "token": "$10,599.23",
-      "kind": "amount",
-      "value": 10599.23,
-      "tol": 0.0050000010000000004,
-      "matched": true,
-      "fact": 10599.23
-    },
-    {
-      "token": "-2.2%",
-      "kind": "percent",
-      "value": 2.2,
-      "tol": 0.050000001,
-      "matched": true,
-      "fact": 2.2138
-    },
-    {
-      "token": "$468,181.80",
-      "kind": "amount",
-      "value": 468181.8,
-      "tol": 0.0050000010000000004,
-      "matched": true,
-      "fact": 468181.8
-    },
-    {
-      "token": "$330,756.08",
+      "token": "-330,756.08",
       "kind": "amount",
       "value": 330756.08,
       "tol": 0.0050000010000000004,
@@ -99,7 +35,7 @@
       "fact": 330756.08
     },
     {
-      "token": "$8,343.52",
+      "token": "8,343.52",
       "kind": "amount",
       "value": 8343.52,
       "tol": 0.0050000010000000004,
@@ -107,7 +43,311 @@
       "fact": 8343.52
     },
     {
-      "token": "$17,970.67",
+      "token": "(2.46%",
+      "kind": "percent",
+      "value": 2.46,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 2.4604999999999997
+    },
+    {
+      "token": "-339,099.60",
+      "kind": "amount",
+      "value": 339099.6,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 339099.6
+    },
+    {
+      "token": "195,898.16",
+      "kind": "amount",
+      "value": 195898.16,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 195898.16
+    },
+    {
+      "token": "12,452.80",
+      "kind": "amount",
+      "value": 12452.8,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 12452.8
+    },
+    {
+      "token": "(5.98%",
+      "kind": "percent",
+      "value": 5.98,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 5.9768
+    },
+    {
+      "token": "-330,756.08",
+      "kind": "amount",
+      "value": 330756.08,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 330756.08
+    },
+    {
+      "token": "0.00",
+      "kind": "amount",
+      "value": 0.0,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 0.0
+    },
+    {
+      "token": "195,898.16",
+      "kind": "amount",
+      "value": 195898.16,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 195898.16
+    },
+    {
+      "token": "208,350.96",
+      "kind": "amount",
+      "value": 208350.96,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 208350.96
+    },
+    {
+      "token": "12,452.80",
+      "kind": "amount",
+      "value": 12452.8,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 12452.8
+    },
+    {
+      "token": "(5.98%",
+      "kind": "percent",
+      "value": 5.98,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 5.9768
+    },
+    {
+      "token": "(190,555.65)",
+      "kind": "amount",
+      "value": 190555.65,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 190555.65
+    },
+    {
+      "token": "5,342.51",
+      "kind": "amount",
+      "value": 5342.51,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 5342.51
+    },
+    {
+      "token": "(2.80%",
+      "kind": "percent",
+      "value": 2.8,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 2.7994000000000003
+    },
+    {
+      "token": "2,303,975.51",
+      "kind": "amount",
+      "value": 2303975.51,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 2303975.51
+    },
+    {
+      "token": "-11,142.74",
+      "kind": "amount",
+      "value": 11142.74,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 11142.74
+    },
+    {
+      "token": "177,924.24",
+      "kind": "amount",
+      "value": 177924.24,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 177924.24
+    },
+    {
+      "token": "166,781.50",
+      "kind": "amount",
+      "value": 166781.5,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 166781.5
+    },
+    {
+      "token": "137,425.72",
+      "kind": "amount",
+      "value": 137425.72,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 137425.72
+    },
+    {
+      "token": "139,681.43",
+      "kind": "amount",
+      "value": 139681.43,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 139681.43
+    },
+    {
+      "token": "2,255.71",
+      "kind": "amount",
+      "value": 2255.71,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 2255.71
+    },
+    {
+      "token": "(1.61%",
+      "kind": "percent",
+      "value": 1.61,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 1.6149
+    },
+    {
+      "token": "70.15%",
+      "kind": "percent",
+      "value": 70.15,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 70.1516
+    },
+    {
+      "token": "3.11 percentage points",
+      "kind": "pp",
+      "value": 3.11,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 3.110199
+    },
+    {
+      "token": "67.04%",
+      "kind": "percent",
+      "value": 67.04,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 67.0414
+    },
+    {
+      "token": "4.17 percentage points",
+      "kind": "pp",
+      "value": 4.17,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 4.170895
+    },
+    {
+      "token": "74.32%",
+      "kind": "percent",
+      "value": 74.32,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 74.3225
+    },
+    {
+      "token": "-168.84%",
+      "kind": "percent",
+      "value": 168.84,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 168.8408
+    },
+    {
+      "token": "6.09 percentage points",
+      "kind": "pp",
+      "value": 6.09,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 6.086793
+    },
+    {
+      "token": "-162.75%",
+      "kind": "percent",
+      "value": 162.75,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 162.754
+    },
+    {
+      "token": "18.11 percentage points",
+      "kind": "pp",
+      "value": 18.11,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 18.110446
+    },
+    {
+      "token": "-186.95%",
+      "kind": "percent",
+      "value": 186.95,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 186.9513
+    },
+    {
+      "token": "-3,089,779.59",
+      "kind": "amount",
+      "value": 3089779.59,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 3089779.59
+    },
+    {
+      "token": "-134.11%",
+      "kind": "percent",
+      "value": 134.11,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 134.1064
+    },
+    {
+      "token": "468,181.80",
+      "kind": "amount",
+      "value": 468181.8,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 468181.8
+    },
+    {
+      "token": "478,781.03",
+      "kind": "amount",
+      "value": 478781.03,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 478781.03
+    },
+    {
+      "token": "10,599.23",
+      "kind": "amount",
+      "value": 10599.23,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 10599.23
+    },
+    {
+      "token": "(2.21%",
+      "kind": "percent",
+      "value": 2.21,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 2.2138
+    },
+    {
+      "token": "+17,970.67",
       "kind": "amount",
       "value": 17970.67,
       "tol": 0.0050000010000000004,
@@ -115,12 +355,204 @@
       "fact": 17970.67
     },
     {
-      "token": "$14,741.53",
+      "token": "11,323.91",
+      "kind": "amount",
+      "value": 11323.91,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 11323.91
+    },
+    {
+      "token": "29,294.58",
+      "kind": "amount",
+      "value": 29294.58,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 29294.58
+    },
+    {
+      "token": "-14,741.53",
       "kind": "amount",
       "value": 14741.53,
       "tol": 0.0050000010000000004,
       "matched": true,
       "fact": 14741.53
+    },
+    {
+      "token": "12,935.29",
+      "kind": "amount",
+      "value": 12935.29,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 12935.29
+    },
+    {
+      "token": "-1,806.24",
+      "kind": "amount",
+      "value": 1806.24,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 1806.24
+    },
+    {
+      "token": "25,377.14",
+      "kind": "amount",
+      "value": 25377.14,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 25377.14
+    },
+    {
+      "token": "(7.11%",
+      "kind": "percent",
+      "value": 7.11,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 7.1129
+    },
+    {
+      "token": "331,397.16",
+      "kind": "amount",
+      "value": 331397.16,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 331397.16
+    },
+    {
+      "token": "6,249.74",
+      "kind": "amount",
+      "value": 6249.74,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 6249.74
+    },
+    {
+      "token": "(7.74%",
+      "kind": "percent",
+      "value": 7.74,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 7.736999999999999
+    },
+    {
+      "token": "74,527.55",
+      "kind": "amount",
+      "value": 74527.55,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 74527.55
+    },
+    {
+      "token": "15,832.89",
+      "kind": "amount",
+      "value": 15832.89,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 15832.89
+    },
+    {
+      "token": "(86.72%",
+      "kind": "percent",
+      "value": 86.72,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 86.7242
+    },
+    {
+      "token": "34,089.48",
+      "kind": "amount",
+      "value": 34089.48,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 34089.48
+    },
+    {
+      "token": "713,481.26",
+      "kind": "amount",
+      "value": 713481.26,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 713481.26
+    },
+    {
+      "token": "215,543.33",
+      "kind": "amount",
+      "value": 215543.33,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 215543.33
+    },
+    {
+      "token": "(23.20%",
+      "kind": "percent",
+      "value": 23.2,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 23.201
+    },
+    {
+      "token": "929,024.59",
+      "kind": "amount",
+      "value": 929024.59,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 929024.59
+    },
+    {
+      "token": "209,656.62",
+      "kind": "amount",
+      "value": 209656.62,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 209656.62
+    },
+    {
+      "token": "3.40",
+      "kind": "amount",
+      "value": 3.4,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 3.403094
+    },
+    {
+      "token": "3.31",
+      "kind": "amount",
+      "value": 3.31,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 3.310152
+    },
+    {
+      "token": "2.29",
+      "kind": "amount",
+      "value": 2.29,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 2.286999
+    },
+    {
+      "token": "17,970.67",
+      "kind": "amount",
+      "value": 17970.67,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 17970.67
+    },
+    {
+      "token": "-14,741.53",
+      "kind": "amount",
+      "value": 14741.53,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 14741.53
+    },
+    {
+      "token": "-11,142.74",
+      "kind": "amount",
+      "value": 11142.74,
+      "tol": 0.0050000010000000004,
+      "matched": true,
+      "fact": 11142.74
     }
   ],
   "top_movements": [
@@ -137,13 +569,13 @@
     {
       "account": "Usage Fees",
       "mom_change": -11142.74,
-      "mentioned": false
+      "mentioned": true
     }
   ],
   "cash_risk": {
-    "covered": false,
-    "cash_stated": false,
-    "runway_stated": false,
+    "covered": true,
+    "cash_stated": true,
+    "runway_stated": true,
     "cash": 713481.26,
     "runway_months": {
       "1m": 3.310152,
