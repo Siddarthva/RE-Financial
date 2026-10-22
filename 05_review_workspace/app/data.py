@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -281,3 +282,96 @@ def load_demo_run(run_dir: Path) -> dict:
         if got is None or (isinstance(got, Loaded) and not got.ok):
             res["missing"].append(f"{client}/{name}" if client else name)
     return res
+
+
+# ---- one runs list: demo runs ("Full (Claude)") and pipeline manifests ("Pipeline only"), plus stage timelines ----
+FULL, PIPE = "Full (Claude)", "Pipeline only"
+IST = timezone(timedelta(hours=5, minutes=30))
+CLAUDE_STAGES = ["Skill draft", "Grade (attempts)", "Review (first)", "Revise", "Review (final)", "Final grade", "Package"]
+
+
+def _utc(iso) -> datetime | None:
+    try:
+        t = datetime.fromisoformat(str(iso))
+    except ValueError:
+        return None
+    return t if t.tzinfo else t.replace(tzinfo=timezone.utc)
+
+
+def _ist(iso) -> str:
+    t = _utc(iso)
+    return t.astimezone(IST).strftime("%Y-%m-%d %H:%M:%S") if t else "n/a"
+
+
+def _grade_text(fg) -> str:
+    if not fg:
+        return "not recorded"
+    return f"{'PASS' if fg.get('passed') else 'FAIL'} {fg.get('numbers') or ''}".strip()
+
+
+def list_all_runs(client: str) -> list[dict]:
+    """Every run for the client, newest first. Reads run.json and manifests only; nothing is computed."""
+    rows = []
+    for d in list_demo_runs():
+        run = _read_json(d / "run.json")
+        r = run.data if run.ok else {}
+        who = r.get("client") or next((p.name for p in sorted(d.iterdir()) if p.is_dir()), None)
+        if who != client:
+            continue
+        started = (r.get("started") or {}).get("utc") or ""
+        status = r.get("pipeline_status") or "n/a"
+        if r.get("final_grade") is None:
+            status += " (Claude stages incomplete)"
+        rows.append({"key": f"demo:{d.name}", "kind": FULL, "run": f"Output {d.name.removeprefix('output_')}", "sort": started,
+                     "started": _ist(started) if started else "n/a", "period": r.get("month"),
+                     "final_grade": _grade_text(r.get("final_grade")),
+                     "verdict": r.get("reviewer_final_verdict") or "not recorded",
+                     "sha": (r.get("git_head") or "n/a")[:7], "status": status, "dir": d, "content": r})
+    man = load_manifests(client)
+    for item in (man.data if man.ok else []):
+        c = item["content"]
+        started = c.get("started_at") or ""
+        rows.append({"key": f"pipe:{c.get('run_id')}", "kind": PIPE, "run": c.get("run_id"), "sort": started,
+                     "started": _ist(started) if started else "n/a", "period": c.get("period"),
+                     "final_grade": "not run", "verdict": "not run", "sha": c.get("git_sha") or "n/a",
+                     "status": c.get("status"), "dir": None, "content": c})
+    key = lambda x: (_utc(x["sort"]) or datetime.min.replace(tzinfo=timezone.utc), x["run"] or "")  # noqa: E731
+    return sorted(rows, key=key, reverse=True)
+
+
+def run_timeline(row: dict) -> list[dict]:
+    """Stage rows {Stage, Status, Started (IST), duration_s} for one run. Claude stages of a pipeline-only run say 'not run'."""
+    c = row["content"]
+    out = []
+
+    def add(name, status, started=None, dur=None):
+        out.append({"Stage": name, "Status": status, "Started (IST)": _ist(started) if started else "n/a", "duration_s": dur})
+
+    if row["kind"] == PIPE:
+        by = {s.get("name"): s for s in c.get("stages", [])}
+        for name in ("Intake", "Calculate"):
+            s = by.pop(name, None)
+            add(name, s.get("status") if s else "not recorded", None, s.get("duration_s") if s else None)
+        for name in CLAUDE_STAGES:
+            add(name, "not run")
+        for name, s in by.items():
+            add(name, s.get("status"), None, s.get("duration_s"))
+        return out
+    t, stages = c.get("timings") or {}, c.get("stages") or {}
+    fallback = {"Intake": "Intake", "Calculate": "Calculate", "Skill draft": "Commentary draft",
+                "Review (final)": "Review", "Package": "Package"}
+    names = ["Intake", "Calculate", "Skill draft"]
+    attempts = sorted((n for n in t if n.startswith("Grade attempt")), key=lambda n: int(n.rsplit(" ", 1)[1]))
+    names += attempts or ["Grade (attempts)"]
+    names += ["Review (first)", "Revise", "Review (final)", "Final grade", "Package"]
+    for name in names:
+        e = t.get(name)
+        if e:
+            add(name, e.get("status") or "done", e.get("started"), e.get("duration_s"))
+        elif name == "Final grade" and c.get("final_grade"):
+            add(name, "PASS" if c["final_grade"].get("passed") else "FAIL")
+        elif name == "Grade (attempts)" and c.get("grade_attempts"):
+            add(name, f"{len(c['grade_attempts'])} attempt(s) recorded")
+        else:
+            add(name, stages.get(fallback.get(name, ""), "not recorded"))
+    return out

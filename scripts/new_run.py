@@ -1,6 +1,7 @@
 """Create the next numbered demo run folder and run the deterministic stages into it.
 
     python scripts/new_run.py abc 2026-06                   # creates demo_runs/output_NNN/ and runs intake + calculate there
+    python scripts/new_run.py mark demo_runs/output_001 "Skill draft" start   # also: end [--status X], skipped
     python scripts/new_run.py finish demo_runs/output_001   # records the outcome of the later stages in run.json
 
 `new_run` never writes to outputs/. The folder number is the next free one and is never reused or overwritten.
@@ -27,6 +28,7 @@ DEMO_RUNS = PROJECT / "demo_runs"
 IST = timezone(timedelta(hours=5, minutes=30))
 MONTH = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 FOLDER = re.compile(r"^output_(\d{3,})$")
+STAGE = re.compile(r"^(Skill draft|Review \((first|final)\)|Revise|Final grade|Package|Grade attempt [1-9]\d*)$")
 
 
 def stamps(t: datetime) -> dict:
@@ -93,17 +95,51 @@ def create(client: str, month: str, root: Path = DEMO_RUNS, clients_root: Path =
     if "Grade commentary" in stages and not (out / f"commentary_{month}.md").is_file():
         stages["Grade commentary"] = "skipped (no draft yet)"
     intake = read_json(out / f"intake_{month}.json") or {}
+    timings, t = {}, started
+    for st_ in (manifest or {}).get("stages", []):  # Intake and Calculate run back to back, so start = previous end
+        if st_.get("name") in ("Intake", "Calculate") and isinstance(st_.get("duration_s"), (int, float)):
+            end = t + timedelta(seconds=st_["duration_s"])
+            timings[st_["name"]] = {"started": stamps(t)["utc"], "ended": stamps(end)["utc"],
+                                    "duration_s": round(st_["duration_s"], 1), "status": st_.get("status")}
+            t = end
     write_run(folder, {
         "run_number": n, "run_id": folder.name, "client": client, "month": month,
         "started": stamps(started), "finished": stamps(datetime.now(timezone.utc)),
         "git_branch": _git("rev-parse", "--abbrev-ref", "HEAD"), "git_head": _git("rev-parse", "HEAD"),
         "workbook_sha256_16": (intake.get("sha256") or "")[:16] or None,
         "pipeline_status": (manifest or {}).get("status", "failed" if r.returncode else "unknown"),
-        "stages": stages,
+        "stages": stages, "timings": timings,
         "grade_attempts": None, "retry_used": None, "reviewer_first_verdict": None, "reviewer_final_verdict": None,
         "final_grade": None, "pack_path": None, "open_question_count": None,
     })
     return n, folder
+
+
+def mark(folder: Path, stage: str, event: str, status: str | None = None) -> dict:
+    """Record the start, end and duration of one stage in run.json. event: start, end or skipped."""
+    if not STAGE.match(stage):
+        raise ValueError(f"unknown stage {stage!r}")
+    run = read_json(folder / "run.json")
+    if not run:
+        raise ValueError(f"{folder}/run.json is missing or unreadable")
+    now = datetime.now(timezone.utc)
+    e = run.setdefault("timings", {}).setdefault(stage, {})
+    if event == "start":
+        e.clear()
+        e.update({"started": stamps(now)["utc"], "ended": None, "duration_s": None, "status": "running"})
+    elif event == "end":
+        began = e.get("started")
+        if not began:
+            raise ValueError(f"{stage!r} has no start; run `mark ... start` first")
+        e.update({"ended": stamps(now)["utc"], "duration_s": round((now - datetime.fromisoformat(began)).total_seconds(), 1),
+                  "status": status or "done"})
+    elif event == "skipped":
+        e.clear()
+        e.update({"started": None, "ended": None, "duration_s": 0.0, "status": status or "skipped"})
+    else:
+        raise ValueError(f"unknown event {event!r}; use start, end or skipped")
+    write_run(folder, run)
+    return e
 
 
 def finish(folder: Path) -> dict:
@@ -130,6 +166,20 @@ def finish(folder: Path) -> dict:
     stages["Commentary draft"] = "done" if (out / f"commentary_{month}.md").is_file() else "not run"
     stages["Review"] = "done" if final else "not run"
     stages["Package"] = "done" if pack.is_file() and (out / f"owner_memo_{month}.md").is_file() else "not run"
+    # Stage outcomes in the timeline come from the same files; a revision that was never needed is recorded as skipped.
+    tm = run.setdefault("timings", {})
+    for i, a in enumerate(rec.get("attempts", []), 1):
+        if f"Grade attempt {i}" in tm:
+            tm[f"Grade attempt {i}"]["status"] = "PASS" if a.get("passed") else "FAIL"
+    if "Final grade" in tm and fg:
+        tm["Final grade"]["status"] = "PASS" if fg["passed"] else "FAIL"
+    for key, v in (("Review (first)", first.get("verdict")), ("Review (final)", final.get("verdict"))):
+        if key in tm and v:
+            tm[key]["status"] = v
+    if "Revise" not in tm and first.get("verdict") == "approve":
+        tm["Revise"] = {"started": None, "ended": None, "duration_s": 0.0, "status": "skipped (first review approved)"}
+    if "Review (final)" not in tm and first.get("verdict") == "approve":
+        tm["Review (final)"] = {"started": None, "ended": None, "duration_s": 0.0, "status": "skipped (first review is final)"}
     run["finished"] = stamps(datetime.now(timezone.utc))
     write_run(folder, run)
     return run
@@ -137,11 +187,21 @@ def finish(folder: Path) -> dict:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("args", nargs="+", help="<client> <YYYY-MM>   or   finish <run folder>")
+    ap.add_argument("args", nargs="+", help="<client> <YYYY-MM>   or   finish <run folder>   or   mark <run folder> <stage> start|end|skipped")
+    ap.add_argument("--status", help="with mark ... end: the status to record (default done)")
     ap.add_argument("--root", type=Path, default=DEMO_RUNS, help="where run folders live (tests use a temp folder)")
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
+    if a.args[0] == "mark":
+        if len(a.args) != 4:
+            ap.error("mark takes: <run folder> <stage> start|end|skipped")
+        try:
+            print(json.dumps(mark(Path(a.args[1]), a.args[2], a.args[3], a.status)))
+        except ValueError as exc:
+            print(f"ERROR: {exc}")
+            return 2
+        return 0
     if a.args[0] == "finish":
         if len(a.args) != 2:
             ap.error("finish takes one argument: the run folder")

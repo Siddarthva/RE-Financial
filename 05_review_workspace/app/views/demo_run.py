@@ -231,11 +231,11 @@ def _download(run):
         st.caption(f"Not available: {run['files']['pack']}")
 
 
-def render_run(run_dir):
+def render_body(run_dir):
+    """Every section for one run folder (banner, summary, commentary review, grades, raw JSON, pack). Used by the run page and the Runs page."""
     run = data.load_demo_run(run_dir)
     r = run["run"].data if run["run"].ok else {}
     passed, numbers, mismatches = _grade_state(run)
-    ui.title(label(run_dir), "Demo run · read from the run folder only; nothing on this page is calculated")
     if passed is False:
         st.error(FAIL_BANNER)
     if run["missing"]:
@@ -249,3 +249,8 @@ def render_run(run_dir):
     _memo(run)
     _raw(run)
     _download(run)
+
+
+def render_run(run_dir):
+    ui.title(label(run_dir), "Demo run · read from the run folder only; nothing on this page is calculated")
+    render_body(run_dir)
